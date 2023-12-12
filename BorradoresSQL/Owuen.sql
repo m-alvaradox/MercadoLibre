@@ -105,72 +105,20 @@ insert into TELEFONO values(1008,0989125982);
 insert into TELEFONO values(1009,0985181891);
 insert into TELEFONO values(1010,0985181895);
 
-INSERT INTO CATEGORIA_PRODUCTO VALUES
-  ('ELECTRONICA', 'CELULARES'),
-  ('HOGAR', 'MUEBLES'),
-  ('ROPA', 'VESTIDOS'),
-  ('DEPORTES', 'ZAPATILLAS'),
-  ('LIBROS', 'NOVELAS'),
-  ('TECNOLOGIA', 'LAPTOPS'),
-  ('BELLEZA', 'MAQUILLAJE'),
-  ('MUSICA', 'CDs'),
-  ('AUTOS', 'ACCESORIOS'),
-  ('JUGUETES', 'LEGOS');
 
 insert into PRODUCTO values
-    (50001,'Smartphone','Samsung',2000,'ELECTRONICA'),
-    (50002,'Laptop','Asus',1000,'TECNOLOGIA'),
-    (50003,'Laptop','Acer',500,'TECNOLOGIA'),
-    (50004,'Air force 1','Nike',120,'DEPORTES'),
-    (50005,'Forum Low','Adidas',150,'DEPORTES'),
-    (50006,'Lego Star Wars Millennium Falcon','Lego',200,'JUGUETES'),
-    (50007,'Mesa','Pycca',40,'HOGAR'),
-    (50008,'Iphone 15 Pro Max','Apple',1000,'ELECTRONICA'),
-    (50009,'Kit de faros LED para auto','Philips',  200,'AUTOS'),
-    (50010,'Cámara de reversa con pantalla','Anker',300,'AUTOS'),
-    (50011,'Sistema de audio para auto','JBL',1000,'AUTOS'),
-    (50012,'Lego Creator 3 en 1','Lego',50,'JUGUETES');
-
-INSERT INTO IMAGEN_PRODUCTO values
-    (50001,'imagen01.jpg'),
-    (50002,'imagen02.jpg'),
-    (50003,'imagen03.jpg'),
-    (50004,'imagen04.jpg'),
-    (50005,'imagen05.jpg'),
-    (50006,'imagen06.jpg'),
-    (50007,'imagen07.jpg'),
-    (50008,'imagen08.jpg'),
-    (50009,'imagen09.jpg'),
-    (50010,'imagen10.jpg'),
-    (50011,'imagen11.jpg'),
-    (50012,'imagen12.jpg');
-
-INSERT INTO INVENTARIO values
-    (111001,10),
-    (111002,13),
-    (111003,5),
-    (111004,20),
-    (111005,40),
-    (111006,12),
-    (111007,4),
-    (111008,10),
-    (111009,100),
-    (111010,32),
-    (111011,8),
-    (111012,3),
-    (111013,30);
-
-INSERT INTO ALMACENAMIENTO values
-    (111001,50001),
-    (111002,50002),
-    (111003,50003),
-    (111004,50004),
-    (111005,50005),
-    (111006,50006),
-    (111007,50007),
-    (111008,50008),
-    (111009,50009),
-    (111010,50010);
+    (50001,'Smartphone','Samsung''ELECTRONICA','Celulares'),
+    (50002,'Laptop','Asus','TECNOLOGIA','Laptops'),
+    (50003,'Laptop','Acer','TECNOLOGIA','Laptops'),
+    (50004,'Air force 1','Nike','DEPORTES','Zapatillas'),
+    (50005,'Forum Low','Adidas','DEPORTES','Zapatillas'),
+    (50006,'Lego Star Wars Millennium Falcon','Lego','JUGUETES','LEGOS'),
+    (50007,'Mesa','Pycca','HOGAR','MUEBLES'),
+    (50008,'Iphone 15 Pro Max','Apple','ELECTRONICA','CELULARES'),
+    (50009,'Kit de faros LED para auto','Philips','AUTOS','ACCESORIOS'),
+    (50010,'Cámara de reversa con pantalla','Anker','AUTOS','ACCESORIOS'),
+    (50011,'Sistema de audio para auto','JBL','AUTOS','ACCESORIOS'),
+    (50012,'Lego Creator 3 en 1','Lego','JUGUETES','LEGOS');
 
 INSERT INTO PUBLICACION(DESCRIPCION,TIPO_EXPOSICION,PRODUCT_ID,ID_VENDEDOR) values
     ('El Galaxy S23: lo último en tecnología móvil. Pantalla AMOLED de 6,1 pulgadas, procesador Snapdragon 8 Gen 2, cámara de 50MP.',
@@ -194,15 +142,17 @@ INSERT INTO PUBLICACION(DESCRIPCION,TIPO_EXPOSICION,PRODUCT_ID,ID_VENDEDOR) valu
     ('La cámara de reversa Anker: más seguridad al estacionar. Imágenes nítidas y claras, pantalla de 5 pulgadas.',
     'Gratuita',50010,1016);
 
-insert into VISUALIZACION_PUBLICACIONES values
-    (),
-    (),
-    (),
-    (),
-    (),
-    (),
-    (),
-    (),
-    (),
-    ();
+INSERT INTO IMAGEN_PUBLICACION values
+    (1,'imagen01.jpg'),
+    (2,'imagen02.jpg'),
+    (3,'imagen03.jpg'),
+    (4,'imagen04.jpg'),
+    (5,'imagen05.jpg'),
+    (6,'imagen06.jpg'),
+    (7,'imagen07.jpg'),
+    (8,'imagen08.jpg'),
+    (9,'imagen09.jpg'),
+    (10,'imagen10.jpg'),
+
+
 
