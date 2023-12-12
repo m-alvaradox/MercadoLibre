@@ -11,6 +11,7 @@
 
 def bienvenida() :
     print("----- MERCADO LIBRE -----")
+    print("Compra más facil y seguro")
 
 bienvenida()
 
