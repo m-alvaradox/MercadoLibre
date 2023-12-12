@@ -1,4 +1,4 @@
-use database mercado_libre;
+use mercado_libre;
 
 insert into USUARIO values(1001,'12345','Owen','Yagual',04-10-2002,true,true);
 insert into USUARIO values(1002,'54321','Mario','Alvarado',14-11-2003,true,true);
@@ -94,15 +94,26 @@ insert into DIRECCION values(2008,'Portoviejo',1008,'Portoviejo','Avenida 3 de M
 insert into DIRECCION values(2009,'Salinas',1009,'San Lorenzo','Avenida 9 de Octubre','Calle 10 de Agosto',100,'Yatch Club');
 insert into DIRECCION values(2010,'Libertad',1010,'San Sebastian','Avenida Colombia','Calle Estados Unidos',100,'Refineria');
 
-insert into TELEFONO values();
-insert into TELEFONO values();
-insert into TELEFONO values();
-insert into TELEFONO values();
-insert into TELEFONO values();
-insert into TELEFONO values();
-insert into TELEFONO values();
-insert into TELEFONO values();
-insert into TELEFONO values();
-insert into TELEFONO values();
+insert into TELEFONO values(1001,0987654321);
+insert into TELEFONO values(1002,0912345678);
+insert into TELEFONO values(1003,0913246587);
+insert into TELEFONO values(1004,0915364875);
+insert into TELEFONO values(1005,0958455652);
+insert into TELEFONO values(1006,0985128912);
+insert into TELEFONO values(1007,0921289128);
+insert into TELEFONO values(1008,0989125982);
+insert into TELEFONO values(1009,0985181891);
+insert into TELEFONO values(1010,0985181895);
 
+INSERT INTO CATEGORIA_PRODUCTO VALUES
+  ('ELECTRONICA', 'CELULARES'),
+  ('HOGAR', 'MUEBLES'),
+  ('ROPA', 'VESTIDOS'),
+  ('DEPORTES', 'ZAPATILLAS'),
+  ('LIBROS', 'NOVELAS'),
+  ('TECNOLOGIA', 'LAPTOPS'),
+  ('BELLEZA', 'MAQUILLAJE'),
+  ('MUSICA', 'CDs'),
+  ('AUTOS', 'ACCESORIOS'),
+  ('JUGUETES', 'MUÑECAS');
 
