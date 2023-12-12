@@ -115,5 +115,94 @@ INSERT INTO CATEGORIA_PRODUCTO VALUES
   ('BELLEZA', 'MAQUILLAJE'),
   ('MUSICA', 'CDs'),
   ('AUTOS', 'ACCESORIOS'),
-  ('JUGUETES', 'MUÑECAS');
+  ('JUGUETES', 'LEGOS');
+
+insert into PRODUCTO values
+    (50001,'Smartphone','Samsung',2000,'ELECTRONICA'),
+    (50002,'Laptop','Asus',1000,'TECNOLOGIA'),
+    (50003,'Laptop','Acer',500,'TECNOLOGIA'),
+    (50004,'Air force 1','Nike',120,'DEPORTES'),
+    (50005,'Forum Low','Adidas',150,'DEPORTES'),
+    (50006,'Lego Star Wars Millennium Falcon','Lego',200,'JUGUETES'),
+    (50007,'Mesa','Pycca',40,'HOGAR'),
+    (50008,'Iphone 15 Pro Max','Apple',1000,'ELECTRONICA'),
+    (50009,'Kit de faros LED para auto','Philips',  200,'AUTOS'),
+    (50010,'Cámara de reversa con pantalla','Anker',300,'AUTOS'),
+    (50011,'Sistema de audio para auto','JBL',1000,'AUTOS'),
+    (50012,'Lego Creator 3 en 1','Lego',50,'JUGUETES');
+
+INSERT INTO IMAGEN_PRODUCTO values
+    (50001,'imagen01.jpg'),
+    (50002,'imagen02.jpg'),
+    (50003,'imagen03.jpg'),
+    (50004,'imagen04.jpg'),
+    (50005,'imagen05.jpg'),
+    (50006,'imagen06.jpg'),
+    (50007,'imagen07.jpg'),
+    (50008,'imagen08.jpg'),
+    (50009,'imagen09.jpg'),
+    (50010,'imagen10.jpg'),
+    (50011,'imagen11.jpg'),
+    (50012,'imagen12.jpg');
+
+INSERT INTO INVENTARIO values
+    (111001,10),
+    (111002,13),
+    (111003,5),
+    (111004,20),
+    (111005,40),
+    (111006,12),
+    (111007,4),
+    (111008,10),
+    (111009,100),
+    (111010,32),
+    (111011,8),
+    (111012,3),
+    (111013,30);
+
+INSERT INTO ALMACENAMIENTO values
+    (111001,50001),
+    (111002,50002),
+    (111003,50003),
+    (111004,50004),
+    (111005,50005),
+    (111006,50006),
+    (111007,50007),
+    (111008,50008),
+    (111009,50009),
+    (111010,50010);
+
+INSERT INTO PUBLICACION(DESCRIPCION,TIPO_EXPOSICION,PRODUCT_ID,ID_VENDEDOR) values
+    ('El Galaxy S23: lo último en tecnología móvil. Pantalla AMOLED de 6,1 pulgadas, procesador Snapdragon 8 Gen 2, cámara de 50MP.',
+    'Gratuita', 50001,1001),
+    ('La VivoBook 15: rendimiento y portabilidad. Procesador Intel Core i5 de 11.ª generación, pantalla de 15,6 pulgadas.',
+    'Gratuita',50002,1002),
+    ('La Nitro 5: rendimiento potente y diseño elegante. Procesador Intel Core i7 de 12.ª generación, tarjeta gráfica NVIDIA RTX 3060',
+    'Gratuita',50003,1003),
+    ('Las Air Force 1: un clásico de la moda urbana. Diseño sencillo, comodidad inigualable.',
+    'Gratuita',50004,1004),
+    ('Las Forum Low: versátiles y combinables. Diseño retro, estilo minimalista.',
+    'Gratuita',50005,1011),
+    ('El Millennium Falcon: el set de Lego más grande de la historia. 7541 piezas, nave espacial a escala 1:144.',
+    'Gratuita',50006,1012),
+    ('La mesa Pycca: sencilla y elegante. Diseño moderno, construcción resistente.',
+    'Gratuita',50007,1013),
+    ('El iPhone 15 Pro Max: lo último en tecnología Apple. Pantalla OLED de 6,7 pulgadas, procesador A16 Bionic, cámara triple de 48MP.',
+    'Gratuita',50008,1014),
+    ('Los faros LED Philips: más visibilidad y seguridad. Iluminación potente y uniforme, diseño elegante.',
+    'Gratuita',50009,1015),
+    ('La cámara de reversa Anker: más seguridad al estacionar. Imágenes nítidas y claras, pantalla de 5 pulgadas.',
+    'Gratuita',50010,1016);
+
+insert into VISUALIZACION_PUBLICACIONES values
+    (),
+    (),
+    (),
+    (),
+    (),
+    (),
+    (),
+    (),
+    (),
+    ();
 
