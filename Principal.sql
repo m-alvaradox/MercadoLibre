@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS PRODUCTO (
 
 CREATE TABLE IF NOT EXISTS PUBLICACION (
   NOPUBLICACION  int   AUTO_INCREMENT,
-  DESCRIPCION VARCHAR(100),
+  DESCRIPCION VARCHAR(500),
   TIPOEXPOSICION ENUM('Gratuita','Clásica','Premium') NOT NULL,
   PRODUCTID INT,
   IDVENDEDOR VARCHAR(50),
@@ -252,24 +252,22 @@ insert into PRODUCTO values
     
     INSERT INTO PUBLICACION(DESCRIPCION,TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,FECHAPUBLICACION,NOMBREPUBLICACION) values
     ('El Galaxy S23: lo último en tecnología móvil. Pantalla AMOLED de 6,1 pulgadas, procesador Snapdragon 8 Gen 2, cámara de 50MP.',
-    'Gratuita', 50001,1001,612.50,'Activa','2023-12-12','SAMSUNG GALAXY A70 SELLADO'),
+    'Gratuita', 50001,'ownyag',612.50,'Activa','2023-12-12','SAMSUNG GALAXY A70 SELLADO'),
     ('INSPIRON 3910: rendimiento y portabilidad. Procesador Intel Core i5 de 11.ª generación, pantalla de 15,6 pulgadas.',
-    'Gratuita',50002,1002,800,'Activa','2022-10-23','DELL INSPIRON 3910 NUEVO'),
+    'Gratuita',50002,'malvaradox',800,'Activa','2022-10-23','DELL INSPIRON 3910 NUEVO'),
     ('La Nitro 5: rendimiento potente y diseño elegante. Procesador Intel Core i7 de 12.ª generación, tarjeta gráfica NVIDIA RTX 3060',
-    'Gratuita',50003,1003,250,'Agotada','2019-11-11','XXXKIU DE OPORTUNIDAD'),
+    'Gratuita',50003,'xavicam',250,'Agotado','2019-11-11','XXXKIU DE OPORTUNIDAD'),
     ('Las Air Force 1: un clásico de la moda urbana. Diseño sencillo, comodidad inigualable.',
-    'Gratuita',50004,1004),
-    ('Las Forum Low: versátiles y combinables. Diseño retro, estilo minimalista.',
-    'Gratuita',50005,1011),
+    'Gratuita',50004,'javirod',62.50,'Activa','2023-12-01','NKE AIR FORCE ONE'),
+    ('Las Forum Low: versátiles y combinables. Diseño retro, estilo minimalista.', 'Gratuita',50005,'angon',210,
+    'Activa','2022-11-11','ADIDAS FORUM LOW'),
     ('El Millennium Falcon: el set de Lego más grande de la historia. 7541 piezas, nave espacial a escala 1:144.',
-    'Gratuita',50006,1012),
+    'Gratuita',50006,'ferchon',34.50,'Activa','2023-11-14','MILLENNIUM FALCOM APROVECHA'),
     ('La mesa Pycca: sencilla y elegante. Diseño moderno, construcción resistente.',
-    'Gratuita',50007,1013),
+    'Gratuita',50007,'jorgquij',15.60,'Activa','2023-10-10','MESA PYCCA PARA LA FAMILIA'),
     ('El iPhone 15 Pro Max: lo último en tecnología Apple. Pantalla OLED de 6,7 pulgadas, procesador A16 Bionic, cámara triple de 48MP.',
-    'Gratuita',50008,1014),
+    'Gratuita',50008,'arperez',1299.99,'Activa','2023-11-26','IPHONE 15 PRO MAX TRAIDA DESDE USA'),
     ('Los faros LED Philips: más visibilidad y seguridad. Iluminación potente y uniforme, diseño elegante.',
-    'Gratuita',50009,1015),
+    'Gratuita',50009,'fiotorres',11.23,'Agotado','2022-11-13','FAROS LED PHILLIPS'),
     ('La cámara de reversa Anker: más seguridad al estacionar. Imágenes nítidas y claras, pantalla de 5 pulgadas.',
-    'Gratuita',50010,1016);
-    
-    
+    'Gratuita',50010,'daniroca',300,'Activa','2023-09-09','CAMARA REVERSA');
