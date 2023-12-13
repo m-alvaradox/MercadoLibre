@@ -61,10 +61,10 @@ CREATE TABLE IF NOT EXISTS TELEFONO (
 
 CREATE TABLE IF NOT EXISTS PRODUCTO (
   PRODUCTID INT PRIMARY KEY,
-  NOMBRE VARCHAR(10) NOT NULL,
+  NOMBRE VARCHAR(50) NOT NULL,
   MARCA VARCHAR(10),
-  CATEGORIA VARCHAR(10),
-  SUBCATEGORIA VARCHAR(10)
+  CATEGORIA VARCHAR(20),
+  SUBCATEGORIA VARCHAR(20)
 );
 
 CREATE TABLE IF NOT EXISTS PUBLICACION (
@@ -73,6 +73,10 @@ CREATE TABLE IF NOT EXISTS PUBLICACION (
   TIPOEXPOSICION ENUM('Gratuita','Clásica','Premium') NOT NULL,
   PRODUCTID INT,
   IDVENDEDOR VARCHAR(50),
+  PRECIOVENTA FLOAT,
+  ESTADO ENUM('Activa','Agotado','No Activa'),
+  FECHAPUBLICACION DATE,
+  NOMBREPUBLICACION VARCHAR(50),
   PRIMARY KEY(NOPUBLICACION),
   FOREIGN KEY (PRODUCTID) REFERENCES PRODUCTO (PRODUCTID),
   FOREIGN KEY (IDVENDEDOR) REFERENCES VENDEDOR (USERID)
@@ -227,3 +231,45 @@ insert into DIRECCION values
 (2008,'Portoviejo','charlesrod','Portoviejo','Avenida 3 de Mayo Calle 28 de Agosto 100 Parque de la Ciudad'),
 (2009,'Salinas','joelvill','San Lorenzo','Avenida 9 de Octubre Calle 10 de Agosto 100 Yatch Club'),
 (2010,'Libertad','angivel','San Sebastian','Avenida Colombia Calle Estados Unidos 100 Refineria');
+
+insert into TELEFONO values
+('ownyag',0987654321),('malvaradox',0912345678),('xavicam',0913246587),('javirod',0915364875),('naybor',0958455652),
+('luchoont',0985128912),('nickfigu',0921289128),('charlesrod',0989125982),('joelvill',0985181891),('angivel',0985181895);
+
+insert into PRODUCTO values
+    (50001,'GALAXY A70','SAMSUNG','TECNOLOGIA','SMARTPHONES'),
+    (50002,'INSPIRON 3910','DELL','TECNOLOGIA','LAPTOPS'),
+    (50003,'XXKIU','ACER','TECNOLOGIA','LAPTOPS'),
+    (50004,'AIR FORCE 1','NIKE','DEPORTES','ZAPATILLAS'),
+    (50005,'FORUM LOW','ADIDAS','DEPORTES','ZAPATILLAS'),
+    (50006,'LEGO STAR WARS MILLENNIUM FALCON','LEGO','JUGUETES','ROMPECABEZAS'),
+    (50007,'MESA','PYCCA','HOGAR','MUEBLES'),
+    (50008,'IPHONE 15 PRO MAX','APPLE','TECNOLOGIA','SMARTPHONES'),
+    (50009,'KIT DE FAROS LED PARA AUTO','PHILIPS','AUTOS','ACCESORIOS'),
+    (50010,'CAMARA DE REVERSA CON PANTALLA','ANKER','AUTOS','ACCESORIOS'),
+    (50011,'SISTEMA DE AUDIO PARA AUTO','JBL','AUTOS','ACCESORIOS'),
+    (50012,'LEGO CREATOR 3 EN 1','LEGO','JUGUETES','ROMPECABEZAS');
+    
+    INSERT INTO PUBLICACION(DESCRIPCION,TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,FECHAPUBLICACION,NOMBREPUBLICACION) values
+    ('El Galaxy S23: lo último en tecnología móvil. Pantalla AMOLED de 6,1 pulgadas, procesador Snapdragon 8 Gen 2, cámara de 50MP.',
+    'Gratuita', 50001,1001,612.50,'Activa','2023-12-12','SAMSUNG GALAXY A70 SELLADO'),
+    ('INSPIRON 3910: rendimiento y portabilidad. Procesador Intel Core i5 de 11.ª generación, pantalla de 15,6 pulgadas.',
+    'Gratuita',50002,1002,800,'Activa','2022-10-23','DELL INSPIRON 3910 NUEVO'),
+    ('La Nitro 5: rendimiento potente y diseño elegante. Procesador Intel Core i7 de 12.ª generación, tarjeta gráfica NVIDIA RTX 3060',
+    'Gratuita',50003,1003,250,'Agotada','2019-11-11','XXXKIU DE OPORTUNIDAD'),
+    ('Las Air Force 1: un clásico de la moda urbana. Diseño sencillo, comodidad inigualable.',
+    'Gratuita',50004,1004),
+    ('Las Forum Low: versátiles y combinables. Diseño retro, estilo minimalista.',
+    'Gratuita',50005,1011),
+    ('El Millennium Falcon: el set de Lego más grande de la historia. 7541 piezas, nave espacial a escala 1:144.',
+    'Gratuita',50006,1012),
+    ('La mesa Pycca: sencilla y elegante. Diseño moderno, construcción resistente.',
+    'Gratuita',50007,1013),
+    ('El iPhone 15 Pro Max: lo último en tecnología Apple. Pantalla OLED de 6,7 pulgadas, procesador A16 Bionic, cámara triple de 48MP.',
+    'Gratuita',50008,1014),
+    ('Los faros LED Philips: más visibilidad y seguridad. Iluminación potente y uniforme, diseño elegante.',
+    'Gratuita',50009,1015),
+    ('La cámara de reversa Anker: más seguridad al estacionar. Imágenes nítidas y claras, pantalla de 5 pulgadas.',
+    'Gratuita',50010,1016);
+    
+    
