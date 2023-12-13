@@ -1,5 +1,7 @@
 def imprimirMenuPrincipal():
-  print('Bienvenido a Mercado Libre' + '\n' + 'Seleccione una opcion del menu principal:')
+  print("\n----- MERCADO LIBRE -----")
+  print("Compra más facil y seguro")
+  print('\nSeleccione una opcion del menu principal:')
   print('1. Explorar Productos')
   print('2. Ver Carrito de Compras')
   print('3. Realizar Pedido')
