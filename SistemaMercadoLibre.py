@@ -58,6 +58,7 @@ mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 
 cur = mercadolibreconnection.cursor()
 
 #Menu Principal Mercado Libre
+
 op = imprimirMenuPrincipal()
 
 # Mostrar todas las publicaciones
@@ -75,7 +76,6 @@ elif op == 3:
 elif op == 4:
   mostrarAccesoriosAutos(cur)
 
-op = imprimirMenuPrincipal()
 
   
   
