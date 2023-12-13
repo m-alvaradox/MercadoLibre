@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS PAIS (
 CREATE TABLE IF NOT EXISTS PROVINCIA (
   PROVID INT PRIMARY KEY,
   COUNTRYID INT,
-  NOMBREPROVINCIA VARCHAR(10) NOT NULL,
+  NOMBREPROVINCIA VARCHAR(20) NOT NULL,
   FOREIGN KEY (COUNTRYID) REFERENCES PAIS (COUNTRYID)
 );
 
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS DIRECCION (
   CIUDAD VARCHAR(50),
   USERID VARCHAR(50),
   PARROQUIA VARCHAR(50),
-  REFERENCIAS VARCHAR(50),
+  REFERENCIAS VARCHAR(200),
   FOREIGN KEY (USERID) REFERENCES USUARIO (USERID),
   FOREIGN KEY (CIUDAD) REFERENCES CIUDAD (NOMBRECIUDAD)
 );
@@ -195,3 +195,35 @@ insert into USUARIO values('jorgquij','aasdaaaa','Jorge','Quijije','2002-09-01',
 insert into USUARIO values('arperez','11ads','Ariana','Perez','2002-12-01',false,true);
 insert into USUARIO values('fiotorres','1x23zx45','Fiorella','Torres','1980-05-07',false,true);
 insert into USUARIO values('daniroca','5s43bcds21','Daniela','Roca','1980-10-05',false,true);
+
+insert into CLIENTE values
+('ownyag'),('malvaradox'),('xavicam'),('javirod'),('naybor'),('luchoont'),('nickfigu'),('charlesrod'),('joelvill'),('angivel');
+
+insert into VENDEDOR values
+('ownyag',5),('malvaradox',5),('xavicam',4),('javirod',4.5),('angon',4.6),('ferchon',3),('jorgquij',2),('arperez',5),('fiotorres',1),('daniroca',2.7);
+
+insert into PAIS values
+(901,'Ecuador'),(902,'Venezuela'),(903,'Colombia'),(904,'Brasil'),(905,'Uruguay'),
+(906,'Chile'),(907,'Argentina'),(908,'Bolivia'),(909,'Paraguay'),(910,'México');
+
+insert into PROVINCIA values
+(801,901,'Guayas'),(802,902,'Zulia'),(803,903,'Bogotá'),(804,904,'Sao Paulo'),(805,905,'Montevideo'),(806,906,'Santiago'),
+(807,907,'Buenos Aires'),(808,908,'La Paz'),(809,909,'Central'),(810,910,'Ciudad de México'),(811,901,'Pichincha'),
+(812,901,'Manabí'),(813,901,'Santa Elena'),(814,901,'Esmeraldas');
+
+insert into CIUDAD values
+('Guayaquil',801,'GYE'),('Maracaibo',802,'MAR'),('Bogotá',803,'BOG'),('Sao Paulo',804,'SP'),
+('Montevideo',805,'MVO'),('Santiago',806,'SGO'),('Buenos Aires',807,'CABA'),('La Paz',808,'LPZ'),('Asunción',809,'ASUN'),
+('Ciudad de México',810,'CDMX'),('Quito',811,'PQT'),('Manta',812,'MNT'),('Portoviejo',812,'PTV'),('Salinas',813,'SLN'),('Libertad',813,'LBT');
+
+insert into DIRECCION values 
+(2001,'Guayaquil','ownyag','Rocafuerte','Avenida Rocafuerte Calle Escobedo 100 Parque de la Libertad'),
+(2002,'Guayaquil','malvaradox','Carbo','Calle 9 de Octubre Calle 10 de Agosto 100 Malecón Simón Bolívar'),
+(2003,'Guayaquil','xavicam','Urdesa','Avenida Las Américas Calle Francisco de Orellana 100 Parque Samanes'),
+(2004,'Quito','javirod','Centro Historico','Calle García Moreno Calle Sucre 100 Palacio de Carondelet'),
+(2005,'Quito','naybor','La Mariscal','Avenida 18 de Semptiembre Calle Reina Victoria 100 Plaza Foch'),
+(2006,'Quito','luchoont','El Ejido','Avenida de los Shyris Calle Colón 100 Parque El Ejido'),
+(2007,'Manta','nickfigu','Tarqui','Avenida 25 de Julio Calle 10 de Agosto 100 Parque de la madre'),
+(2008,'Portoviejo','charlesrod','Portoviejo','Avenida 3 de Mayo Calle 28 de Agosto 100 Parque de la Ciudad'),
+(2009,'Salinas','joelvill','San Lorenzo','Avenida 9 de Octubre Calle 10 de Agosto 100 Yatch Club'),
+(2010,'Libertad','angivel','San Sebastian','Avenida Colombia Calle Estados Unidos 100 Refineria');
