@@ -54,11 +54,10 @@ def mostrarAccesoriosAutos(cursor):
           '\n-----------------------------------\n')
 
 
-mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 'password123', db='mercadolibre')
+mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 'root', db='mercadolibre')
 cur = mercadolibreconnection.cursor()
 
 #Menu Principal Mercado Libre
-
 op = imprimirMenuPrincipal()
 
 # Mostrar todas las publicaciones

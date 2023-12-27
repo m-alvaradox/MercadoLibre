@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS PAGO (
 
 CREATE TABLE IF NOT EXISTS PREGUNTA (
   IDPREGUNTA int  AUTO_INCREMENT,
-  CONTENIDO VARCHAR(30) NOT NULL,
+  CONTENIDO VARCHAR(50) NOT NULL,
   TIEMPOENVIADO DATETIME NOT NULL,
   FECHAHORARESPUESTA DATETIME,
   MENSAJERESPUESTA VARCHAR(100),
@@ -285,30 +285,40 @@ insert into PRODUCTO values
     
     INSERT INTO DETALLECONTACTO (IDCLIENTE, IDVENDEDOR, IDPUBLICACION, MENSAJE, FECHAHORA) VALUES
   ('malvaradox','ownyag', 1,'Amigo, algun descuento?', '2023-12-07 14:30:00'),
-  ('malvaradox', 'ownyag', 1,'No, amigo es fijo', '2023-12-07 14:35:00');
-  
-  INSERT INTO PAGO(TRANSID,IDCLIENTE,MONTO,METODO,CARDNUMBER,CUOTA) VALUES
-(3001,'ownyag',200.50,'Depósito','4XXX 2XXX 0X4X 8X56',1),
+  ('malvaradox', 'ownyag', 1,'No, amigo es fijo', '2023-12-07 14:35:00'),
+  ('naybor','xavicam',3,'Hola, estoy interesado en el producto','2023-12-25 14:35:00'),
+  ('naybor','xavicam',3,'Claro, te doy mi whatsapp: 09982736546','2023-12-27 14:35:00'),
+  ('charlesrod','arperez',8,'No tiene el mismo iphone con mayor capacidad?','2023-12-24 23:00:00');
+
+INSERT INTO PAGO(TRANSID,IDCLIENTE,MONTO,METODO,CARDNUMBER,CUOTA) VALUES
+(3001,'ownyag',210,'Depósito','4XXX 2XXX 0X4X 8X56',1),
 (3002,'malvaradox',612.50,'Crédito/Débito','5XX7 1X92 X075 3X12',1),
-(3003,'xavicam',20.00,'Depósito','12X5 XXX0 7XX2 5XX0',1),
-(3004,'javirod',45.50,'Crédito/Débito','9XXX 1528 43X6 2XX8',1),
-(3005,'naybor',150.00,'Depósito','3156 X92X 7X08 74X5',1),
-(3006,'luchoont',124.50,'Depósito','82X5 XX41 6XX7 XXXX',1),
-(3007,'nickfigu',78.25,'Crédito/Débito','6XX9 8XXX 2XX9 34X2',1),
-(3008,'charlesrod',360.00,'Depósito','2XX6 7XX1 XX53 64X5',1),
-(3009,'joelvill',44.50,'Depósito','7XXX 3XXX 2XXX 1XXX',1),
-(3010,'angivel',24.99,'Depósito','156X XXX0 XXX7 2XX8',1);
+(3003,'xavicam',34.50,'Depósito','12X5 XXX0 7XX2 5XX0',1),
+(3004,'javirod',22.46,'Crédito/Débito','9XXX 1528 43X6 2XX8',1),
+(3005,'naybor',980,'Depósito','3156 X92X 7X08 74X5',1);
 
 INSERT INTO PREGUNTA (IDCLIENTE, IDVENDEDOR, NOPUBLICACION,  CONTENIDO, TIEMPOENVIADO, FECHAHORARESPUESTA, MENSAJERESPUESTA) VALUES
-  ('xavicam','arperez',8, '¿El producto incluye garantía?', '2023-12-07 21:30:00', '2023-12-07 21:40:00','Sí, todos nuestros productos tienen garantía de 1 año.');
+  ('xavicam','arperez',8, '¿El producto incluye garantía?', '2023-12-07 21:30:00', '2023-12-07 21:40:00','Sí, todos nuestros productos tienen garantía de 1 año.'),
+  ('luchoont','malvaradox',2,'¿Acepta transferencias por PagoMovil?','2023-12-23 07:15:00','2023-12-23 09:40:00','No amigo, solo tarjetas de credito'),
+  ('nickfigu','malvaradox',2,'Tiene para colocar SIM fisico?','2023-12-23 10:10:10','2023-12-23 17:00:00','No, solo soporta ESIM que puede conseguir en Movistar'),
+  ('joelvill','javirod',4,'Son originales?','2024-01-02 12:35:21','2024-01-03 13:15:33','Si, por que no?'),
+  ('angivel','jorgquij',7,'Estan ubicados en Manta?','2023-12-27 12:00:00',NULL,NULL);
   
 INSERT INTO CUPON VALUES
 (4001,'DESCNAV',32,'2023-12-31','malvaradox'),(4002,'DESCMAQ',35,'2023-12-31','xavicam'),
 (4003,'DESCDOG',20,'2023-12-25','naybor'),(4004,'DESCCAT',30,'2023-12-31','nickfigu'),
-(4005,'DESCNAV',40,'2023-12-15','charlesrod');
+(4005,'DESCNPH',40,'2023-12-15','charlesrod');
 
 INSERT INTO ORDEN (ORDERID,IDCUPON,PRODUCTID,IDPAGO,IDCLIENTE,IDVENDEDOR,IDDIRECCION,FECHACREACION,ESTADO,CANTIDADPRODUCTO,IMPORTE,COSTOENVIO,FECHAENTREGA,ESTRELLASPRODUCTO,ESTRELLASVENDEDOR,COMENTARIO) VALUES
-(1234,4001,50001,3002,'malvaradox','ownyag',2002,'2023-12-11','Pendiente',1,612.50,0,'2023-12-12',4,4,'Recibi en buenas condiciones pero muy tardado el envio');
+(1234,4001,50001,3002,'malvaradox','ownyag',2002,'2023-12-11','Completada',1,612.50,0,'2023-12-12',4,4,'Recibi en buenas condiciones pero muy tardado el envio'),
+(2232,NULL,50005,3001,'ownyag','angon',NULL,'2023-12-26','Completada',1,210,NULL,NULL,5,5,'Buena experiencia, gracias'),
+(2132,NULL,50006,3003,'xavicam','ferchon',NULL,'2023-12-21','Completada',1,34.50,NULL,NULL,4,4,NULL),
+(1235,NULL,50009,3004,'javirod','fiotorres',NULL,'2023-12-15','Completada',2,22.46,NULL,NULL,5,5,'Me gusto, gracias'),
+(4444,4003,50001,3005,'naybor','ownyag',2005,'2023-12-13','Completada',2,980,0,'2023-12-19',3,2,'Solo me llego una exijo una devolucion');
 
 INSERT INTO RECLAMO (ID,CLIENTEID,VENDEDORID,ORDERID,TIPO,ESTADO)VALUES
-(7001,'malvaradox','ownyag',1234,'RETRASO','Cerrado');
+(7001,'malvaradox','ownyag',1234,'RETRASO','Cerrado'),
+(7002,'naybor','ownyag',4444,'FALLO ENTREGA', 'Abierto');
+
+INSERT INTO FACTURA VALUES
+(8989,'2023-12-14','COMPRA DE PRODUCTOS','ownyag','malvaradox',1234);
