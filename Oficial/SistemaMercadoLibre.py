@@ -15,10 +15,6 @@ mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure
 cur = mercadolibreconnection.cursor()
 
 #funciones
-
-def mostrarcaratula():
-   print("\n----- MERCADO LIBRE -----")
-   print("Compra más facil y seguro")
    
 def validar_fecha(fecha_str):
     try:
@@ -43,84 +39,6 @@ def es_mayor_de_edad(fecha_nacimiento):
     fecha_actual = datetime.now()
     edad = fecha_actual.year - fecha_nacimiento.year - ((fecha_actual.month, fecha_actual.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
     return edad >= 18
-
-def imprimirMenuPrincipalInvitado():
-    op = ""
-    while op !=0:
-        mostrarcaratula()
-        print("Bienvenido")
-        print('1. Iniciar sesión')
-        print('2. Crear Cuenta')
-        print('3. Ver Publicaciones')
-        print('4. Ver Recientes Publicaciones 2023')
-        print('6. Productos existentes de categoria Autos')
-        print('0. SALIR')
-        op = validaropcion(0,6)
-        AccionarInvitado(op)
-    
-
-def imprimirMenuPrincipalUsuario(nomuser):
-    op = ""
-    while op !=0:
-       mostrarcaratula()
-       cur.execute("SELECT NOMBRE FROM USUARIO WHERE USERID = '"+nomuser+"'")
-       for NOMBRE in cur.fetchall():
-          print("Bienvenido,",NOMBRE[0])
-          print('1. Cerrar Sesion')
-          print('2. Ver Publicaciones')
-          print('3. Ver Recientes Publicaciones 2023')
-          print('4. Productos existentes de categoria Autos')
-          print('5. Mis Cupones')
-          print('0. SALIR')
-          op = validaropcion(0,6)
-          AccionarUsuario(op,nomuser)
-
-def mostrarPublicaciones():
-   cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION from PUBLICACION")
-   for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION in cur.fetchall():
-    print('Publicacion #',NOPUBLICACION,
-          '\nNombre: ',NOMBREPUBLICACION,
-          '\nVendedor: ',IDVENDEDOR,
-          '\nPrecio: ',PRECIOVENTA,
-          '\nPublicado el: ',FECHAPUBLICACION,
-          '\n-----------------------------------\n')
-    
-def mostrarPublicaciones2023():
- cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION from PUBLICACION WHERE YEAR(FECHAPUBLICACION) = 2023")
- for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION in cur.fetchall():
-    print('Publicacion #',NOPUBLICACION,
-          '\nNombre: ',NOMBREPUBLICACION,
-          '\nVendedor: ',IDVENDEDOR,
-          '\nPrecio: ',PRECIOVENTA,
-          '\nPublicado el: ',FECHAPUBLICACION,
-          '\n-----------------------------------\n')
-    
-def mostrarCupones(user):
-  cur.execute("SELECT ID, NOMBRE, DESCUENTO, FECHAVENCIMIENTO,CLIENTEID FROM CUPON WHERE CLIENTEID ='"+user+"'")
-  resultado = cur.fetchall()
-
-  if(len(resultado) == 0):
-     print("No tiene cupones disponibles")
-     return
-  else:
-     print("\nSus cupones\n")
-
-  for ID,NOMBRE,DESCUENTO,FECHAVENCIMIENTO,CLIENTEID in resultado:
-          print('Cupon #',ID,
-          '\nNombre: ',NOMBRE,
-          '\nDescuento: ',DESCUENTO,
-          '\nVence: ',FECHAVENCIMIENTO,
-          '\n-----------------------------------\n')
-
-def mostrarAccesoriosAutos():
-  cur.execute("SELECT PRODUCTID, NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA FROM PRODUCTO WHERE CATEGORIA LIKE 'AUTOS'")
-  for PRODUCTID, NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA in cur.fetchall():
-          print('ID#',PRODUCTID,
-          '\nNombre: ',NOMBRE,
-          '\nMarca: ',MARCA,
-          '\nCategoria: ',CATEGORIA,
-          '\nSubcategoria: ',SUBCATEGORIA,
-          '\n-----------------------------------\n')
 
 def IniciarSesion():
    while True:
@@ -210,6 +128,89 @@ def AccionarUsuario(opcion,user):
     if opcion == 5:
        mostrarCupones(user)
       
+def mostrarcaratula():
+   print("\n----- MERCADO LIBRE -----")
+   print("Compra más facil y seguro")
+
+def imprimirMenuPrincipalInvitado():
+    op = ""
+    while op !=0:
+        mostrarcaratula()
+        print("Bienvenido")
+        print('1. Iniciar sesión')
+        print('2. Crear Cuenta')
+        print('3. Ver Publicaciones')
+        print('4. Ver Recientes Publicaciones 2023')
+        print('6. Productos existentes de categoria Autos')
+        print('0. SALIR')
+        op = validaropcion(0,6)
+        AccionarInvitado(op)
+    
+
+def imprimirMenuPrincipalUsuario(nomuser):
+    op = ""
+    while op !=0:
+       mostrarcaratula()
+       cur.execute("SELECT NOMBRE FROM USUARIO WHERE USERID = '"+nomuser+"'")
+       for NOMBRE in cur.fetchall():
+          print("Bienvenido,",NOMBRE[0])
+          print('1. Cerrar Sesion')
+          print('2. Ver Publicaciones')
+          print('3. Ver Recientes Publicaciones 2023')
+          print('4. Productos existentes de categoria Autos')
+          print('5. Mis Cupones')
+          print('0. SALIR')
+          op = validaropcion(0,6)
+          AccionarUsuario(op,nomuser)
+
+def mostrarPublicaciones():
+   cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION from PUBLICACION")
+   for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION in cur.fetchall():
+    print('Publicacion #',NOPUBLICACION,
+          '\nNombre: ',NOMBREPUBLICACION,
+          '\nVendedor: ',IDVENDEDOR,
+          '\nPrecio: ',PRECIOVENTA,
+          '\nPublicado el: ',FECHAPUBLICACION,
+          '\n-----------------------------------\n')
+    
+def mostrarPublicaciones2023():
+ cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION from PUBLICACION WHERE YEAR(FECHAPUBLICACION) = 2023")
+ for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION in cur.fetchall():
+    print('Publicacion #',NOPUBLICACION,
+          '\nNombre: ',NOMBREPUBLICACION,
+          '\nVendedor: ',IDVENDEDOR,
+          '\nPrecio: ',PRECIOVENTA,
+          '\nPublicado el: ',FECHAPUBLICACION,
+          '\n-----------------------------------\n')
+    
+def mostrarCupones(user):
+  cur.execute("SELECT ID, NOMBRE, DESCUENTO, FECHAVENCIMIENTO,CLIENTEID FROM CUPON WHERE CLIENTEID ='"+user+"'")
+  resultado = cur.fetchall()
+
+  if(len(resultado) == 0):
+     print("No tiene cupones disponibles")
+     return
+  else:
+     print("\nSus cupones\n")
+
+  for ID,NOMBRE,DESCUENTO,FECHAVENCIMIENTO,CLIENTEID in resultado:
+          print('Cupon #',ID,
+          '\nNombre: ',NOMBRE,
+          '\nDescuento: ',DESCUENTO,
+          '\nVence: ',FECHAVENCIMIENTO,
+          '\n-----------------------------------\n')
+
+def mostrarAccesoriosAutos():
+  cur.execute("SELECT PRODUCTID, NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA FROM PRODUCTO WHERE CATEGORIA LIKE 'AUTOS'")
+  for PRODUCTID, NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA in cur.fetchall():
+          print('ID#',PRODUCTID,
+          '\nNombre: ',NOMBRE,
+          '\nMarca: ',MARCA,
+          '\nCategoria: ',CATEGORIA,
+          '\nSubcategoria: ',SUBCATEGORIA,
+          '\n-----------------------------------\n')
+
+
 
 
        
