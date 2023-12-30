@@ -1,3 +1,11 @@
+"""
+Sistema de Mercado Libre
+Integrantes Grupo #6
+- Mario Alvarado
+- Xavier Camacho
+- Javier Rodriguez
+- Owuen Yagual
+"""
 #imports
 import pymysql
 from datetime import datetime
@@ -7,6 +15,11 @@ mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure
 cur = mercadolibreconnection.cursor()
 
 #funciones
+
+def mostrarcaratula():
+   print("\n----- MERCADO LIBRE -----")
+   print("Compra más facil y seguro")
+   
 def validar_fecha(fecha_str):
     try:
         fecha = datetime.strptime(fecha_str, '%Y-%m-%d')
@@ -14,33 +27,53 @@ def validar_fecha(fecha_str):
     except ValueError:
         return False
     
+def validaropcion(desde,hasta):
+   while True:
+    opcion = input('\nSeleccione una opcion: ')
+    if(opcion.isnumeric() and int(opcion) >=desde and int(opcion) <=hasta):
+       if(int(opcion) == 0):
+          print("Adios")
+          exit()
+       return int(opcion)
+    else:
+       print("Opcion incorrecta, vuelva a intentar")
+    
 def es_mayor_de_edad(fecha_nacimiento):
     fecha_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
     fecha_actual = datetime.now()
     edad = fecha_actual.year - fecha_nacimiento.year - ((fecha_actual.month, fecha_actual.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
     return edad >= 18
 
-def imprimirMenuPrincipal(nomuser):
-  print("\n----- MERCADO LIBRE -----")
-  print("Compra más facil y seguro")
-  if nomuser == "":
-     print("Bienvenido")
-  else:
-     cur.execute("SELECT NOMBRE FROM USUARIO WHERE USERID = '"+nomuser+"'")
-     for NOMBRE in cur.fetchall():
-      print("Bienvenido,",NOMBRE[0])
+def imprimirMenuPrincipalInvitado():
+    op = ""
+    while op !=0:
+        mostrarcaratula()
+        print("Bienvenido")
+        print('1. Iniciar sesión')
+        print('2. Crear Cuenta')
+        print('3. Ver Publicaciones')
+        print('4. Ver Recientes Publicaciones 2023')
+        print('6. Productos existentes de categoria Autos')
+        print('0. SALIR')
+        op = validaropcion(0,6)
+        AccionarInvitado(op)
+    
 
-  print('1. Iniciar sesión')
-  print('2. Crear Cuenta')
-  print('3. Ver Publicaciones')
-  print('4. Ver Recientes Publicaciones 2023')
-  print('5. Mis Cupones')
-  print('6. Productos existentes de categoria Autos')
-  print('0. SALIR')
-
-  opcion = int(input('\nSeleccione una opcion: '))
-
-  return opcion
+def imprimirMenuPrincipalUsuario(nomuser):
+    op = ""
+    while op !=0:
+       mostrarcaratula()
+       cur.execute("SELECT NOMBRE FROM USUARIO WHERE USERID = '"+nomuser+"'")
+       for NOMBRE in cur.fetchall():
+          print("Bienvenido,",NOMBRE[0])
+          print('1. Cerrar Sesion')
+          print('2. Ver Publicaciones')
+          print('3. Ver Recientes Publicaciones 2023')
+          print('4. Productos existentes de categoria Autos')
+          print('5. Mis Cupones')
+          print('0. SALIR')
+          op = validaropcion(0,6)
+          AccionarUsuario(op,nomuser)
 
 def mostrarPublicaciones():
    cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION from PUBLICACION")
@@ -63,11 +96,16 @@ def mostrarPublicaciones2023():
           '\n-----------------------------------\n')
     
 def mostrarCupones(user):
-  cur.execute("SELECT ID, NOMBRE, DESCUENTO, FECHAVENCIMIENTO,CLIENTEID FROM CUPON")
-  print("\nSus cupones\n")
+  cur.execute("SELECT ID, NOMBRE, DESCUENTO, FECHAVENCIMIENTO,CLIENTEID FROM CUPON WHERE CLIENTEID ='"+user+"'")
+  resultado = cur.fetchall()
 
-  for ID,NOMBRE,DESCUENTO,FECHAVENCIMIENTO,CLIENTEID in cur.fetchall():
-    if(CLIENTEID == user) :
+  if(len(resultado) == 0):
+     print("No tiene cupones disponibles")
+     return
+  else:
+     print("\nSus cupones\n")
+
+  for ID,NOMBRE,DESCUENTO,FECHAVENCIMIENTO,CLIENTEID in resultado:
           print('Cupon #',ID,
           '\nNombre: ',NOMBRE,
           '\nDescuento: ',DESCUENTO,
@@ -134,38 +172,49 @@ def CrearCuenta():
   mercadolibreconnection.commit()
   print(userName,"creado exitosamente!")
 
+  return userName
+
+def AccionarInvitado(opcion):
+    if opcion == 1:
+        usuario = IniciarSesion()
+        imprimirMenuPrincipalUsuario(usuario)
+
+    if opcion == 2:
+       usuario = CrearCuenta()
+       imprimirMenuPrincipalUsuario(usuario)
+
+    if opcion == 3:
+       mostrarPublicaciones()
+
+    if opcion == 4:
+       mostrarPublicaciones2023()
+
+    if opcion == 5:
+       mostrarAccesoriosAutos()
+
+
+def AccionarUsuario(opcion,user):
+    if opcion == 1:
+      print("Sesion cerrada exitosamente")
+      imprimirMenuPrincipalInvitado()
+
+    if opcion == 2:
+       mostrarPublicaciones()
+
+    if opcion == 3:
+       mostrarPublicaciones2023()
+
+    if opcion == 4:
+       mostrarAccesoriosAutos()
+
+    if opcion == 5:
+       mostrarCupones(user)
+      
+
 
        
 #Programa Principal
-op = ''
-usuario = ''
-while(op != 0):
-  op = imprimirMenuPrincipal(usuario)
-  
-  if op == 1:
-    usuario = IniciarSesion()
-    
-  if op == 2:
-     CrearCuenta()
-     
-  if op == 3:
-     mostrarPublicaciones()
-     
-  if op == 4:
-     mostrarPublicaciones2023()
-     
-  if op == 5:
-    user = input("Ingrese su nombre de usuario: ")
-    mostrarCupones(user)
-    
-  if op == 6:
-    mostrarAccesoriosAutos()
+imprimirMenuPrincipalInvitado()
 
-
-  
-  
-  
-
-  
 
 mercadolibreconnection.close()
