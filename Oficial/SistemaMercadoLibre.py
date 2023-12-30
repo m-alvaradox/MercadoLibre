@@ -3,7 +3,7 @@ import pymysql
 from datetime import datetime
 
 # Conexion a la base de datos de mercadolibre
-mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure.com", user='root', passwd= 'root', db='mercadolibre')
+mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure.com", user='invitado', passwd= 'root', db='mercadolibre')
 cur = mercadolibreconnection.cursor()
 
 #funciones
