@@ -36,6 +36,7 @@ def imprimirMenuPrincipal(nomuser):
   print('4. Ver Recientes Publicaciones 2023')
   print('5. Mis Cupones')
   print('6. Productos existentes de categoria Autos')
+  print('0. SALIR')
 
   opcion = int(input('\nSeleccione una opcion: '))
 
@@ -135,29 +136,30 @@ def CrearCuenta():
 
 
        
-#Programa Principal           
-op = imprimirMenuPrincipal("")
-
-
-if op == 1:
-   usuario = IniciarSesion()
-   imprimirMenuPrincipal(usuario)
-
-if op == 2:
-   CrearCuenta()
-
-if op == 3:
-  mostrarPublicaciones()
-
-elif op == 4:
-  mostrarPublicaciones2023()
-
-elif op == 5:
-  user = input("Ingrese su nombre de usuario: ")
-  mostrarCupones(user)
-
-elif op == 6:
-  mostrarAccesoriosAutos()
+#Programa Principal
+op = ''
+usuario = ''
+while(op != 0):
+  op = imprimirMenuPrincipal(usuario)
+  
+  if op == 1:
+    usuario = IniciarSesion()
+    
+  if op == 2:
+     CrearCuenta()
+     
+  if op == 3:
+     mostrarPublicaciones()
+     
+  if op == 4:
+     mostrarPublicaciones2023()
+     
+  if op == 5:
+    user = input("Ingrese su nombre de usuario: ")
+    mostrarCupones(user)
+    
+  if op == 6:
+    mostrarAccesoriosAutos()
 
 
   
