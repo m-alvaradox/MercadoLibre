@@ -130,6 +130,7 @@ def CrearCuenta():
         print("No valida, debe ser max. 16 caracteres")
         
   cur.execute("INSERT INTO USUARIO(USERID,PASS,NOMBRE,APELLIDO,FECHANACIMIENTO,ESCLIENTE,ESVENDEDOR) VALUES ('"+userName+"','"+password+"','"+nombre+"','"+apellido+"','"+fechanacimiento+"',true,false)")
+  mercadolibreconnection.commit()
   print(userName,"creado exitosamente!")
 
 
