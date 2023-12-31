@@ -10,7 +10,9 @@ CREATE TABLE IF NOT EXISTS USUARIO (
   APELLIDO VARCHAR(10) NOT NULL,
   FECHANACIMIENTO DATE NOT NULL,
   ESCLIENTE BOOLEAN NOT NULL,
-  ESVENDEDOR BOOLEAN NOT NULL
+  ESVENDEDOR BOOLEAN NOT NULL,
+  EMAIL VARCHAR(50) NOT NULL,
+  TELEFONO VARCHAR(10) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS CLIENTE (
@@ -51,12 +53,6 @@ CREATE TABLE IF NOT EXISTS DIRECCION (
   REFERENCIAS VARCHAR(200),
   FOREIGN KEY (USERID) REFERENCES USUARIO (USERID),
   FOREIGN KEY (CIUDAD) REFERENCES CIUDAD (NOMBRECIUDAD)
-);
-
-CREATE TABLE IF NOT EXISTS TELEFONO (
-  USERID VARCHAR(50) PRIMARY KEY,
-  FOREIGN KEY (USERID) REFERENCES USUARIO (USERID),
-  NUM_TELEFONO VARCHAR(10) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS PRODUCTO (
@@ -190,22 +186,22 @@ FOREIGN KEY (IDORDEN) REFERENCES ORDEN(ORDERID)
 
 -- Insercion Datos
 
-insert into USUARIO values('ownyag','12345','Owen','Yagual','2002-01-10',true,true); 
-insert into USUARIO values('malvaradox','54321','Mario','Alvarado','2003-11-14',true,true);
-insert into USUARIO values('xavicam','aaaaa','Xavier','Camacho','2002-04-01',true,true);
-insert into USUARIO values('javirod','11111','Javier','Rodriguez','2005-03-01',true,true);
-insert into USUARIO values('naybor','12222222','Nayeli','Borbor','2001-02-01',true,false);
-insert into USUARIO values('luchoont','12229871','Luis','Ontaneda','1990-05-01',true,false);
-insert into USUARIO values('nickfigu','122253','Nick','Figueroa','2002-07-09',true,false);
-insert into USUARIO values('charlesrod','1256ga22','Carlos','Rodriguez','2010-05-12',true,false);
-insert into USUARIO values('joelvill','1asdsa2222','Joel','Villon','2004-04-01',true,false);
-insert into USUARIO values('angivel','122xv2092','Angie','Velastegui','2007-04-01',true,false);
-insert into USUARIO values('angon','oiadsa','Angel','Ontaneda','2011-05-01',false,true);
-insert into USUARIO values('ferchon','5ioqw','Fernando','Chacon','2015-03-01',false,true);
-insert into USUARIO values('jorgquij','aasdaaaa','Jorge','Quijije','2002-09-01',false,true);
-insert into USUARIO values('arperez','11ads','Ariana','Perez','2002-12-01',false,true);
-insert into USUARIO values('fiotorres','1x23zx45','Fiorella','Torres','1980-05-07',false,true);
-insert into USUARIO values('daniroca','5s43bcds21','Daniela','Roca','1980-10-05',false,true);
+insert into USUARIO values('ownyag','12345','Owen','Yagual','2002-01-10',true,true,'ownyag@live.com','0987654321'); 
+insert into USUARIO values('malvaradox','54321','Mario','Alvarado','2003-11-14',true,true,'malvaradox@live.com','0912345678');
+insert into USUARIO values('xavicam','aaaaa','Xavier','Camacho','2002-04-01',true,true,'xavicam@live.com','0913246587');
+insert into USUARIO values('javirod','11111','Javier','Rodriguez','2005-03-01',true,true,'javirod@live.com','0915364875');
+insert into USUARIO values('naybor','12222222','Nayeli','Borbor','2001-02-01',true,false,'naybor@live.com','0958455652');
+insert into USUARIO values('luchoont','12229871','Luis','Ontaneda','1990-05-01',true,false,'luchont@yahoo.com','0985128912');
+insert into USUARIO values('nickfigu','122253','Nick','Figueroa','2002-07-09',true,false,'nickfigur@hotmail.com','0921289128');
+insert into USUARIO values('charlesrod','1256ga22','Carlos','Rodriguez','2010-05-12',true,false,'charlesrod@gmail.com','0989125982');
+insert into USUARIO values('joelvill','1asdsa2222','Joel','Villon','2004-04-01',true,false,'joelvilla@gmail.com','0985181891');
+insert into USUARIO values('angivel','122xv2092','Angie','Velastegui','2007-04-01',true,false,'angivel@live.com','0985181895');
+insert into USUARIO values('angon','oiadsa','Angel','Ontaneda','2011-05-01',false,true,'angon@live.com','0923748372');
+insert into USUARIO values('ferchon','5ioqw','Fernando','Chacon','2015-03-01',false,true,'ferchon@live.com','1234365465');
+insert into USUARIO values('jorgquij','aasdaaaa','Jorge','Quijije','2002-09-01',false,true,'jorguijij@icloud.com','0998724354');
+insert into USUARIO values('arperez','11ads','Ariana','Perez','2002-12-01',false,true,'arperez@live.com','3432345676');
+insert into USUARIO values('fiotorres','1x23zx45','Fiorella','Torres','1980-05-07',false,true,'fiotorres@live.com','0983546753');
+insert into USUARIO values('daniroca','5s43bcds21','Daniela','Roca','1980-10-05',false,true,'daniroca@outlook.es','0956473847');
 
 insert into CLIENTE values
 ('ownyag'),('malvaradox'),('xavicam'),('javirod'),('naybor'),('luchoont'),('nickfigu'),('charlesrod'),('joelvill'),('angivel');
@@ -238,10 +234,6 @@ insert into DIRECCION values
 (2008,'Portoviejo','charlesrod','Portoviejo','Avenida 3 de Mayo Calle 28 de Agosto 100 Parque de la Ciudad'),
 (2009,'Salinas','joelvill','San Lorenzo','Avenida 9 de Octubre Calle 10 de Agosto 100 Yatch Club'),
 (2010,'Libertad','angivel','San Sebastian','Avenida Colombia Calle Estados Unidos 100 Refineria');
-
-insert into TELEFONO values
-('ownyag',0987654321),('malvaradox',0912345678),('xavicam',0913246587),('javirod',0915364875),('naybor',0958455652),
-('luchoont',0985128912),('nickfigu',0921289128),('charlesrod',0989125982),('joelvill',0985181891),('angivel',0985181895);
 
 insert into PRODUCTO values
     (50001,'GALAXY A70','SAMSUNG','TECNOLOGIA','SMARTPHONES'),
