@@ -196,15 +196,15 @@ insert into USUARIO values('nickfigu','122253','Nick','Figueroa','2002-07-09',tr
 insert into USUARIO values('charlesrod','1256ga22','Carlos','Rodriguez','2010-05-12',true,false,'charlesrod@gmail.com','0989125982');
 insert into USUARIO values('joelvill','1asdsa2222','Joel','Villon','2004-04-01',true,false,'joelvilla@gmail.com','0985181891');
 insert into USUARIO values('angivel','122xv2092','Angie','Velastegui','2007-04-01',true,false,'angivel@live.com','0985181895');
-insert into USUARIO values('angon','oiadsa','Angel','Ontaneda','2011-05-01',false,true,'angon@live.com','0923748372');
-insert into USUARIO values('ferchon','5ioqw','Fernando','Chacon','2015-03-01',false,true,'ferchon@live.com','1234365465');
-insert into USUARIO values('jorgquij','aasdaaaa','Jorge','Quijije','2002-09-01',false,true,'jorguijij@icloud.com','0998724354');
-insert into USUARIO values('arperez','11ads','Ariana','Perez','2002-12-01',false,true,'arperez@live.com','3432345676');
-insert into USUARIO values('fiotorres','1x23zx45','Fiorella','Torres','1980-05-07',false,true,'fiotorres@live.com','0983546753');
-insert into USUARIO values('daniroca','5s43bcds21','Daniela','Roca','1980-10-05',false,true,'daniroca@outlook.es','0956473847');
+insert into USUARIO values('angon','oiadsa','Angel','Ontaneda','2011-05-01',true,true,'angon@live.com','0923748372');
+insert into USUARIO values('ferchon','5ioqw','Fernando','Chacon','2015-03-01',true,true,'ferchon@live.com','1234365465');
+insert into USUARIO values('jorgquij','aasdaaaa','Jorge','Quijije','2002-09-01',true,true,'jorguijij@icloud.com','0998724354');
+insert into USUARIO values('arperez','11ads','Ariana','Perez','2002-12-01',true,true,'arperez@live.com','3432345676');
+insert into USUARIO values('fiotorres','1x23zx45','Fiorella','Torres','1980-05-07',true,true,'fiotorres@live.com','0983546753');
+insert into USUARIO values('daniroca','5s43bcds21','Daniela','Roca','1980-10-05',true,true,'daniroca@outlook.es','0956473847');
 
 insert into CLIENTE values
-('ownyag'),('malvaradox'),('xavicam'),('javirod'),('naybor'),('luchoont'),('nickfigu'),('charlesrod'),('joelvill'),('angivel');
+('ownyag'),('malvaradox'),('xavicam'),('javirod'),('naybor'),('luchoont'),('nickfigu'),('charlesrod'),('joelvill'),('angivel'),('angon'),('ferchon'),('jorgquij'),('arperez'),('fiotorres'),('daniroca');
 
 insert into VENDEDOR values
 ('ownyag',5),('malvaradox',5),('xavicam',4),('javirod',4.5),('angon',4.6),('ferchon',3),('jorgquij',2),('arperez',5),('fiotorres',1),('daniroca',2.7);
