@@ -80,13 +80,30 @@ def CrearCuenta():
       print("La fecha no es válida\n")
 
   while True:
+     telefono = input("Ingrese su numero de telefono (10 digitos): ")
+     if(len(telefono)==10):
+        break
+     else:
+        print("Error, vuelva a intentar\n")
+
+  while True:
+     email = input("Ingrese su correo (ej. 'usuario@dominio.com'): ")
+     separ = email.split('@')
+     sepun = email.split('.')
+     if('@' in email and len(separ)==2 and '.' in email and len(sepun)==2):
+        break
+     else:
+        print("Incorrecto, vuelva a intentarlo\n")
+
+  while True:
      password = input("Ingrese su contraseña (Max. 16 caracteres): ")
      if(len(password)<16):
         break
      else:
         print("No valida, debe ser max. 16 caracteres")
         
-  cur.execute("INSERT INTO USUARIO(USERID,PASS,NOMBRE,APELLIDO,FECHANACIMIENTO,ESCLIENTE,ESVENDEDOR) VALUES ('"+userName+"','"+password+"','"+nombre+"','"+apellido+"','"+fechanacimiento+"',true,false)")
+  cur.execute("INSERT INTO USUARIO(USERID,PASS,NOMBRE,APELLIDO,FECHANACIMIENTO,ESCLIENTE,ESVENDEDOR,EMAIL,TELEFONO) VALUES ('"+userName+"','"+password+"','"+nombre+"','"+apellido+"','"+fechanacimiento+"',true,false,'"+email+"','"+telefono+"')")
+  cur.execute("INSERT INTO CLIENTE VALUES ('"+userName+"')")
   mercadolibreconnection.commit()
   print(userName,"creado exitosamente!")
 
