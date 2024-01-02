@@ -31,6 +31,7 @@ while (sinUsuario != 'salir'):
         password = input("Ingrese su contraseña: ")
       else:
         password = input("Ingrese una contraseña válida: ")
+      j+= 1
     print('Ingreso exitoso a la aplicacion, puede continuar')
     sinUsuario = 'salir'
   elif (sinUsuario == '2'):
