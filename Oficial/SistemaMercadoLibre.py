@@ -129,6 +129,7 @@ def AccionarInvitado(opcion):
 
 
 def AccionarUsuario(opcion,user):
+    
     if opcion == 1:
       print("Sesion cerrada exitosamente")
       imprimirMenuPrincipalInvitado()
@@ -144,6 +145,10 @@ def AccionarUsuario(opcion,user):
 
     if opcion == 5:
        mostrarCupones(user)
+
+    if opcion == 6:
+       mostrarPerfil(user)
+       
       
 def mostrarcaratula():
    print("\n----- MERCADO LIBRE -----")
@@ -153,7 +158,7 @@ def imprimirMenuPrincipalInvitado():
     op = ""
     while op !=0:
         mostrarcaratula()
-        print("Bienvenido")
+        print("Hola!")
         print('1. Iniciar sesión')
         print('2. Crear Cuenta')
         print('3. Ver Publicaciones')
@@ -170,12 +175,13 @@ def imprimirMenuPrincipalUsuario(nomuser):
        mostrarcaratula()
        cur.execute("SELECT NOMBRE FROM USUARIO WHERE USERID = '"+nomuser+"'")
        for NOMBRE in cur.fetchall():
-          print("Bienvenido,",NOMBRE[0])
+          print("Hola!",NOMBRE[0])
           print('1. Cerrar Sesion')
           print('2. Ver Publicaciones')
           print('3. Ver Recientes Publicaciones 2023')
           print('4. Productos existentes de categoria Autos')
           print('5. Mis Cupones')
+          print('6. Mi Perfil')
           print('0. SALIR')
           op = validaropcion(0,6)
           AccionarUsuario(op,nomuser)
@@ -227,10 +233,21 @@ def mostrarAccesoriosAutos():
           '\nSubcategoria: ',SUBCATEGORIA,
           '\n-----------------------------------\n')
 
+def mostrarPerfil(user):
+   print("--Mi Perfil--")
 
+   cur.execute ("SELECT USERID, EMAIL, NOMBRE, APELLIDO, TELEFONO FROM USUARIO WHERE USERID = '"+user+"'")
 
+   for USERID, EMAIL, NOMBRE, APELLIDO, TELEFONO in cur.fetchall():
+      print("\n--Datos de cuenta")
+      print("Usuario:",USERID)
+      print("Email:",EMAIL)
 
-       
+      print("\n--Datos personales")
+      print("Nombre y Apellido:",NOMBRE,APELLIDO)
+      print("Telefono:",TELEFONO)
+
+ 
 #Programa Principal
 imprimirMenuPrincipalInvitado()
 
