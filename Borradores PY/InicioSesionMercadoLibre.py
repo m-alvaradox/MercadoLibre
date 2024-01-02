@@ -11,7 +11,7 @@ while (sinUsuario != 'salir'):
   for USER_ID in a.fetchall():
     lista.append(str(USER_ID))
   funciones.imprimirMenuPrincipalUsuario()
-  sinUsuario = usuario = input("Escoja una opcion del menu(1 - 9) o ingrese salir para abandonar la aplicacion: ")
+  sinUsuario = input("Escoja una opcion del menu(1 - 9) o ingrese salir para abandonar la aplicacion: ")
   if (sinUsuario == '1'):
     userName = ''
     i = 0
