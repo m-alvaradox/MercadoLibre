@@ -258,7 +258,7 @@ insert into PRODUCTO values
     ('INSPIRON 3910: rendimiento y portabilidad. Procesador Intel Core i5 de 11.ª generación, pantalla de 15,6 pulgadas.',
     'Gratuita',50002,'malvaradox',800,'Activa','2022-10-23','DELL INSPIRON 3910 NUEVO',3),
     ('La Nitro 5: rendimiento potente y diseño elegante. Procesador Intel Core i7 de 12.ª generación, tarjeta gráfica NVIDIA RTX 3060',
-    'Gratuita',50003,'xavicam',250,'Agotado','2019-11-11','XXXKIU DE OPORTUNIDAD',4),
+    'Gratuita',50003,'xavicam',250,'Activa','2019-11-11','XXXKIU DE OPORTUNIDAD',4),
     ('Las Air Force 1: un clásico de la moda urbana. Diseño sencillo, comodidad inigualable.',
     'Gratuita',50004,'javirod',62.50,'Activa','2023-12-01','NKE AIR FORCE ONE',1),
     ('Las Forum Low: versátiles y combinables. Diseño retro, estilo minimalista.', 'Gratuita',50005,'angon',210,
@@ -270,7 +270,7 @@ insert into PRODUCTO values
     ('El iPhone 15 Pro Max: lo último en tecnología Apple. Pantalla OLED de 6,7 pulgadas, procesador A16 Bionic, cámara triple de 48MP.',
     'Gratuita',50008,'arperez',1299.99,'Activa','2023-11-26','IPHONE 15 PRO MAX TRAIDA DESDE USA',5),
     ('Los faros LED Philips: más visibilidad y seguridad. Iluminación potente y uniforme, diseño elegante.',
-    'Gratuita',50009,'fiotorres',11.23,'Agotado','2022-11-13','FAROS LED PHILLIPS',2),
+    'Gratuita',50009,'fiotorres',11.23,'Activa','2022-11-13','FAROS LED PHILLIPS',2),
     ('La cámara de reversa Anker: más seguridad al estacionar. Imágenes nítidas y claras, pantalla de 5 pulgadas.',
     'Gratuita',50010,'daniroca',300,'Activa','2023-09-09','CAMARA REVERSA',8);
     
