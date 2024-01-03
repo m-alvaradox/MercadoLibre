@@ -207,7 +207,7 @@ def mostrarPublicaciones2023():
           '\n-----------------------------------\n')
     
 def mostrarCupones(user):
-  cur.execute("SELECT ID, NOMBRE, DESCUENTO, FECHAVENCIMIENTO,CLIENTEID FROM CUPON WHERE CLIENTEID ='"+user+"'")
+  cur.execute("SELECT ID, NOMBRE, DESCUENTO, FECHAVENCIMIENTO,CLIENTEID, VECES FROM CUPON WHERE CLIENTEID ='"+user+"'")
   resultado = cur.fetchall()
 
   if(len(resultado) == 0):
@@ -216,11 +216,12 @@ def mostrarCupones(user):
   else:
      print("\nSus cupones\n")
 
-  for ID,NOMBRE,DESCUENTO,FECHAVENCIMIENTO,CLIENTEID in resultado:
+  for ID,NOMBRE,DESCUENTO,FECHAVENCIMIENTO,CLIENTEID, VECES in resultado:
           print('Cupon #',ID,
-          '\nNombre: ',NOMBRE,
-          '\nDescuento: ',DESCUENTO,
-          '\nVence: ',FECHAVENCIMIENTO,
+          '\nNombre:',NOMBRE,
+          '\nDescuento:',DESCUENTO,
+          '\nVence:',FECHAVENCIMIENTO,
+          '\nPuede usarlo:',VECES,'veces',
           '\n-----------------------------------\n')
 
 def mostrarAccesoriosAutos():
