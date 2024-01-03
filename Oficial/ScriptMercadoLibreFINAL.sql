@@ -237,7 +237,8 @@ insert into DIRECCION values
 (2007,712,'nickfigu','Tarqui','Avenida 25 de Julio Calle 10 de Agosto 100 Parque de la madre'),
 (2008,713,'charlesrod','Portoviejo','Avenida 3 de Mayo Calle 28 de Agosto 100 Parque de la Ciudad'),
 (2009,714,'joelvill','San Lorenzo','Avenida 9 de Octubre Calle 10 de Agosto 100 Yatch Club'),
-(2010,715,'angivel','San Sebastian','Avenida Colombia Calle Estados Unidos 100 Refineria');
+(2010,715,'angivel','San Sebastian','Avenida Colombia Calle Estados Unidos 100 Refineria'),
+(2011,701,'malvaradox','Tarqui','La Vista Towers Edif. 8D 7A');
 
 insert into PRODUCTO values
     (50001,'GALAXY A70','SAMSUNG','TECNOLOGIA','SMARTPHONES'),
