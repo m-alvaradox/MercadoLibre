@@ -187,13 +187,14 @@ def imprimirMenuPrincipalUsuario(nomuser):
           AccionarUsuario(op,nomuser)
 
 def mostrarPublicaciones():
-   cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION from PUBLICACION")
-   for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION in cur.fetchall():
+   cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION, STOCK from PUBLICACION")
+   for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION, STOCK in cur.fetchall():
     print('Publicacion #',NOPUBLICACION,
-          '\nNombre: ',NOMBREPUBLICACION,
-          '\nVendedor: ',IDVENDEDOR,
-          '\nPrecio: ',PRECIOVENTA,
-          '\nPublicado el: ',FECHAPUBLICACION,
+          '\nNombre:',NOMBREPUBLICACION,
+          '\nVendedor:',IDVENDEDOR,
+          '\nPrecio:',PRECIOVENTA,
+          '\nStock:',STOCK,
+          '\nPublicado el:',FECHAPUBLICACION,
           '\n-----------------------------------\n')
     
 def mostrarPublicaciones2023():
