@@ -33,26 +33,27 @@ CREATE TABLE IF NOT EXISTS PAIS (
 
 CREATE TABLE IF NOT EXISTS PROVINCIA (
   PROVID INT PRIMARY KEY,
-  COUNTRYID INT,
+  COUNTRYID INT NOT NULL,
   NOMBREPROVINCIA VARCHAR(20) NOT NULL,
   FOREIGN KEY (COUNTRYID) REFERENCES PAIS (COUNTRYID)
 );
 
 CREATE TABLE IF NOT EXISTS CIUDAD (
-  NOMBRECIUDAD VARCHAR(50) PRIMARY KEY,
-  PROVID INT,
-   SIGLAS VARCHAR(5),
+  CITYID INT PRIMARY KEY,
+  NOMBRECIUDAD VARCHAR(50) NOT NULL,
+  PROVID INT NOT NULL,
+   SIGLAS VARCHAR(5) NOT NULL,
   FOREIGN KEY (PROVID) REFERENCES PROVINCIA (PROVID)
 );
 
 CREATE TABLE IF NOT EXISTS DIRECCION (
   ID INT PRIMARY KEY,
-  CIUDAD VARCHAR(50),
-  USERID VARCHAR(50),
-  PARROQUIA VARCHAR(50),
-  REFERENCIAS VARCHAR(200),
+  IDCIUDAD INT NOT NULL,
+  USERID VARCHAR(50) NOT NULL,
+  PARROQUIA VARCHAR(50) NOT NULL,
+  REFERENCIAS VARCHAR(200) NOT NULL,
   FOREIGN KEY (USERID) REFERENCES USUARIO (USERID),
-  FOREIGN KEY (CIUDAD) REFERENCES CIUDAD (NOMBRECIUDAD)
+  FOREIGN KEY (IDCIUDAD) REFERENCES CIUDAD (CITYID)
 );
 
 CREATE TABLE IF NOT EXISTS PRODUCTO (
@@ -222,21 +223,21 @@ insert into PROVINCIA values
 (812,901,'Manabí'),(813,901,'Santa Elena'),(814,901,'Esmeraldas');
 
 insert into CIUDAD values
-('Guayaquil',801,'GYE'),('Maracaibo',802,'MAR'),('Bogotá',803,'BOG'),('Sao Paulo',804,'SP'),
-('Montevideo',805,'MVO'),('Santiago',806,'SGO'),('Buenos Aires',807,'CABA'),('La Paz',808,'LPZ'),('Asunción',809,'ASUN'),
-('Ciudad de México',810,'CDMX'),('Quito',811,'PQT'),('Manta',812,'MNT'),('Portoviejo',812,'PTV'),('Salinas',813,'SLN'),('Libertad',813,'LBT');
+(701,'Guayaquil',801,'GYE'),(702,'Maracaibo',802,'MAR'),(703,'Bogotá',803,'BOG'),(704,'Sao Paulo',804,'SP'),
+(705,'Montevideo',805,'MVO'),(706,'Santiago',806,'SGO'),(707,'Buenos Aires',807,'CABA'),(708,'La Paz',808,'LPZ'),(709,'Asunción',809,'ASUN'),
+(710,'Ciudad de México',810,'CDMX'),(711,'Quito',811,'PQT'),(712,'Manta',812,'MNT'),(713,'Portoviejo',812,'PTV'),(714,'Salinas',813,'SLN'),(715,'Libertad',813,'LBT');
 
 insert into DIRECCION values 
-(2001,'Guayaquil','ownyag','Rocafuerte','Avenida Rocafuerte Calle Escobedo 100 Parque de la Libertad'),
-(2002,'Guayaquil','malvaradox','Carbo','Calle 9 de Octubre Calle 10 de Agosto 100 Malecón Simón Bolívar'),
-(2003,'Guayaquil','xavicam','Urdesa','Avenida Las Américas Calle Francisco de Orellana 100 Parque Samanes'),
-(2004,'Quito','javirod','Centro Historico','Calle García Moreno Calle Sucre 100 Palacio de Carondelet'),
-(2005,'Quito','naybor','La Mariscal','Avenida 18 de Semptiembre Calle Reina Victoria 100 Plaza Foch'),
-(2006,'Quito','luchoont','El Ejido','Avenida de los Shyris Calle Colón 100 Parque El Ejido'),
-(2007,'Manta','nickfigu','Tarqui','Avenida 25 de Julio Calle 10 de Agosto 100 Parque de la madre'),
-(2008,'Portoviejo','charlesrod','Portoviejo','Avenida 3 de Mayo Calle 28 de Agosto 100 Parque de la Ciudad'),
-(2009,'Salinas','joelvill','San Lorenzo','Avenida 9 de Octubre Calle 10 de Agosto 100 Yatch Club'),
-(2010,'Libertad','angivel','San Sebastian','Avenida Colombia Calle Estados Unidos 100 Refineria');
+(2001,701,'ownyag','Rocafuerte','Avenida Rocafuerte Calle Escobedo 100 Parque de la Libertad'),
+(2002,701,'malvaradox','Carbo','Calle 9 de Octubre Calle 10 de Agosto 100 Malecón Simón Bolívar'),
+(2003,701,'xavicam','Urdesa','Avenida Las Américas Calle Francisco de Orellana 100 Parque Samanes'),
+(2004,711,'javirod','Centro Historico','Calle García Moreno Calle Sucre 100 Palacio de Carondelet'),
+(2005,711,'naybor','La Mariscal','Avenida 18 de Semptiembre Calle Reina Victoria 100 Plaza Foch'),
+(2006,711,'luchoont','El Ejido','Avenida de los Shyris Calle Colón 100 Parque El Ejido'),
+(2007,712,'nickfigu','Tarqui','Avenida 25 de Julio Calle 10 de Agosto 100 Parque de la madre'),
+(2008,713,'charlesrod','Portoviejo','Avenida 3 de Mayo Calle 28 de Agosto 100 Parque de la Ciudad'),
+(2009,714,'joelvill','San Lorenzo','Avenida 9 de Octubre Calle 10 de Agosto 100 Yatch Club'),
+(2010,715,'angivel','San Sebastian','Avenida Colombia Calle Estados Unidos 100 Refineria');
 
 insert into PRODUCTO values
     (50001,'GALAXY A70','SAMSUNG','TECNOLOGIA','SMARTPHONES'),
