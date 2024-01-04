@@ -194,7 +194,6 @@ def imprimirMenuPrincipalUsuario(nomuser):
 def mostrarPublicaciones():
    cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION, STOCK from PUBLICACION")
    print("")
-   contador = 0
    for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION, STOCK in cur.fetchall():
     print('\nPublicacion #',NOPUBLICACION,
           '\nNombre:',NOMBREPUBLICACION,
@@ -203,11 +202,7 @@ def mostrarPublicaciones():
           '\nStock:',STOCK,
           '\nPublicado el:',FECHAPUBLICACION,
           '\n-----------------------------------\n')
-    contador += 1
    
-   print("Seleccione la publicacion para explorar, [0] para SALIR")
-   opc = validaropcion(0,contador)
-
 
 def mostrarPublicaciones2023():
  cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION from PUBLICACION WHERE YEAR(FECHAPUBLICACION) = 2023")
