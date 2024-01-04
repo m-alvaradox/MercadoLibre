@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS CIUDAD (
 );
 
 CREATE TABLE IF NOT EXISTS DIRECCION (
-  ID INT PRIMARY KEY,
+  ID INT auto_increment PRIMARY KEY,
   IDCIUDAD INT NOT NULL,
   USERID VARCHAR(50) NOT NULL,
   PARROQUIA VARCHAR(50) NOT NULL,
@@ -228,18 +228,18 @@ insert into CIUDAD values
 (705,'Montevideo',805,'MVO'),(706,'Santiago',806,'SGO'),(707,'Buenos Aires',807,'CABA'),(708,'La Paz',808,'LPZ'),(709,'Asunción',809,'ASUN'),
 (710,'Ciudad de México',810,'CDMX'),(711,'Quito',811,'PQT'),(712,'Manta',812,'MNT'),(713,'Portoviejo',812,'PTV'),(714,'Salinas',813,'SLN'),(715,'Libertad',813,'LBT');
 
-insert into DIRECCION values 
-(2001,701,'ownyag','Rocafuerte','Avenida Rocafuerte Calle Escobedo 100 Parque de la Libertad'),
-(2002,701,'malvaradox','Carbo','Calle 9 de Octubre Calle 10 de Agosto 100 Malecón Simón Bolívar'),
-(2003,701,'xavicam','Urdesa','Avenida Las Américas Calle Francisco de Orellana 100 Parque Samanes'),
-(2004,711,'javirod','Centro Historico','Calle García Moreno Calle Sucre 100 Palacio de Carondelet'),
-(2005,711,'naybor','La Mariscal','Avenida 18 de Semptiembre Calle Reina Victoria 100 Plaza Foch'),
-(2006,711,'luchoont','El Ejido','Avenida de los Shyris Calle Colón 100 Parque El Ejido'),
-(2007,712,'nickfigu','Tarqui','Avenida 25 de Julio Calle 10 de Agosto 100 Parque de la madre'),
-(2008,713,'charlesrod','Portoviejo','Avenida 3 de Mayo Calle 28 de Agosto 100 Parque de la Ciudad'),
-(2009,714,'joelvill','San Lorenzo','Avenida 9 de Octubre Calle 10 de Agosto 100 Yatch Club'),
-(2010,715,'angivel','San Sebastian','Avenida Colombia Calle Estados Unidos 100 Refineria'),
-(2011,701,'malvaradox','Tarqui','La Vista Towers Edif. 8D 7A');
+insert into DIRECCION (IDCIUDAD, USERID, PARROQUIA, REFERENCIAS) values 
+(701,'ownyag','Rocafuerte','Avenida Rocafuerte Calle Escobedo 100 Parque de la Libertad'),
+(701,'malvaradox','Carbo','Calle 9 de Octubre Calle 10 de Agosto 100 Malecón Simón Bolívar'),
+(701,'xavicam','Urdesa','Avenida Las Américas Calle Francisco de Orellana 100 Parque Samanes'),
+(711,'javirod','Centro Historico','Calle García Moreno Calle Sucre 100 Palacio de Carondelet'),
+(711,'naybor','La Mariscal','Avenida 18 de Semptiembre Calle Reina Victoria 100 Plaza Foch'),
+(711,'luchoont','El Ejido','Avenida de los Shyris Calle Colón 100 Parque El Ejido'),
+(712,'nickfigu','Tarqui','Avenida 25 de Julio Calle 10 de Agosto 100 Parque de la madre'),
+(713,'charlesrod','Portoviejo','Avenida 3 de Mayo Calle 28 de Agosto 100 Parque de la Ciudad'),
+(714,'joelvill','San Lorenzo','Avenida 9 de Octubre Calle 10 de Agosto 100 Yatch Club'),
+(715,'angivel','San Sebastian','Avenida Colombia Calle Estados Unidos 100 Refineria'),
+(701,'malvaradox','Tarqui','La Vista Towers Edif. 8D 7A');
 
 insert into PRODUCTO values
     (50001,'GALAXY A70','SAMSUNG','TECNOLOGIA','SMARTPHONES'),
@@ -308,11 +308,11 @@ INSERT INTO CUPON VALUES
 (4005,'DESCNPH',40,'2023-12-15','charlesrod',2), (4006, 'START2024',50,'2024-01-30','malvaradox',1);
 
 INSERT INTO ORDEN (IDCUPON,PRODUCTID,IDPAGO,IDCLIENTE,IDVENDEDOR,IDDIRECCION,FECHACREACION,ESTADO,CANTIDADPRODUCTO,IMPORTE,COSTOENVIO,FECHAENTREGA,ESTRELLASPRODUCTO,ESTRELLASVENDEDOR,COMENTARIO,IDPUBLICACION) VALUES
-(4001,50001,3002,'malvaradox','ownyag',2002,'2023-12-11','Completada',1,612.50,0,'2023-12-12',4,4,'Recibi en buenas condiciones pero muy tardado el envio',1),
+(4001,50001,3002,'malvaradox','ownyag',2,'2023-12-11','Completada',1,612.50,0,'2023-12-12',4,4,'Recibi en buenas condiciones pero muy tardado el envio',1),
 (NULL,50005,3001,'ownyag','angon',NULL,'2023-12-26','Completada',1,210,0,NULL,5,5,'Buena experiencia, gracias',5),
 (NULL,50006,3003,'xavicam','ferchon',NULL,'2023-12-21','Completada',1,34.50,0,NULL,4,4,NULL,6),
 (NULL,50009,3004,'javirod','fiotorres',NULL,'2023-12-15','Completada',2,22.46,0,NULL,5,5,'Me gusto, gracias',9),
-(4003,50001,3005,'naybor','ownyag',2005,'2023-12-13','Completada',2,980,0,'2023-12-19',3,2,'Solo me llego una exijo una devolucion',1);
+(4003,50001,3005,'naybor','ownyag',5,'2023-12-13','Completada',2,980,0,'2023-12-19',3,2,'Solo me llego una exijo una devolucion',1);
 
 INSERT INTO RECLAMO (ID,CLIENTEID,VENDEDORID,ORDERID,TIPO,ESTADO)VALUES
 (7001,'malvaradox','ownyag',1,'RETRASO','Cerrado'),
