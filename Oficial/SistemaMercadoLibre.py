@@ -15,6 +15,14 @@ mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure
 cur = mercadolibreconnection.cursor()
 
 #funciones
+
+def opcionnumerica():
+   while True:
+      option = input("Ingrese opcion: ")
+      if(option.isnumeric()):
+         return option
+      else:
+         print("Opcion incorrecta, vuelva a intentar")
    
 def validar_fecha(fecha_str):
     try:
@@ -122,6 +130,7 @@ def AccionarInvitado(opcion):
 
     if opcion == 3:
        mostrarPublicaciones()
+       print("\nPara generar una orden, debe iniciar sesión o crear una cuenta en Mercado Libre")
 
     if opcion == 4:
        mostrarPublicaciones2023()
@@ -142,6 +151,13 @@ def AccionarUsuario(opcion,user):
 
     if opcion == 2:
        mostrarPublicaciones()
+       print("\nSeleccione la publicacion de su interés\nPara SALIR digite 0")
+       pub = opcionnumerica()
+
+       if(pub == "0"):
+          return
+       else:
+          generarOrden(pub,user)
 
     if opcion == 3:
        mostrarPublicaciones2023()
@@ -193,15 +209,15 @@ def imprimirMenuPrincipalUsuario(nomuser):
 
 def mostrarPublicaciones():
    cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION, STOCK from PUBLICACION")
-   print("")
+   print("\n-- PUBLICACIONES --\n")
    for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION, STOCK in cur.fetchall():
-    print('\nPublicacion #',NOPUBLICACION,
+    print('Publicacion #',NOPUBLICACION,
           '\nNombre:',NOMBREPUBLICACION,
           '\nVendedor:',IDVENDEDOR,
           '\nPrecio:',PRECIOVENTA,
           '\nStock:',STOCK,
           '\nPublicado el:',FECHAPUBLICACION,
-          '\n-----------------------------------\n')
+          '\n-----------------------------------')
    
 
 def mostrarPublicaciones2023():
@@ -271,10 +287,18 @@ def mostrarDirecciones(user):
 
 def generarOrden(nopublicacion, user):
     
+
+    
     fecha_actual = date.today()
 
     cur.execute("SELECT NOMBREPUBLICACION, STOCK, PRECIOVENTA, PRODUCTID, IDVENDEDOR FROM PUBLICACION WHERE NOPUBLICACION ="+str(nopublicacion)+"")
     detallespublicacion = cur.fetchone()
+
+    if(detallespublicacion == None):
+       print("\nPublicacion no encontrada!")
+       return
+    
+    print("\n-- GENERAR ORDEN --")
 
     while True:
         cantidad = int(input("Ingrese la cantidad deseada: "))
