@@ -9,6 +9,9 @@ Integrantes Grupo #6
 #imports
 import pymysql
 from datetime import datetime, date, timedelta
+import os
+import time
+
 
 # Conexion a la base de datos de mercadolibre
 mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure.com", user='invitado', passwd= 'root', db='mercadolibre')
@@ -16,13 +19,19 @@ cur = mercadolibreconnection.cursor()
 
 #funciones
 
+def limpiarPantalla():
+  if os.name == "posix":
+   os.system ("clear")
+  elif os.name == "ce" or os.name == "nt" or os.name == "dos":
+   os.system ("cls")
+
 def opcionnumerica():
    while True:
-      option = input("Ingrese opcion: ")
+      option = input("Ingrese: ")
       if(option.isnumeric()):
          return option
       else:
-         print("Opcion incorrecta, vuelva a intentar")
+         print("Opcion incorrecta, vuelva a intentar\n")
    
 def validar_fecha(fecha_str):
     try:
@@ -53,8 +62,10 @@ def IniciarSesion():
       cur.execute("SELECT USERID,PASS FROM USUARIO WHERE USERID = '"+userName+"'")
       for USERID,PASS in cur.fetchall():
          if(userName.lower() == USERID and password == PASS):
+            limpiarPantalla()
             print("Inicio exitoso")
             return userName
+      limpiarPantalla()
       print("Usuario y/o contraseña incorrectos. Vuelva a intentarlo\n")
 
 def CrearCuenta():
@@ -105,11 +116,12 @@ def CrearCuenta():
      if(len(password)<16):
         break
      else:
-        print("No valida, debe ser max. 16 caracteres")
+        print("No valida, debe ser max. 16 caracteres\n")
         
   cur.execute("INSERT INTO USUARIO(USERID,PASS,NOMBRE,APELLIDO,FECHANACIMIENTO,ESCLIENTE,ESVENDEDOR,EMAIL,TELEFONO) VALUES ('"+userName+"','"+password+"','"+nombre+"','"+apellido+"','"+fechanacimiento+"',true,false,'"+email+"','"+telefono+"')")
   cur.execute("INSERT INTO CLIENTE VALUES ('"+userName+"')")
   mercadolibreconnection.commit()
+  limpiarPantalla()
   print(userName,"creado exitosamente!")
 
   return userName
@@ -121,16 +133,21 @@ def AccionarInvitado(opcion):
       exit()
 
     if opcion == 1:
+        limpiarPantalla()
         usuario = IniciarSesion()
         imprimirMenuPrincipalUsuario(usuario)
 
     if opcion == 2:
+       limpiarPantalla()
        usuario = CrearCuenta()
        imprimirMenuPrincipalUsuario(usuario)
 
     if opcion == 3:
+       limpiarPantalla()
        mostrarPublicaciones()
        print("\nPara generar una orden, debe iniciar sesión o crear una cuenta en Mercado Libre")
+       input("Presione ENTER para regresar -->")
+       limpiarPantalla()
 
     if opcion == 4:
        mostrarPublicaciones2023()
@@ -146,6 +163,7 @@ def AccionarUsuario(opcion,user):
        exit()
        
     if opcion == 1:
+      limpiarPantalla()
       print("Sesion cerrada exitosamente")
       imprimirMenuPrincipalInvitado()
 
@@ -155,9 +173,11 @@ def AccionarUsuario(opcion,user):
        pub = opcionnumerica()
 
        if(pub == "0"):
+          limpiarPantalla()
           return
        else:
           generarOrden(pub,user)
+          imprimirMenuPrincipalUsuario(user)
 
     if opcion == 3:
        mostrarPublicaciones2023()
@@ -166,10 +186,16 @@ def AccionarUsuario(opcion,user):
        mostrarAccesoriosAutos()
 
     if opcion == 5:
+       limpiarPantalla()
        mostrarCupones(user)
+       input("\nPresione ENTER para regresar -->")
+       limpiarPantalla()
 
     if opcion == 6:
+       limpiarPantalla()
        mostrarPerfil(user)
+       input("\nPresione ENTER para regresar -->")
+       limpiarPantalla()
        
       
 def mostrarcaratula():
@@ -277,7 +303,7 @@ def mostrarDirecciones(user):
                " FROM DIRECCION JOIN CIUDAD ON IDCIUDAD=CITYID NATURAL JOIN PROVINCIA NATURAL JOIN PAIS"+
                " WHERE USERID = '"+user+"'")
    
-   print("Sus direcciones registradas\n")
+   print("\nSus direcciones registradas\n")
    contador = 1
    for ID,PARROQUIA,REFERENCIAS,NOMBRECIUDAD,NOMBREPROVINCIA,NOMBREPAIS in cur.fetchall():
       print("-- Direccion #",contador)
@@ -285,10 +311,7 @@ def mostrarDirecciones(user):
       print(NOMBRECIUDAD+","+NOMBREPROVINCIA+","+NOMBREPAIS+"\n")
       contador += 1
 
-def generarOrden(nopublicacion, user):
-    
-
-    
+def generarOrden(nopublicacion, user):    
     fecha_actual = date.today()
 
     cur.execute("SELECT NOMBREPUBLICACION, STOCK, PRECIOVENTA, PRODUCTID, IDVENDEDOR FROM PUBLICACION WHERE NOPUBLICACION ="+str(nopublicacion)+"")
@@ -298,20 +321,35 @@ def generarOrden(nopublicacion, user):
        print("\nPublicacion no encontrada!")
        return
     
-    print("\n-- GENERAR ORDEN --")
+    limpiarPantalla()
+    
+    print("-- GENERAR ORDEN --")
 
     while True:
-        cantidad = int(input("Ingrese la cantidad deseada: "))
+        print("Ingrese la cantidad deseada, 0 para cancelar")
+        cantidad = int(opcionnumerica())
+
+        if cantidad == 0:
+           limpiarPantalla()
+           print("Orden Cancelada")
+           return
+           
         if cantidad <= detallespublicacion[1]:
             break
         else:
             print("Sin stock\n")
 
-    print("Como desea la entrega?\n"+
+    print("\nComo desea la entrega?\n"+
           "1.Entrega a domicilio (Entrega en 5 dias)\n"+
-          "2.Entrega a acordar con el vendedor")
+          "2.Entrega a acordar con el vendedor\n"+
+          "0.Cancelar")
     
-    op = validaropcion(1,2)
+    op = validaropcion(0,2)
+
+    if op == 0:
+      limpiarPantalla()
+      print("Orden Cancelada")
+      return
 
     direccionid=None
     fechaentrega = None
@@ -319,33 +357,58 @@ def generarOrden(nopublicacion, user):
 
     if op == 1:
        mostrarDirecciones(user)
-       opc = int(input("Seleccione direccion: "))
-       cur.execute("SELECT ID FROM DIRECCION WHERE USERID = '"+user+"'")
-       direccionid = cur.fetchall()[opc-1][0]
-       costoenvio = 2
-       fechaentrega = date.today() + timedelta(days=5)
 
-       
-    
+       while True:
+         print("Seleccione direccion, 0 para cancelar")
+         opc = int(opcionnumerica())
+
+         if opc == 0:
+            limpiarPantalla()
+            print("Orden Cancelada")
+            return
+
+         cur.execute("SELECT ID FROM DIRECCION WHERE USERID = '"+user+"'")
+         resultado = cur.fetchall()
+
+         if(opc > len(resultado)):
+            print("Error. Seleccione la opcion correcta\n")
+         else:
+            direccionid = resultado[opc-1][0]
+            costoenvio = 2
+            fechaentrega = date.today() + timedelta(days=5)
+            break
+
     subtotal = detallespublicacion[2] * cantidad
     total = subtotal + costoenvio
-    print("Usted desea adquirir:",detallespublicacion[0])
+    print("\nUsted desea adquirir:",detallespublicacion[0])
     print("Cantidad:",cantidad)
     print("Subtotal:",subtotal)
     print("Costo envio:",costoenvio)
     print("Total:",total)
     print("Fecha de Entrega estimada:",fechaentrega)
 
-    print("\nDesea ingresar cupon? 1. SI 2. NO")
-    op2 = validaropcion(1,2)
+    print("\nDesea ingresar cupon? 1. SI 2. NO 0. CANCELAR")
+    op2 = validaropcion(0,2)
     idCupon = None
     descuento = 0
+
+    if op2 == 0:
+      limpiarPantalla()
+      print("Orden Cancelada")
+      return
 
     if op2==1:
        mostrarCupones(user)
        while True:
-         opc2 = input("\nEscribe el numero del cupón: ")
-         cur.execute("SELECT ID, NOMBRE, DESCUENTO, FECHAVENCIMIENTO,CLIENTEID, VECES FROM CUPON WHERE CLIENTEID ='"+user+"' AND ID = "+str(opc2)+"")
+         print("\nEscribe el numero del cupón, 0 para cancelar")
+         opc2 = opcionnumerica()
+
+         if(int(opc2) == 0):
+            limpiarPantalla()
+            print("Orden Cancelada")
+            return
+
+         cur.execute("SELECT ID, NOMBRE, DESCUENTO, FECHAVENCIMIENTO,CLIENTEID, VECES FROM CUPON WHERE CLIENTEID ='"+user+"' AND ID = "+opc2+"")
          detallescupon = cur.fetchone()
 
          if (detallescupon == None):
@@ -367,13 +430,26 @@ def generarOrden(nopublicacion, user):
                print("Fecha de Entrega estimada:",fechaentrega)
                break
 
-    print("\nDesea proceder con la compra? 1.SI 2.NO ")
+    print("\nDesea proceder con la compra? 1.SI 2.NO")
     op3 = validaropcion(1,2)
+
+    if op3 == 2:
+      limpiarPantalla()
+      print("Orden Cancelada")
+      return
 
     if op3 == 1:
       print("\n-- PAGO")
       while True:
-         trans = input("Asocie un numero de transaccion para generar la orden: ")
+         print("Asocie un numero de transaccion para generar la orden, 0 para CANCELAR")
+         trans = opcionnumerica()
+
+         if(int(trans) == 0):
+            limpiarPantalla()
+            print("Orden Cancelada")
+            return
+
+
          cur.execute("SELECT TRANSID, METODO, MONTO, CUOTA, CARDNUMBER FROM PAGO WHERE TRANSID = "+trans+" AND MONTO = "+str(total)+" AND IDCLIENTE = '"+user+"'")
          detallespago = cur.fetchone()
 
@@ -385,8 +461,12 @@ def generarOrden(nopublicacion, user):
             registropagos.append(IDPAGO[0])
          
          if (detallespago == None or (int(trans) in registropagos)):
+            limpiarPantalla()
+            print("TRANSACCION RECHAZADA")
             print("Lo sentimos, no tiene ningún pago asociado por el momento o fue usado en otra orden, intente de nuevo\n")
+            return
          else:
+            limpiarPantalla()
             print("\n--- Transaccion valida")
             print("\nDetalles de la transaccion:")
             print("No.Transaccion:",detallespago[0])
