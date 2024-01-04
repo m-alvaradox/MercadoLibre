@@ -252,6 +252,10 @@ def AccionarUsuario(opcion,user):
        mostrarPerfil(user)
        input("\nPresione ENTER para regresar -->")
        limpiarPantalla()
+
+    if opcion == 7:
+       limpiarPantalla()
+       mostrarDirecciones(user)
        
       
 def mostrarcaratula():
@@ -285,8 +289,9 @@ def imprimirMenuPrincipalUsuario(nomuser):
        print('4. Productos existentes de categoria Autos')
        print('5. Mis Cupones')
        print('6. Mi Perfil')
+       print('7. Direcciones registradas')
        print('0. SALIR')
-       op = validaropcion(0,6)
+       op = validaropcion(0,7)
        AccionarUsuario(op,nomuser)
 
 def mostrarPublicaciones():

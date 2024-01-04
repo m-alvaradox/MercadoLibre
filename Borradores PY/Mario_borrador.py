@@ -2,6 +2,7 @@ import pymysql
 from datetime import datetime, date, timedelta
 
 mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure.com", user='invitado', passwd= 'root', db='mercadolibre')
+#mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 'root', db='mercadolibre')
 cur = mercadolibreconnection.cursor()
 
 
@@ -64,7 +65,7 @@ def generarOrden(nopublicacion, user):
             print("Sin stock\n")
 
     print("Como desea la entrega?\n"+
-          "1.Entrega a domicilio\n"+
+          "1.Entrega a domicilio (Entrega en 5 dias)\n"+
           "2.Entrega a acordar con el vendedor")
     
     op = validaropcion(1,2)
@@ -182,13 +183,3 @@ def generarOrden(nopublicacion, user):
             break
 
 
-           
-            
-
-
-
-
-
-
-
-generarOrden(1,'malvaradox')
