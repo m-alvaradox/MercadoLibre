@@ -56,8 +56,14 @@ def es_mayor_de_edad(fecha_nacimiento):
 
 def IniciarSesion():
    while True:
-      userName = input("Ingrese su nombre de usuario: ")
+      print("-- INICIAR SESION --")
+      print("Inicie sesion con sus credenciales, doble ENTER para salir")
+      userName = input("\nIngrese su nombre de usuario: ")
       password = input("Ingrese su contraseña: ")
+
+      if userName == "" and password == "":
+         limpiarPantalla()
+         return   
       
       cur.execute("SELECT USERID,PASS FROM USUARIO WHERE USERID = '"+userName+"'")
       for USERID,PASS in cur.fetchall():
@@ -65,28 +71,70 @@ def IniciarSesion():
             limpiarPantalla()
             print("Inicio exitoso")
             return userName
+      
       limpiarPantalla()
       print("Usuario y/o contraseña incorrectos. Vuelva a intentarlo\n")
 
 def CrearCuenta():
+  print("-- CREAR CUENTA --") 
   lusuarios = []
 
   cur.execute("SELECT USERID FROM USUARIO")
   for USERID in cur.fetchall():
     lusuarios.append(USERID[0])
 
+  print("\n-- Crear usuario")
+  print("ENTER para salir\n")
   while True:
     userName = input("Indique un nombre de usuario: ")
-    if(userName in lusuarios):
-      print("El usuario ya existe en el sistema, intente con otro\n")
-    else:
-       break
+    if userName == "":
+       limpiarPantalla()
+       return
+    
+    condletras = False
 
-  nombre = input("Ingrese nombre: ")
-  apellido = input("Ingrese apellido: ")
+    for caracter in userName:
+       if (caracter.isalpha()):
+          condletras = True
+    
+    if(condletras == True):
+      if(userName in lusuarios):
+         print("El usuario ya existe en el sistema, intente con otro\n")
+      else:
+         break
+    else:
+      print("El usuario debe tener al menos una letra\n")
+
+  print("\n-- Datos personales")
+  while True:
+   nombre = input("\nIngrese nombre: ")
+   cond = True
+   
+   for c in nombre:
+      if c == " " or nombre.isalpha() == False:
+         cond = False
+
+   if cond == True:
+      break
+   else:
+      print("Nombre debe contener solo letras y no debe haber espacios")
 
   while True:
-    fechanacimiento = input("Ingrese su fecha de nacimiento en formato YYYY-MM-DD: ")
+   apellido = input("\nIngrese apellido: ")
+   cond2 = True
+
+   for i in apellido:
+      if i == " " or apellido.isalpha() == False:
+         cond2 = False
+   
+   if cond2 == True:
+      break
+   else:
+      print("Apellido debe contener solo letras y no debe haber espacios")
+
+
+  while True:
+    fechanacimiento = input("\nIngrese su fecha de nacimiento en formato YYYY-MM-DD: ")
     if validar_fecha(fechanacimiento):
       if es_mayor_de_edad(fechanacimiento):
         break
@@ -97,7 +145,7 @@ def CrearCuenta():
 
   while True:
      telefono = input("Ingrese su numero de telefono (10 digitos): ")
-     if(len(telefono)==10):
+     if(len(telefono)==10 and telefono.isnumeric()==True):
         break
      else:
         print("Error, vuelva a intentar\n")
@@ -135,11 +183,19 @@ def AccionarInvitado(opcion):
     if opcion == 1:
         limpiarPantalla()
         usuario = IniciarSesion()
+
+        if usuario == None:
+           imprimirMenuPrincipalInvitado()
+
         imprimirMenuPrincipalUsuario(usuario)
 
     if opcion == 2:
        limpiarPantalla()
        usuario = CrearCuenta()
+
+       if usuario == None:
+          imprimirMenuPrincipalInvitado()
+
        imprimirMenuPrincipalUsuario(usuario)
 
     if opcion == 3:
