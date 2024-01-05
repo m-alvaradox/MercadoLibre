@@ -98,6 +98,7 @@ def CrearCuenta():
           condletras = True
     
     if(condletras == True):
+      userName = userName.lower() #new
       if(userName in lusuarios):
          print("El usuario ya existe en el sistema, intente con otro\n")
       else:
@@ -106,10 +107,16 @@ def CrearCuenta():
       print("El usuario debe tener al menos una letra\n")
 
   print("\n-- Datos personales")
+  print("Enter para SALIR")
   while True:
    nombre = input("\nIngrese nombre: ")
+
+   if nombre == "":
+      limpiarPantalla()
+      return
+  
    cond = True
-   
+
    for c in nombre:
       if c == " " or nombre.isalpha() == False:
          cond = False
@@ -119,8 +126,15 @@ def CrearCuenta():
    else:
       print("Nombre debe contener solo letras y no debe haber espacios")
 
+  nombre = nombre.capitalize() 
+  
   while True:
    apellido = input("\nIngrese apellido: ")
+
+   if apellido == "":
+      limpiarPantalla()
+      return
+   
    cond2 = True
 
    for i in apellido:
@@ -132,9 +146,14 @@ def CrearCuenta():
    else:
       print("Apellido debe contener solo letras y no debe haber espacios")
 
-
+  apellido = apellido.capitalize()
   while True:
     fechanacimiento = input("\nIngrese su fecha de nacimiento en formato YYYY-MM-DD: ")
+    
+    if fechanacimiento == "":
+       limpiarPantalla()
+       return
+
     if validar_fecha(fechanacimiento):
       if es_mayor_de_edad(fechanacimiento):
         break
@@ -145,6 +164,11 @@ def CrearCuenta():
 
   while True:
      telefono = input("Ingrese su numero de telefono (10 digitos): ")
+
+     if telefono == "":
+        limpiarPantalla()
+        return
+
      if(len(telefono)==10 and telefono.isnumeric()==True):
         break
      else:
@@ -152,6 +176,11 @@ def CrearCuenta():
 
   while True:
      email = input("Ingrese su correo (ej. 'usuario@dominio.com'): ")
+     
+     if email == "":
+        limpiarPantalla()
+        return
+
      separ = email.split('@')
      sepun = email.split('.')
      if('@' in email and len(separ)==2 and '.' in email and len(sepun)==2):
@@ -159,12 +188,27 @@ def CrearCuenta():
      else:
         print("Incorrecto, vuelva a intentarlo\n")
 
+  email = email.lower()
   while True:
      password = input("Ingrese su contraseña (Max. 16 caracteres): ")
-     if(len(password)<16):
-        break
+     
+     if password == "":
+        limpiarPantalla()
+        return
+
+     conpassword = input("Confirme de nuevo su contraseña: ")
+
+     if conpassword == "":
+        limpiarPantalla()
+        return
+     
+     if (password == conpassword):
+      if(len(password)<=16):
+         break
+      else:
+         print("No valida, debe ser max. 16 caracteres\n")
      else:
-        print("No valida, debe ser max. 16 caracteres\n")
+        print("Contraseñas no coinciden, intente de nuevo\n")
         
   cur.execute("INSERT INTO USUARIO(USERID,PASS,NOMBRE,APELLIDO,FECHANACIMIENTO,ESCLIENTE,ESVENDEDOR,EMAIL,TELEFONO) VALUES ('"+userName+"','"+password+"','"+nombre+"','"+apellido+"','"+fechanacimiento+"',true,false,'"+email+"','"+telefono+"')")
   cur.execute("INSERT INTO CLIENTE VALUES ('"+userName+"')")
@@ -256,7 +300,23 @@ def AccionarUsuario(opcion,user):
     if opcion == 7:
        limpiarPantalla()
        mostrarDirecciones(user)
+       print("\n1. Añadir direccion")
+       print("2. Eliminar direccion")
+       print("0. SALIR")
+       opdir = validaropcion(0,2)
+
+       if (opdir == 0):
+          limpiarPantalla()
+          return
        
+       if (opdir == 1):
+          limpiarPantalla()
+          anadirDireccion(user)
+
+       if (opdir == 2):
+          eliminarDireccion(user)
+          
+
       
 def mostrarcaratula():
    print("\n----- MERCADO LIBRE -----")
@@ -565,6 +625,135 @@ def generarOrden(nopublicacion, user):
             print("Orden",ordenes[0],"realizada con éxito!")
             print("Gracias por comprar en Mercado Libre :)")
             break
+
+def anadirDireccion(user):
+   print("--- NUEVA DIRECCION ---\n")
+   print("-- Seleccion de pais")
+   print("0 para SALIR\n")
+   cur.execute("SELECT * FROM PAIS")
+   listapaises = cur.fetchall()
+   contador = 0
+   for pais in listapaises:
+      contador +=1
+      print(str(contador)+"."+pais[1])
+
+   seleccionpais = validaropcion(0,contador)
+   
+   if seleccionpais == 0:
+      limpiarPantalla()
+      return
+   
+   idpais = listapaises[seleccionpais-1][0]
+
+   print("\n-- Seleccion de estado")
+   print("0 para SALIR\n")
+
+   cur.execute("SELECT PROVID, NOMBREPROVINCIA FROM PAIS JOIN PROVINCIA USING (COUNTRYID) WHERE COUNTRYID ="+str(idpais)+"")
+
+   listaestados = cur.fetchall()
+   contador2 = 0
+
+   for estado in listaestados:
+      contador2 += 1
+      print(str(contador2)+"."+estado[1])
+
+   seleccionestado = validaropcion(0,contador2)
+
+   if seleccionestado == 0:
+      limpiarPantalla()
+      return
+   
+   idestado = listaestados[seleccionestado-1][0]
+
+   print("\n-- Seleccion de ciudad")
+   print("0 para SALIR\n")
+
+   cur.execute("SELECT CITYID, NOMBRECIUDAD FROM PROVINCIA JOIN CIUDAD USING (PROVID) WHERE PROVID ="+str(idestado)+"")
+
+   listaciudades = cur.fetchall()
+   contador3 = 0
+
+   for ciudad in listaciudades:
+      contador3 +=1
+      print(str(contador3)+"."+ciudad[1])
+
+   seleccionciudad = validaropcion(0,contador3)
+
+   if seleccionciudad == 0:
+      limpiarPantalla()
+      return
+   
+   idciudad = listaciudades[seleccionciudad-1][0]
+
+   print("\n-- Detalles de Direccion\n0 para SALIR\n")
+   while True:
+      parroquia = input("Ingrese parroquia: ")
+
+      if parroquia == "0":
+         limpiarPantalla()
+         return
+
+      if(parroquia.isalpha()):
+         break
+      else:
+         print("Ingrese solo caracteres\n")
+
+   
+   referencias = input("Especifique una referencia: ")
+
+   if referencias == "0":
+      limpiarPantalla()
+      return
+
+   limpiarPantalla()
+   print("Añadiendo dirección...")
+
+   cur.execute("INSERT INTO DIRECCION (PARROQUIA, REFERENCIAS, IDCIUDAD, USERID) VALUES ('"+parroquia+"','"+referencias+"',"+str(idciudad)+",'"+user+"')")
+   mercadolibreconnection.commit()
+
+   print("Direccion añadida correctamente!")
+
+def eliminarDireccion(user):
+   print ("\n--- ELIMINAR DIRECCION ---\n")
+
+   while True:
+         print("Seleccione la direccion a eliminar, 0 para cancelar")
+         opc = int(opcionnumerica())
+
+         if opc == 0:
+            limpiarPantalla()
+            return
+
+         cur.execute("SELECT ID FROM DIRECCION WHERE USERID = '"+user+"'")
+         resultado = cur.fetchall()
+
+         if(opc > len(resultado)):
+            print("Error. Seleccione la opcion correcta\n")
+         else:
+            direccionid = resultado[opc-1][0]
+            break
+
+   print("\nRecuerde que si borra su direccion, también se borrará en las ordenes que haya realizado")
+   print("¿Seguro que desea eliminar la direccion #",opc,"?")
+   print("1. SI"+
+         "\n0. CANCELAR")
+   
+   opconf = validaropcion(0,1)
+
+   if opconf == 0:
+      limpiarPantalla()
+      return
+   
+   limpiarPantalla()
+   print("Eliminando direccion...")
+
+   cur.execute("DELETE FROM DIRECCION WHERE ID = "+str(direccionid)+"")
+   mercadolibreconnection.commit()
+
+   print("Direccion eliminada exitosamente")
+
+
+
 
 #Programa Principal
 imprimirMenuPrincipalInvitado()
