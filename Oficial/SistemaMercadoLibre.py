@@ -1096,6 +1096,19 @@ def registrarVisualizacion(user,noPublicacion):
    cur.execute("INSERT INTO VISUALIZACION_PUBLICACIONES (USERID, NOPUBLICACION, FECHA) VALUES ('"+user+"','"+noPublicacion+"','"+str(datetime.now)+"')")
    mercadolibreconnection.commit()
 
+def mostrarPublicacionesDeInteres(user):
+   cur.execute("SELECT p.NOPUBLICACION, p.NOMBREPUBLICACION, p.IDVENDEDOR, p.PRECIOVENTA, p.FECHAPUBLICACION from VISUALIZACION_PUBLICACIONES vp JOIN PUBLICACION p USING (NOPUBLICACION) WHERE USERID = '"+user+"'")
+   print("\nPubliicaciones Visitadas")
+   for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION, FECHA in cur.fetchall():
+      print('Publicacion #',NOPUBLICACION,
+          '\nNombre: ',NOMBREPUBLICACION,
+          '\nVendedor: ',IDVENDEDOR,
+          '\nPrecio: ',PRECIOVENTA,
+          '\nPublicado el: ',FECHAPUBLICACION,
+          '\nVista el: ',FECHA,
+          '\n-----------------------------------\n')
+
+
 # Facturas
    
 def mostrarFacturas(user):
