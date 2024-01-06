@@ -282,7 +282,11 @@ def AccionarUsuario(opcion,user):
        mostrarPublicaciones2023()
 
     if opcion == 4:
-       mostrarAccesoriosAutos()
+       limpiarPantalla()
+       mostrarReclamos(user)
+       input("\nPresione ENTER para regresar -->")
+       limpiarPantalla()
+
 
     if opcion == 5:
        limpiarPantalla()
@@ -319,14 +323,15 @@ def AccionarUsuario(opcion,user):
        limpiarPantalla()
        mostrarcompras(user)
        print("\n1. Calificar Compra")
+       print("2. Hacer un reclamo")
        print("0. SALIR")
-       opt = validaropcion(0,1)
+       opt = validaropcion(0,2)
 
        if opt == 0:
           limpiarPantalla()
           return
        
-       if opt == 1:
+       if opt == 1 or opt == 2:
           print("\nSeleccione Compra, 0 para SALIR")
           while True:
              comp = opcionnumerica()
@@ -339,8 +344,13 @@ def AccionarUsuario(opcion,user):
              if(cur.fetchone() == None):
                print("\nNo corresponde, intenta de nuevo")
              else:
-                calificarCompra(comp,user)
                 break
+             
+       if opt == 1:
+          calificarCompra(comp,user)
+       
+       if opt == 2:
+          realizarReclamo(comp,user)
              
     if opcion == 9:
        print('1. Facturas Recibidas')
@@ -349,6 +359,10 @@ def AccionarUsuario(opcion,user):
        print('0. SALIR')
 
        optc = validaropcion(0,3)
+
+       if optc == 0:
+          limpiarPantalla()
+          return
 
        if optc == 1:
           mostrarFacturas(user)
@@ -398,7 +412,7 @@ def imprimirMenuPrincipalUsuario(nomuser):
        print('1. Cerrar Sesion')
        print('2. Ver Publicaciones')
        print('3. Ver Recientes Publicaciones 2023')
-       print('4. Productos existentes de categoria Autos')
+       print('4. Reclamos')
        print('5. Mis Cupones')
        print('6. Mi Perfil')
        print('7. Direcciones registradas')
@@ -1129,8 +1143,62 @@ def EmitirFactura(user):
    print("FACT#",cur.fetchone()[0],"generada con exito")
 
 
+# Reclamos
+   
+def realizarReclamo(comp,user):
+   print("\n--- EMITIR RECLAMO COMPRA #",comp,"---")
+   print("ENTER para SALIR\n")
 
+   cur.execute("SELECT R.ID, R.TIPO, R.ESTADO, R.VENDEDORID, NOMBRE FROM RECLAMO R JOIN ORDEN USING(ORDERID) JOIN PRODUCTO USING(PRODUCTID) WHERE ORDERID = "+comp+" AND CLIENTEID = '"+user+"'")
+   resultado = cur.fetchone()
 
+   if resultado != None:
+      limpiarPantalla()
+      print("Estimado usuario, usted ya realizo un reclamo anteriormente\n")
+      print("Reclamo #",resultado[0])
+      print("Tipo:",resultado[1])
+      print("Estado:",resultado[2])
+      print("Vendedor:",resultado[3])
+      print("Producto:",resultado[4])
+
+   while True:
+      tipo = input("Especifique TIPO: ")
+
+      if tipo == "":
+         limpiarPantalla()
+         print("Reclamo cancelado!")
+         return
+      
+      if tipo.isalpha() == True:
+         break
+      else:
+         print("\nError, intente de nuevo")
+
+   print("\nSeguro que desea enviar el reclamo?")
+   print("1. SI\n0. SALIR")
+   opt = validaropcion(0,1)
+
+   if opt == 0:
+      limpiarPantalla()
+      print("Reclamo Cancelado!")
+      return
+   
+   limpiarPantalla()
+   print("Generando reclamo...")
+   cur.execute("SELECT IDVENDEDOR FROM ORDEN WHERE ORDERID = "+comp+" AND IDCLIENTE = '"+user+"'")
+   idvendedor = cur.fetchone()[0]
+
+   cur.execute("INSERT INTO RECLAMO (TIPO, ESTADO, CLIENTEID, VENDEDORID, ORDERID, FECHAINGRESO) VALUES"+
+               "('"+tipo+"','Abierto','"+user+"','"+idvendedor+"',"+comp+",now())")
+   mercadolibreconnection.commit()
+   cur.execute("SELECT ID FROM RECLAMO WHERE ORDERID = "+comp+" AND CLIENTEID = '"+user+"'")
+   print("Reclamo #"+str(cur.fetchone()[0])+" generado con exito!")
+
+      
+
+def mostrarReclamos(user):
+   limpiarPantalla()
+   print("--- RECLAMOS ---\n")
 
 #Programa Principal
 imprimirMenuPrincipalInvitado()
