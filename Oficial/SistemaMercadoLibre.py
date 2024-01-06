@@ -272,7 +272,7 @@ def AccionarUsuario(opcion,user):
       print("Sesion cerrada exitosamente")
       imprimirMenuPrincipalInvitado()
 
-    if opcion == 11:
+    if opcion == 12:
        mostrarPublicaciones()
        print("\nSeleccione la publicacion de su interés\nPara SALIR digite 0")
        pub = opcionnumerica()
@@ -398,9 +398,13 @@ def AccionarUsuario(opcion,user):
     if opcion == 10:
        limpiarPantalla()
        crearpublicacion(user)
-   
-          
 
+    if opcion == 11:
+       limpiarPantalla()
+       verventas(user)
+       input("\nPresione ENTER para regresar -->")
+       limpiarPantalla()
+   
       
 def mostrarcaratula():
    print("\n----- MERCADO LIBRE -----")
@@ -437,9 +441,10 @@ def imprimirMenuPrincipalUsuario(nomuser):
        print('8. Mis Compras')
        print("9. Mis Facturas")
        print("10. Vender")
-       print('11. Ver Publicaciones')
+       print("11. Mis Ventas")
+       print('12. Ver Publicaciones')
        print('0. SALIR')
-       op = validaropcion(0,11)
+       op = validaropcion(0,12)
 
        AccionarUsuario(op,nomuser)
 
@@ -1259,8 +1264,10 @@ def validarUsuario(usuario):
         return True
     else:
         return False
-    
-def actualizarUsuario(user): #Javier #funcion parametrizada
+
+#Funciones Javier
+        
+def actualizarUsuario(user):  #funcion parametrizada
     print("\n--- MODIFICAR CUENTA ---")
     print("Enter para SALIR\n")
 
@@ -1336,9 +1343,36 @@ def eliminarUsuario(user): #funcion parametrizada
         print("Acción cancelada")
         return user
 
+def imprimirOrden(registros):
+    try:
+        if len(registros) > 0:
+            print(" -- ORDENES CON ESTADO '" + registros[0][1].upper()+"': --")
+            for registro in registros:
+                nombre,estado,cupon,suma = registro
+                print("PRODUCTO: "+nombre)
+                print("Cantidad: "+ str(suma))
+                print("Estado: "+estado)
+                if(cupon != None):
+                    print("Cupon: "+str(cupon))
+                else:
+                    print("No se usaron cupones")
+                print("")
+    except Exception as e:
+        print(f"Error: {e}")
 
-
-
+def verventas(user): #funcion parametrizada
+    cur.execute("select  idvendedor from orden o natural join producto p where idvendedor = '"+user+"';")
+    if(len(cur.fetchall())) > 0:
+        print("--- REPORTE DE ORDENES ---")
+        cur.execute("select  p.nombre,o.estado,idcupon, sum(cantidadproducto) sumaproductos from orden o natural join producto p where idvendedor = '"+user+"' and estado = 'Completada' group by o.idvendedor, p.nombre,o.estado,idcupon;")
+        imprimirOrden(cur.fetchall())
+        cur.execute("select  p.nombre,o.estado,idcupon, sum(cantidadproducto) sumaproductos from orden o natural join producto p where idvendedor = '"+user+"' and estado = 'Pendiente' group by o.idvendedor, p.nombre,o.estado,idcupon;")
+        imprimirOrden(cur.fetchall())
+        cur.execute("select  p.nombre,o.estado,idcupon, sum(cantidadproducto) sumaproductos from orden o natural join producto p where idvendedor = '"+user+"' and estado = 'En curso' group by o.idvendedor, p.nombre,o.estado,idcupon;")
+        imprimirOrden(cur.fetchall())
+    else:
+        limpiarPantalla()
+        print("Por ahora usted no tiene ordenes realizadas")
 
 
 
