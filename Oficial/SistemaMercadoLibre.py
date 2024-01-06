@@ -879,21 +879,46 @@ def calificarCompra(comp,user):
 # Facturas
    
 def mostrarFacturas(user):
-   print("--- MIS FACTURAS ---")
+   limpiarPantalla()
+   print("\n--- MIS FACTURAS ---\n")
 
-   cur.execute("SELECT * FROM FACTURA WHERE IDCLIENTE = '"+user+"'")
+   cur.execute("SELECT FACTID, FECHA, DESCRIPCION, FACT.IDVENDEDOR, FACT.IDCLIENTE, FACT.IDORDEN, NOMBRE FROM FACTURA FACT JOIN ORDEN USING (IDCLIENTE) JOIN PRODUCTO USING (PRODUCTID) WHERE FACT.IDCLIENTE = '"+user+"'")
    detallesfacturas = cur.fetchall()
 
    if (len(detallesfacturas) == 0):
+      limpiarPantalla()
       print("No hay facturas")
       return
    
    for factura in detallesfacturas:
       print("FACT #",factura[0])
+      print("Fecha Emision:",factura[1])
+      print("Descripcion: ",factura[2])
+      print("Vendedor:",factura[3])
+      print("Cliente:",factura[4])
+      print("Orden:",factura[5])
+      print("Producto:",factura[6])
+      print("-------------------------------")
 
 
-def mostrarFacturasEmitidas():
+def mostrarFacturasEmitidas(user):
    print("--- FACTURAS EMITIDAS ---")
+   cur.execute("SELECT FACTID, FECHA, DESCRIPCION, FACT.IDCLIENTE, FACT.IDORDEN, NOMBRE FROM PRODUCTO PROD JOIN ORDEN ORD USING(PRODUCTID) JOIN FACTURA FACT ON IDORDEN = ORDERID JOIN VENDEDOR V ON FACT.IDVENDEDOR = USERID WHERE FACT.IDVENDEDOR ='"+user+"'")
+   resultado = cur.fetchall()
+
+   if len(resultado) == 0:
+      limpiarPantalla()
+      print("No dispone de facturas emitidas actualmente!")
+      return
+   
+   for i in resultado:
+      print("FACT #",i[0])
+      print("Fecha Emision:",i[1])
+      print("Descripcion: ",i[2])
+      print("Cliente:",i[3])
+      print("Orden:",i[4])
+      print("Producto:",i[5])
+      print("-------------------------------")
 
 def EmitirFactura():
    print("--- EMISION DE FACTURA ---")
