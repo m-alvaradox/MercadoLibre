@@ -256,10 +256,16 @@ def AccionarInvitado(opcion):
        limpiarPantalla()
 
     if opcion == 4:
+       limpiarPantalla()
        mostrarPublicaciones2023()
+       input("\nPresione ENTER para regresar -->")
+       limpiarPantalla()
 
     if opcion == 5:
+       limpiarPantalla()
        mostrarAccesoriosAutos()
+       input("\nPresione ENTER para regresar -->")
+       limpiarPantalla()
 
 def AccionarUsuario(opcion,user):
     
@@ -409,6 +415,18 @@ def AccionarUsuario(opcion,user):
        limpiarPantalla()
        responderpregunta(user)
        limpiarPantalla()
+
+    if opcion == 14:
+       limpiarPantalla()
+       mostrarPublicaciones2023()
+       input("\nPresione ENTER para regresar -->")
+       limpiarPantalla()
+
+    if opcion == 15:
+       limpiarPantalla()
+       mostrarAccesoriosAutos()
+       input("\nPresione ENTER para regresar -->")
+       limpiarPantalla()
    
       
 def mostrarcaratula():
@@ -424,7 +442,8 @@ def imprimirMenuPrincipalInvitado():
         print('2. Crear Cuenta')
         print('3. Ver Publicaciones')
         print('4. Ver Recientes Publicaciones 2023')
-        print('6. Productos existentes de categoria Autos')
+        print('5. Productos existentes de categoria Autos')
+
         print('0. SALIR')
         op = validaropcion(0,6)
         AccionarInvitado(op)
@@ -449,8 +468,10 @@ def imprimirMenuPrincipalUsuario(nomuser):
        print("11. Mis Ventas")
        print("12. Ver Publicaciones")
        print("13. Responder Preguntas")
+       print("14. Ver Recientes Publicaciones 2023")
+       print("15. Productos existentes de categoria Autos")
        print('0. SALIR')
-       op = validaropcion(0,13)
+       op = validaropcion(0,15)
 
        AccionarUsuario(op,nomuser)
 
@@ -1444,9 +1465,6 @@ def verReclamos(userid):
         print("Vendedor:", reclamo[4])
         print("")
     print("")
-
-
-
 
 
 #Programa Principal
