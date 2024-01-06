@@ -52,12 +52,8 @@ def actualizarUsuario():
         print(f"Error: {e}")
     cur.close()
 
-def eliminarUsuario():
-    userid = input("Ingrese su usuario a eliminar:\n")
-    while not validarUsuario(userid):
-        print("Usuario invalido")
-        userid = input("Ingrese su usuario:\n")
-    validacion = input("¿Está eguro que quiere eliminar su cuenta?\n¡Esta acción no se puede revertir!\nEscriba 'si' para confirmar\n")
+def eliminarUsuario(userid):
+    validacion = input("¿Está seguro que quiere eliminar su cuenta?\n¡Esta acción no se puede revertir!\nEscriba 'si' para confirmar\n")
     if validacion.lower() == "si":
         try:
             mercadolibreconnection.begin()
@@ -67,7 +63,6 @@ def eliminarUsuario():
             cur.execute("DELETE FROM ORDEN WHERE IDCLIENTE = '"+ userid +"' OR IDVENDEDOR = '"+ userid +"';")
             cur.execute("DELETE FROM PAGO WHERE IDCLIENTE = '"+ userid +"';")
             cur.execute("DELETE FROM DIRECCION WHERE USERID = '"+ userid +"';")
-            cur.execute("DELETE FROM DETALLECONTACTO WHERE IDCLIENTE = '"+ userid +"' OR IDVENDEDOR = '"+ userid +"' OR IDPUBLICACION IN (SELECT NOPUBLICACION FROM PUBLICACION WHERE IDVENDEDOR = '"+ userid +"');")
             cur.execute("DELETE FROM CUPON WHERE CLIENTEID = '"+ userid +"';")
             cur.execute("DELETE FROM PREGUNTA WHERE IDCLIENTE = '"+ userid +"' OR IDVENDEDOR = '"+ userid +"';")
             cur.execute("DELETE FROM PUBLICACION WHERE  IDVENDEDOR = '"+ userid +"';")
@@ -86,11 +81,7 @@ def eliminarUsuario():
     else:
         print("Acción cancelada")
 
-def  verventas():
-    userid = input("Ingrese su usuario:\n")
-    while not validarUsuario(userid):
-        print("Usuario invalido")
-        userid = input("Ingrese su usuario:\n")
+def  verventas(userid):
     cur.execute("select  idvendedor from orden o natural join producto p where idvendedor = '"+userid+"';")
     if(len(cur.fetchall())) > 0:
         print("--- REPORTE DE ORDENES ---")
@@ -105,13 +96,10 @@ def  verventas():
 
 # -- Preguntas: El usuario vendedor puede revisar las preguntas que hacen los clientes en cada publicacion, 
 # -- asimismo puede enviar una respuesta, considerar enviar la fecha/hora de respuesta. Consultas, Modificaciones tabla preguntas
-def responderpregunta():
-    userid = input("Ingrese su usuario actual:\n")
-    while not validarUsuario(userid):
-        print("Usuario invalido")
-        userid = input("Ingrese su usuario:\n")
+def responderpregunta(userid):
     cur.execute("SELECT IDPREGUNTA,CONTENIDO,MENSAJERESPUESTA,IDCLIENTE FROM PREGUNTA WHERE IDVENDEDOR = '"+ userid +"';")
     preguntas = cur.fetchall()
+    print("\n-- PREGUNTAS --")
     for pregunta in preguntas:
         idpregunta,contenido,respuesta,cliente = pregunta
         print("")
@@ -146,4 +134,37 @@ def responderpregunta():
         responder = input("¿Desea responder otro comentario?\nSI/NO\n").lower()
         mercadolibreconnection.commit()
 
-responderpregunta()
+# Mis reclamos: El usuario vendedor/cliente puede ver los reclamos que ha generado o que tiene que resolver y en que estado están. Consultas
+def verReclamos(userid):
+    print("")
+    cur.execute("select * from reclamo where clienteid = '"+userid+"'")
+    reclamosGenerados = cur.fetchall()
+    if(len(reclamosGenerados)>0):
+        print("-- Reclamos que usted ha hecho: --")
+    else:
+        print("¡Usted no ha generado reclamos!")
+    for reclamo in reclamosGenerados:
+        id,tipo,estado,clienteid, vendedorid,orderid = reclamo
+        print("ID DEL RECLAMO: " + str(id))
+        print("Tipo: " + tipo)
+        print("Estado: "+ estado) 
+        print("Cliente: " + clienteid)
+        print("Vendedor: " + vendedorid)
+        print("")
+
+    cur.execute("select * from reclamo where vendedorid = '"+userid+"'")
+    reclamosPorResolver = cur.fetchall()
+    if(len(reclamosPorResolver)>0):
+        print("-- Reclamos por resolver: --")
+    else:
+        print("¡Usted no tiene reclamos!")
+    for reclamo in reclamosPorResolver:
+        id,tipo,estado,clienteid, vendedorid,orderid = reclamo
+        print("ID DEL RECLAMO: " + str(id))
+        print("Tipo: " + tipo)
+        print("Estado: "+ estado) 
+        print("Cliente: " + clienteid)
+        print("Vendedor: " + vendedorid)
+        print("")
+    print("")
+verReclamos("javirod")
