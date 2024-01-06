@@ -301,7 +301,7 @@ def AccionarUsuario(opcion,user):
 
     if opcion == 4:
        limpiarPantalla()
-       mostrarReclamos(user)
+       verReclamos(user)
        input("\nPresione ENTER para regresar -->")
        limpiarPantalla()
 
@@ -1254,13 +1254,6 @@ def realizarReclamo(comp,user):
    cur.execute("SELECT ID FROM RECLAMO WHERE ORDERID = "+comp+" AND CLIENTEID = '"+user+"'")
    print("Reclamo #"+str(cur.fetchone()[0])+" generado con exito!")
 
-      
-
-def mostrarReclamos(user):
-   limpiarPantalla()
-   print("--- RECLAMOS ---\n")
-
-
 def validarUsuario(usuario):
     cur.execute("SELECT USERID FROM USUARIO")
     usuarios = []
@@ -1418,6 +1411,39 @@ def responderpregunta(userid): #funcion parametrizada
         cur.execute("UPDATE PREGUNTA SET FECHAHORARESPUESTA = NOW() where idpregunta = "+preg+";")
         responder = input("¿Desea responder otro comentario?\nSI/NO\n").lower()
         mercadolibreconnection.commit()
+
+def verReclamos(userid):
+    print("")
+    cur.execute("select * from reclamo where clienteid = '"+userid+"'")
+    reclamosGenerados = cur.fetchall()
+    if(len(reclamosGenerados)>0):
+        print("-- Reclamos que usted ha hecho: --")
+    else:
+        print("¡Usted no ha generado reclamos!")
+    for reclamo in reclamosGenerados:
+        #id,tipo,estado,clienteid, vendedorid,orderid = reclamo # ?
+        print("ID DEL RECLAMO:",reclamo[0])
+        print("Tipo:",reclamo[1])
+        print("Estado:",reclamo[2]) 
+        print("Cliente:", reclamo[3])
+        print("Vendedor:", reclamo[4])
+        print("")
+
+    cur.execute("select * from reclamo where vendedorid = '"+userid+"'")
+    reclamosPorResolver = cur.fetchall()
+    if(len(reclamosPorResolver)>0):
+        print("-- Reclamos por resolver: --")
+    else:
+        print("¡Usted no tiene reclamos!")
+    for reclamo in reclamosPorResolver:
+        #id,tipo,estado,clienteid, vendedorid,orderid = reclamo # ?
+        print("ID DEL RECLAMO:",reclamo[0])
+        print("Tipo:",reclamo[1])
+        print("Estado:",reclamo[2]) 
+        print("Cliente:", reclamo[3])
+        print("Vendedor:", reclamo[4])
+        print("")
+    print("")
 
 
 
