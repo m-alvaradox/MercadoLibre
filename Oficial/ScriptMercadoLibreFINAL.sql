@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS CLIENTE (
 
 CREATE TABLE IF NOT EXISTS VENDEDOR (
   USERID VARCHAR(50) PRIMARY KEY,
-   REPUTACION FLOAT,
+   REPUTACION FLOAT DEFAULT NULL,
   FOREIGN KEY (USERID) REFERENCES USUARIO (USERID)
 );
 
@@ -199,8 +199,8 @@ insert into USUARIO values('daniroca','5s43bcds21','Daniela','Roca','1980-10-05'
 insert into CLIENTE values
 ('ownyag'),('malvaradox'),('xavicam'),('javirod'),('naybor'),('luchoont'),('nickfigu'),('charlesrod'),('joelvill'),('angivel'),('angon'),('ferchon'),('jorgquij'),('arperez'),('fiotorres'),('daniroca');
 
-insert into VENDEDOR values
-('ownyag',5),('malvaradox',5),('xavicam',4),('javirod',4.5),('angon',4.6),('ferchon',3),('jorgquij',2),('arperez',5),('fiotorres',1),('daniroca',2.7);
+insert into VENDEDOR(USERID) values
+('ownyag'),('malvaradox'),('xavicam'),('javirod'),('angon'),('ferchon'),('jorgquij'),('arperez'),('fiotorres'),('daniroca');
 
 insert into PAIS values
 (901,'Ecuador'),(902,'Venezuela'),(903,'Colombia'),(904,'Brasil'),(905,'Uruguay'),

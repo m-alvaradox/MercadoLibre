@@ -1031,7 +1031,7 @@ def crearpublicacion(user):
    for USERID in cur.fetchall():
          lVenderdores.append(USERID[0])
    if(user not in lVenderdores):
-         cur.execute("INSERT INTO VENDEDOR VALUES ('"+user+"','0')")
+         cur.execute("INSERT INTO VENDEDOR(USERID) VALUES ('"+user+"')")
 
    limpiarPantalla()
    print("Creando Publicacion...")
