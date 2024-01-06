@@ -359,8 +359,6 @@ def AccionarUsuario(opcion,user):
        if optc == 3:
           EmitirFactura(user)
 
-       if opt == 2:
-          mostrarMensajesArchivados(comp,user)
     if opcion == 10:
        limpiarPantalla()
        crearpublicacion(user)
