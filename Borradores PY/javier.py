@@ -2,7 +2,7 @@ import pymysql
 from datetime import datetime
 
 # Conexion a la base de datos de mercadolibre
-mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 'Walboli-18', db='mercadolibre')
+mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 'user2', db='mercadolibre')
 cur = mercadolibreconnection.cursor()
 
 def validarUsuario(usuario):
@@ -167,4 +167,3 @@ def verReclamos(userid):
         print("Vendedor: " + vendedorid)
         print("")
     print("")
-verReclamos("javirod")
