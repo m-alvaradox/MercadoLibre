@@ -911,6 +911,7 @@ def mostrarProductos():
       print("Categoria:",listaProductos[i][3])
       print("Subcategoria: ",listaProductos[i][4])
 
+# Publicaciones
 def crearpublicacion(user):
    print("\n--- VENDER ---\n")
    lusuarios = []
@@ -1012,7 +1013,11 @@ def crearpublicacion(user):
    mercadolibreconnection.commit()
    print("\nHas publicado tu venta")
 
-   
+#Visualizacion de publicaciones
+#Esta funcion debe ser llamada despues de abrir a detalle una publicacion de eleccion del user, recuperando el numero de
+def registrarVisualizacion(user,noPublicacion):
+   cur.execute("INSERT INTO VISUALIZACION_PUBLICACIONES (USERID, NOPUBLICACION, FECHA) VALUES ('"+user+"','"+noPublicacion+"','"+str(datetime.now)+"')")
+   mercadolibreconnection.commit()
 
 # Facturas
    
@@ -1040,7 +1045,6 @@ def mostrarFacturas(user):
 
 
 def mostrarFacturasEmitidas(user):
-   limpiarPantalla()
    print("--- FACTURAS EMITIDAS ---")
    cur.execute("SELECT FACTID, FECHA, DESCRIPCION, FACT.IDCLIENTE, FACT.IDORDEN, NOMBRE FROM PRODUCTO PROD JOIN ORDEN ORD USING(PRODUCTID) JOIN FACTURA FACT ON IDORDEN = ORDERID JOIN VENDEDOR V ON FACT.IDVENDEDOR = USERID WHERE FACT.IDVENDEDOR ='"+user+"'")
    resultado = cur.fetchall()
