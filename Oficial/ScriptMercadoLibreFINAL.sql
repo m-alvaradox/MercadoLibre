@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS DIRECCION (
 );
 
 CREATE TABLE IF NOT EXISTS PRODUCTO (
-  PRODUCTID INT PRIMARY KEY,
+  PRODUCTID INT AUTO_INCREMENT PRIMARY KEY,
   NOMBRE VARCHAR(50) NOT NULL,
   MARCA VARCHAR(10),
   CATEGORIA VARCHAR(20),
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS ORDEN (
 );
 
 CREATE TABLE IF NOT EXISTS RECLAMO (
-  ID INT PRIMARY KEY,
+  ID INT AUTO_INCREMENT PRIMARY KEY,
   TIPO VARCHAR(20),
   ESTADO ENUM('Abierto','Cerrado'),
   CLIENTEID VARCHAR(50),
@@ -228,41 +228,41 @@ insert into DIRECCION (IDCIUDAD, USERID, PARROQUIA, REFERENCIAS) values
 (715,'angivel','San Sebastian','Avenida Colombia Calle Estados Unidos 100 Refineria'),
 (701,'malvaradox','Tarqui','La Vista Towers Edif. 8D 7A');
 
-insert into PRODUCTO values
-    (50001,'GALAXY A70','SAMSUNG','TECNOLOGIA','SMARTPHONES'),
-    (50002,'INSPIRON 3910','DELL','TECNOLOGIA','LAPTOPS'),
-    (50003,'XXKIU','ACER','TECNOLOGIA','LAPTOPS'),
-    (50004,'AIR FORCE 1','NIKE','DEPORTES','ZAPATILLAS'),
-    (50005,'FORUM LOW','ADIDAS','DEPORTES','ZAPATILLAS'),
-    (50006,'LEGO STAR WARS MILLENNIUM FALCON','LEGO','JUGUETES','ROMPECABEZAS'),
-    (50007,'MESA','PYCCA','HOGAR','MUEBLES'),
-    (50008,'IPHONE 15 PRO MAX','APPLE','TECNOLOGIA','SMARTPHONES'),
-    (50009,'KIT DE FAROS LED PARA AUTO','PHILIPS','AUTOS','ACCESORIOS'),
-    (50010,'CAMARA DE REVERSA CON PANTALLA','ANKER','AUTOS','ACCESORIOS'),
-    (50011,'SISTEMA DE AUDIO PARA AUTO','JBL','AUTOS','ACCESORIOS'),
-    (50012,'LEGO CREATOR 3 EN 1','LEGO','JUGUETES','ROMPECABEZAS');
+insert into PRODUCTO (NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA) values
+    ('GALAXY A70','SAMSUNG','TECNOLOGIA','SMARTPHONES'),
+    ('INSPIRON 3910','DELL','TECNOLOGIA','LAPTOPS'),
+    ('XXKIU','ACER','TECNOLOGIA','LAPTOPS'),
+    ('AIR FORCE 1','NIKE','DEPORTES','ZAPATILLAS'),
+    ('FORUM LOW','ADIDAS','DEPORTES','ZAPATILLAS'),
+    ('LEGO STAR WARS MILLENNIUM FALCON','LEGO','JUGUETES','ROMPECABEZAS'),
+    ('MESA','PYCCA','HOGAR','MUEBLES'),
+    ('IPHONE 15 PRO MAX','APPLE','TECNOLOGIA','SMARTPHONES'),
+    ('KIT DE FAROS LED PARA AUTO','PHILIPS','AUTOS','ACCESORIOS'),
+    ('CAMARA DE REVERSA CON PANTALLA','ANKER','AUTOS','ACCESORIOS'),
+    ('SISTEMA DE AUDIO PARA AUTO','JBL','AUTOS','ACCESORIOS'),
+    ('LEGO CREATOR 3 EN 1','LEGO','JUGUETES','ROMPECABEZAS');
     
     INSERT INTO PUBLICACION(DESCRIPCION,TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,FECHAPUBLICACION,NOMBREPUBLICACION,STOCK) values
     ('El Galaxy S23: lo último en tecnología móvil. Pantalla AMOLED de 6,1 pulgadas, procesador Snapdragon 8 Gen 2, cámara de 50MP.',
-    'Gratuita', 50001,'ownyag',612.50,'Activa','2023-12-12','SAMSUNG GALAXY A70 SELLADO',2),
+    'Gratuita', 1,'ownyag',612.50,'Activa','2023-12-12','SAMSUNG GALAXY A70 SELLADO',2),
     ('INSPIRON 3910: rendimiento y portabilidad. Procesador Intel Core i5 de 11.ª generación, pantalla de 15,6 pulgadas.',
-    'Gratuita',50002,'malvaradox',800,'Activa','2022-10-23','DELL INSPIRON 3910 NUEVO',3),
+    'Gratuita',2,'malvaradox',800,'Activa','2022-10-23','DELL INSPIRON 3910 NUEVO',3),
     ('La Nitro 5: rendimiento potente y diseño elegante. Procesador Intel Core i7 de 12.ª generación, tarjeta gráfica NVIDIA RTX 3060',
-    'Gratuita',50003,'xavicam',250,'Activa','2019-11-11','XXXKIU DE OPORTUNIDAD',4),
+    'Gratuita',3,'xavicam',250,'Activa','2019-11-11','XXXKIU DE OPORTUNIDAD',4),
     ('Las Air Force 1: un clásico de la moda urbana. Diseño sencillo, comodidad inigualable.',
-    'Gratuita',50004,'javirod',62.50,'Activa','2023-12-01','NKE AIR FORCE ONE',1),
-    ('Las Forum Low: versátiles y combinables. Diseño retro, estilo minimalista.', 'Gratuita',50005,'angon',210,
+    'Gratuita',4,'javirod',62.50,'Activa','2023-12-01','NKE AIR FORCE ONE',1),
+    ('Las Forum Low: versátiles y combinables. Diseño retro, estilo minimalista.', 'Gratuita',5,'angon',210,
     'Activa','2022-11-11','ADIDAS FORUM LOW',5),
     ('El Millennium Falcon: el set de Lego más grande de la historia. 7541 piezas, nave espacial a escala 1:144.',
-    'Gratuita',50006,'ferchon',34.50,'Activa','2023-11-14','MILLENNIUM FALCOM APROVECHA',1),
+    'Gratuita',6,'ferchon',34.50,'Activa','2023-11-14','MILLENNIUM FALCOM APROVECHA',1),
     ('La mesa Pycca: sencilla y elegante. Diseño moderno, construcción resistente.',
-    'Gratuita',50007,'jorgquij',15.60,'Activa','2023-10-10','MESA PYCCA PARA LA FAMILIA',10),
+    'Gratuita',7,'jorgquij',15.60,'Activa','2023-10-10','MESA PYCCA PARA LA FAMILIA',10),
     ('El iPhone 15 Pro Max: lo último en tecnología Apple. Pantalla OLED de 6,7 pulgadas, procesador A16 Bionic, cámara triple de 48MP.',
-    'Gratuita',50008,'arperez',1299.99,'Activa','2023-11-26','IPHONE 15 PRO MAX TRAIDA DESDE USA',5),
+    'Gratuita',8,'arperez',1299.99,'Activa','2023-11-26','IPHONE 15 PRO MAX TRAIDA DESDE USA',5),
     ('Los faros LED Philips: más visibilidad y seguridad. Iluminación potente y uniforme, diseño elegante.',
-    'Gratuita',50009,'fiotorres',11.23,'Activa','2022-11-13','FAROS LED PHILLIPS',2),
+    'Gratuita',9,'fiotorres',11.23,'Activa','2022-11-13','FAROS LED PHILLIPS',2),
     ('La cámara de reversa Anker: más seguridad al estacionar. Imágenes nítidas y claras, pantalla de 5 pulgadas.',
-    'Gratuita',50010,'daniroca',300,'Activa','2023-09-09','CAMARA REVERSA',8);
+    'Gratuita',10,'daniroca',300,'Activa','2023-09-09','CAMARA REVERSA',8);
     
     INSERT INTO VISUALIZACION_PUBLICACIONES (NOPUBLICACION,USERID,FECHA) VALUES
 	(1,'ownyag','2023-07-07'),(2,'malvaradox','2023-07-09'),(3,'xavicam','2023-07-12'),(4,'javirod','2023-07-15'),(5,'naybor','2023-08-16'),
@@ -288,15 +288,15 @@ INSERT INTO CUPON VALUES
 (4005,'DESCNPH',40,'2023-12-15','charlesrod',2), (4006, 'START2024',50,'2024-01-30','malvaradox',1);
 
 INSERT INTO ORDEN (IDCUPON,PRODUCTID,IDPAGO,IDCLIENTE,IDVENDEDOR,IDDIRECCION,FECHACREACION,ESTADO,CANTIDADPRODUCTO,IMPORTE,COSTOENVIO,FECHAENTREGA,ESTRELLASPRODUCTO,ESTRELLASVENDEDOR,COMENTARIO,IDPUBLICACION) VALUES
-(4001,50001,3002,'malvaradox','ownyag',2,'2023-12-11','Completada',1,612.50,0,'2023-12-12',4,4,'Recibi en buenas condiciones pero muy tardado el envio',1),
-(NULL,50005,3001,'ownyag','angon',NULL,'2023-12-26','Completada',1,210,0,NULL,5,5,'Buena experiencia, gracias',5),
-(NULL,50006,3003,'xavicam','ferchon',NULL,'2023-12-21','Completada',1,34.50,0,NULL,4,4,NULL,6),
-(NULL,50009,3004,'javirod','fiotorres',NULL,'2023-12-15','Completada',2,22.46,0,NULL,5,5,'Me gusto, gracias',9),
-(4003,50001,3005,'naybor','ownyag',5,'2023-12-13','Completada',2,980,0,'2023-12-19',3,2,'Solo me llego una exijo una devolucion',1);
+(4001,1,3002,'malvaradox','ownyag',2,'2023-12-11','Completada',1,612.50,0,'2023-12-12',4,4,'Recibi en buenas condiciones pero muy tardado el envio',1),
+(NULL,5,3001,'ownyag','angon',NULL,'2023-12-26','Completada',1,210,0,NULL,5,5,'Buena experiencia, gracias',5),
+(NULL,6,3003,'xavicam','ferchon',NULL,'2023-12-21','Completada',1,34.50,0,NULL,4,4,NULL,6),
+(NULL,9,3004,'javirod','fiotorres',NULL,'2023-12-15','Completada',2,22.46,0,NULL,5,5,'Me gusto, gracias',9),
+(4003,1,3005,'naybor','ownyag',5,'2023-12-13','Completada',2,980,0,'2023-12-19',3,2,'Solo me llego una exijo una devolucion',1);
 
-INSERT INTO RECLAMO (ID,CLIENTEID,VENDEDORID,ORDERID,TIPO,ESTADO)VALUES
-(7001,'malvaradox','ownyag',1,'RETRASO','Cerrado'),
-(7002,'naybor','ownyag',5,'FALLO ENTREGA', 'Abierto');
+INSERT INTO RECLAMO (CLIENTEID,VENDEDORID,ORDERID,TIPO,ESTADO)VALUES
+('malvaradox','ownyag',1,'RETRASO','Cerrado'),
+('naybor','ownyag',5,'FALLO ENTREGA', 'Abierto');
 
 INSERT INTO FACTURA (FECHA, DESCRIPCION, IDVENDEDOR, IDCLIENTE, IDORDEN) VALUES
 ('2023-12-14','COMPRA DE PRODUCTOS','ownyag','malvaradox',1);
