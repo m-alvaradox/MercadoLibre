@@ -112,4 +112,5 @@ while (usuario != 'salir'):
       print('Nombre del producto: ' + NOMBRE, 'Marca: ' + MARCA, 'Categoria: ' + CATEGORIA, 'Precio: ' + PRECIO)
 
 #Aplicacion - Ver publicaciones (vista del cliente)
-else if (
+def mostrarPublicacionCategoria(categoria, cur):
+  cur.execute()
