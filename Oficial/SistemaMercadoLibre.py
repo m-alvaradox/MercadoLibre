@@ -342,6 +342,23 @@ def AccionarUsuario(opcion,user):
              else:
                 calificarCompra(comp,user)
                 break
+             
+    if opcion == 9:
+       print('1. Facturas Recibidas')
+       print('2. Facturas Emitidas')
+       print('3. Emitir Factura')
+       print('0. SALIR')
+
+       optc = validaropcion(0,3)
+
+       if optc == 1:
+          mostrarFacturas(user)
+
+       if optc == 2:
+          mostrarFacturasEmitidas(user)
+
+       if optc == 3:
+          EmitirFactura(user)
 
           
 
@@ -379,9 +396,9 @@ def imprimirMenuPrincipalUsuario(nomuser):
        print('6. Mi Perfil')
        print('7. Direcciones registradas')
        print('8. Mis Compras')
-       print("9. Mis Facturas")
+       print("9. Facturas")
        print('0. SALIR')
-       op = validaropcion(0,8)
+       op = validaropcion(0,9)
        AccionarUsuario(op,nomuser)
 
 def mostrarPublicaciones():
@@ -858,6 +875,28 @@ def calificarCompra(comp,user):
    limpiarPantalla()
    print("\nOrden calificada!")
 
+
+# Facturas
+   
+def mostrarFacturas(user):
+   print("--- MIS FACTURAS ---")
+
+   cur.execute("SELECT * FROM FACTURA WHERE IDCLIENTE = '"+user+"'")
+   detallesfacturas = cur.fetchall()
+
+   if (len(detallesfacturas) == 0):
+      print("No hay facturas")
+      return
+   
+   for factura in detallesfacturas:
+      print("FACT #",factura[0])
+
+
+def mostrarFacturasEmitidas():
+   print("--- FACTURAS EMITIDAS ---")
+
+def EmitirFactura():
+   print("--- EMISION DE FACTURA ---")
 
 #Programa Principal
 imprimirMenuPrincipalInvitado()
