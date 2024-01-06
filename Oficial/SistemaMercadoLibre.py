@@ -319,28 +319,45 @@ def AccionarUsuario(opcion,user):
        limpiarPantalla()
        mostrarcompras(user)
        print("\n1. Calificar Compra")
-       print("2. Ver Mensajes")
        print("0. SALIR")
-       opt = validaropcion(0,2)
+       opt = validaropcion(0,1)
 
        if opt == 0:
           limpiarPantalla()
           return
        
-       if opt == 1 or opt == 2:
-          print("\nSeleccione Compra")
+       if opt == 1:
+          print("\nSeleccione Compra, 0 para SALIR")
           while True:
              comp = opcionnumerica()
+
+             if comp == "0":
+                limpiarPantalla()
+                return
+
              cur.execute("SELECT * FROM ORDEN WHERE ORDERID = "+comp+" AND IDCLIENTE = '"+user+"'")
              if(cur.fetchone() == None):
                print("\nNo corresponde, intenta de nuevo")
              else:
+                calificarCompra(comp,user)
                 break
-            
+             
+    if opcion == 9:
+       print('1. Facturas Recibidas')
+       print('2. Facturas Emitidas')
+       print('3. Emitir Factura')
+       print('0. SALIR')
 
+       optc = validaropcion(0,3)
 
-       if opt == 1:
-          calificarCompra(comp,user)
+       if optc == 1:
+          mostrarFacturas(user)
+
+       if optc == 2:
+          mostrarFacturasEmitidas(user)
+
+       if optc == 3:
+          EmitirFactura(user)
 
        if opt == 2:
           mostrarMensajesArchivados(comp,user)
@@ -388,6 +405,7 @@ def imprimirMenuPrincipalUsuario(nomuser):
        print("10. Vender")
        print('0. SALIR')
        op = validaropcion(0,10)
+
        AccionarUsuario(op,nomuser)
 
 def mostrarPublicaciones():
@@ -824,7 +842,7 @@ def calificarCompra(comp,user):
          return
    else:
       limpiarPantalla()
-      print("Estimado usuario, solo puede calificar ordenes completadas, 6 para SALIR")
+      print("Estimado usuario, solo puede calificar ordenes completadas")
       return
    
    print("\n-- Estado del producto")
@@ -979,6 +997,53 @@ def crearpublicacion(user):
    print("\nHas publicado tu venta")
 
    
+
+# Facturas
+   
+def mostrarFacturas(user):
+   limpiarPantalla()
+   print("\n--- MIS FACTURAS ---\n")
+
+   cur.execute("SELECT FACTID, FECHA, DESCRIPCION, FACT.IDVENDEDOR, FACT.IDCLIENTE, FACT.IDORDEN, NOMBRE FROM FACTURA FACT JOIN ORDEN USING (IDCLIENTE) JOIN PRODUCTO USING (PRODUCTID) WHERE FACT.IDCLIENTE = '"+user+"'")
+   detallesfacturas = cur.fetchall()
+
+   if (len(detallesfacturas) == 0):
+      limpiarPantalla()
+      print("No hay facturas")
+      return
+   
+   for factura in detallesfacturas:
+      print("FACT #",factura[0])
+      print("Fecha Emision:",factura[1])
+      print("Descripcion: ",factura[2])
+      print("Vendedor:",factura[3])
+      print("Cliente:",factura[4])
+      print("Orden:",factura[5])
+      print("Producto:",factura[6])
+      print("-------------------------------")
+
+
+def mostrarFacturasEmitidas(user):
+   print("--- FACTURAS EMITIDAS ---")
+   cur.execute("SELECT FACTID, FECHA, DESCRIPCION, FACT.IDCLIENTE, FACT.IDORDEN, NOMBRE FROM PRODUCTO PROD JOIN ORDEN ORD USING(PRODUCTID) JOIN FACTURA FACT ON IDORDEN = ORDERID JOIN VENDEDOR V ON FACT.IDVENDEDOR = USERID WHERE FACT.IDVENDEDOR ='"+user+"'")
+   resultado = cur.fetchall()
+
+   if len(resultado) == 0:
+      limpiarPantalla()
+      print("No dispone de facturas emitidas actualmente!")
+      return
+   
+   for i in resultado:
+      print("FACT #",i[0])
+      print("Fecha Emision:",i[1])
+      print("Descripcion: ",i[2])
+      print("Cliente:",i[3])
+      print("Orden:",i[4])
+      print("Producto:",i[5])
+      print("-------------------------------")
+
+def EmitirFactura():
+   print("--- EMISION DE FACTURA ---")
 
 #Programa Principal
 imprimirMenuPrincipalInvitado()
