@@ -255,7 +255,6 @@ def AccionarInvitado(opcion):
     if opcion == 5:
        mostrarAccesoriosAutos()
 
-
 def AccionarUsuario(opcion,user):
     
     if opcion == 0:
@@ -345,6 +344,10 @@ def AccionarUsuario(opcion,user):
 
        if opt == 2:
           mostrarMensajesArchivados(comp,user)
+    if opcion == 10:
+       limpiarPantalla()
+       crearpublicacion(user)
+   
           
 
       
@@ -382,8 +385,9 @@ def imprimirMenuPrincipalUsuario(nomuser):
        print('7. Direcciones registradas')
        print('8. Mis Compras')
        print("9. Mis Facturas")
+       print("10. Vender")
        print('0. SALIR')
-       op = validaropcion(0,8)
+       op = validaropcion(0,10)
        AccionarUsuario(op,nomuser)
 
 def mostrarPublicaciones():
@@ -860,8 +864,121 @@ def calificarCompra(comp,user):
    limpiarPantalla()
    print("\nOrden calificada!")
 
+def mostrarProductos():
+   print("--- PRODUCTOS ---\n")
+   cur.execute("SELECT * FROM PRODUCTO")
+   listaProductos = cur.fetchall()
    
+   for i in range(len(listaProductos)):
+      print("---------------------------------------------")
+      print("ID",listaProductos[i][0])
+      print("Nombre:",listaProductos[i][1])
+      print("Marca:",listaProductos[i][2])
+      print("Categoria:",listaProductos[i][3])
+      print("Subcategoria: ",listaProductos[i][4])
 
+def crearpublicacion(user):
+   print("\n--- VENDER ---\n")
+   lusuarios = []
+   cur.execute("SELECT USERID FROM USUARIO")
+   for USERID in cur.fetchall():
+    lusuarios.append(USERID[0])
+
+   print("\n-- ¡Hola! Antes que nada cuéntanos, ¿Cómo quieres que se muestre tu publicación?")
+   print("\n   1. Gratuita \n2.Clásica \n3.Premium")
+   print("ENTER para salir\n")
+   while True:
+      tipoExposicion = input("Ingrese el número de la opción de tu preferencia: ")
+      if tipoExposicion == "":
+         limpiarPantalla()
+         return
+    
+      if(tipoExposicion == "1"):
+         tipoExposicion == "Gratuita"
+         break
+      elif(tipoExposicion == "2"):
+         tipoExposicion == "Clásica"
+         break
+      elif(tipoExposicion == "2"):
+         tipoExposicion == "Premium"
+         break
+      else:
+         print("Ingrese una opción válida")
+         
+
+   print("\n-- Busquemos tu producto en nuestro catálogo, si tu producto a vender no esta en lista, ingresalo 0 para agregarlo")
+   print("\nEnter para SALIR")
+   mostrarProductos()
+
+   lproductos = []
+
+   cur.execute("SELECT PRODUCTID FROM PRODUCTO")
+   for PRODUCTOID in cur.fetchall():
+      lproductos.append(USERID[0])
+   while True:
+      mostrarProductos()
+      idProducto = input("Ingrese el ID del producto o ingrese 0 para agregar uno nuevo:")
+      if(idProducto!= "0"):
+         if(idProducto in lproductos):
+            break
+         else:
+            print("\n ingrese una ID existente")
+      else:
+         print("\nRegistrando Producto")
+         idProducto = input("Ingrese un ID para el producto: ")
+         if idProducto == "":
+            limpiarPantalla()
+            return
+         if(idProducto in lproductos):
+            idProducto = input("\nIngrese un ID no existente: ")
+         nProducto = input("Ingrese el nombre del producto: ")
+         if nProducto == "":
+            limpiarPantalla()
+            return
+         
+         mProducto = input("Ingrese la marca del producto: ")
+         if mProducto == "":
+            limpiarPantalla()
+            return
+         
+         cProducto = input("Ingrese la categoria del producto: ")
+         if cProducto == "":
+            limpiarPantalla()
+            return
+         
+         scProducto = input("Ingrese la subcategoria del producto: ")
+         if scProducto == "":
+            limpiarPantalla()
+            return
+         
+         print("\nRegistrando Producto")
+         query = "INSERT INTO PRODUCTO (PRODUCTID,NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA) VALUES (%s, %s, %s, %s, %s)"
+         values = (idProducto,nProducto, mProducto, cProducto, scProducto)
+         cur.execute(query, values)
+         
+         print("\nProducto registrado existosamente")
+      
+   nombrePublicacion = input("Ingresa el nombre para tu publicación: ")
+   descrpicion = input(" Redacta la descripción que deseas que los clientes observen en tu publicación: ")
+   precio = input("Ingresa el precio de venta al público: $")
+   stock = input("Ingresa la cantidad de stock que posees: ")
+   now = datetime.now()
+
+   cur.execute("UPDATE USUARIO SET ESVENDEDOR = true WHERE USERID='"+user+"'")
+   mercadolibreconnection.commit()
+      
+   lVenderdores = []
+   cur.execute("SELECT USERID FROM VENDEDOR")
+   for USERID in cur.fetchall():
+         lVenderdores.append(USERID[0])
+   if(user not in lVenderdores):
+         cur.execute("INSERT INTO VENDEDOR VALUES ('"+user+"','0')")
+
+   cur.execute("INSERT INTO PUBLICACION (DESCRIPCION,TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,FECHAPUBLICACION,NOMBREPUBLICACION,STOCK) VALUES ('"+descrpicion+"','"+tipoExposicion+"','"+idProducto+"','"+user+"','"+precio+"','Activa','"+str(now)+"','"+nombrePublicacion+"','"+stock+"')")
+   mercadolibreconnection.commit()
+   print("\nHas publicado tu venta")
+
+   
 
 #Programa Principal
 imprimirMenuPrincipalInvitado()
