@@ -920,8 +920,22 @@ def mostrarFacturasEmitidas(user):
       print("Producto:",i[5])
       print("-------------------------------")
 
-def EmitirFactura():
+def EmitirFactura(user):
    print("--- EMISION DE FACTURA ---")
+
+   cur.execute("SELECT ORDERID, FACT.IDORDEN, ORDEN.IDCLIENTE, ORDEN.IDVENDEDOR"+
+               " FROM FACTURA FACT RIGHT JOIN  ORDEN ON IDORDEN = ORDERID"+
+               " WHERE FACT.IDORDEN IS NULL AND ORDEN.IDVENDEDOR = '"+user+"'")
+
+   ordenespendientesfacturar = cur.fetchall()
+
+   if(len(ordenespendientesfacturar) == 0):
+      limpiarPantalla()
+      print("Estimado usuario, no tiene ordenes que facturar!")
+      return
+
+   for orden in ordenespendientesfacturar:
+      print(orden[0])
 
 #Programa Principal
 imprimirMenuPrincipalInvitado()
