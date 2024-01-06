@@ -352,9 +352,13 @@ def AccionarUsuario(opcion,user):
 
        if optc == 1:
           mostrarFacturas(user)
+          input("\nPresione ENTER para regresar -->")
+          limpiarPantalla()
 
        if optc == 2:
           mostrarFacturasEmitidas(user)
+          input("\nPresione ENTER para regresar -->")
+          limpiarPantalla()
 
        if optc == 3:
           EmitirFactura(user)
@@ -1022,6 +1026,7 @@ def mostrarFacturas(user):
 
 
 def mostrarFacturasEmitidas(user):
+   limpiarPantalla()
    print("--- FACTURAS EMITIDAS ---")
    cur.execute("SELECT FACTID, FECHA, DESCRIPCION, FACT.IDCLIENTE, FACT.IDORDEN, NOMBRE FROM PRODUCTO PROD JOIN ORDEN ORD USING(PRODUCTID) JOIN FACTURA FACT ON IDORDEN = ORDERID JOIN VENDEDOR V ON FACT.IDVENDEDOR = USERID WHERE FACT.IDVENDEDOR ='"+user+"'")
    resultado = cur.fetchall()
@@ -1041,21 +1046,91 @@ def mostrarFacturasEmitidas(user):
       print("-------------------------------")
 
 def EmitirFactura(user):
-   print("--- EMISION DE FACTURA ---")
+   print("\n--- EMISION DE FACTURA ---\n")
 
-   cur.execute("SELECT ORDERID, FACT.IDORDEN, ORDEN.IDCLIENTE, ORDEN.IDVENDEDOR"+
+   cur.execute("SELECT ORDERID, FACT.IDORDEN, ORDEN.IDCLIENTE, ORDEN.IDVENDEDOR, ESTADO"+
                " FROM FACTURA FACT RIGHT JOIN  ORDEN ON IDORDEN = ORDERID"+
-               " WHERE FACT.IDORDEN IS NULL AND ORDEN.IDVENDEDOR = '"+user+"'")
+               " WHERE FACT.IDORDEN IS NULL AND ORDEN.IDVENDEDOR = '"+user+"' AND ESTADO = 'Completada'")
 
    ordenespendientesfacturar = cur.fetchall()
 
    if(len(ordenespendientesfacturar) == 0):
       limpiarPantalla()
-      print("Estimado usuario, no tiene ordenes que facturar!")
+      print("Estimado usuario, no tiene ordenes que facturar!\n")
       return
 
+   print("Estimado usuario, les presentamos las siguientes ordenes a facturar\n")
    for orden in ordenespendientesfacturar:
-      print(orden[0])
+      cur.execute("SELECT NOMBRE FROM ORDEN JOIN PRODUCTO USING(PRODUCTID) WHERE ORDERID ="+str(orden[0]))
+      print("ORDEN #",orden[0])
+      print("Producto:",cur.fetchone()[0])
+      print("Cliente:",orden[2])
+      print("Estado Orden:",orden[4])
+      print("--------------------------------")
+
+   cond = False
+   indice = None
+
+   while cond == False:
+      print("\nSeleccione la orden a facturar, 0 para SALIR")
+      ordenafacturar = opcionnumerica()
+
+      if ordenafacturar == "0":
+         limpiarPantalla()
+         return
+      
+      for orden in ordenespendientesfacturar:
+         if(int(ordenafacturar) == orden[0]):
+            indice = ordenespendientesfacturar.index(orden)
+            cond = True
+            break
+      
+      if cond == False:
+         print("Opcion incorrecta, vuelva a intentar")
+
+   descripcion = None
+
+   print("\nAñada una descripcion (Max.100), EXIT para SALIR, ENTER para saltar")
+
+   while True:
+      descripcion = input("Ingrese: ")
+      if (descripcion.lower() == 'exit'):
+         limpiarPantalla()
+         return
+      if(len(descripcion)<=100):
+         break
+      else:
+         print("La descripcion no debe exceder de los 100 caracteres\n")
+
+   if(descripcion == ""):
+      descripcion = 'NULL'
+   else:
+      descripcion = "'"+descripcion+"'"
+
+   
+
+   print("\nSeguro que desea emitir la factura? No se puede revertir esta accion")
+   print("1. SI\n0. SALIR")
+   opf = validaropcion(0,1)
+
+   if opf == 0:
+      limpiarPantalla()
+      print("Facturacion cancelada!")
+      return
+   
+   fecha_actual = date.today()
+   fecha_actual_str = fecha_actual.strftime('%Y-%m-%d')
+
+   limpiarPantalla()
+   print("Generando Factura...")
+   cur.execute("INSERT INTO FACTURA (FECHA, DESCRIPCION, IDVENDEDOR, IDCLIENTE, IDORDEN) VALUES ('"+fecha_actual_str+"',"+descripcion+",'"+str(ordenespendientesfacturar[indice][3])+"','"+str(ordenespendientesfacturar[indice][2])+"',"+str(ordenespendientesfacturar[indice][0])+")")
+   mercadolibreconnection.commit()
+   cur.execute("SELECT FACTID FROM FACTURA WHERE IDORDEN = "+str(ordenespendientesfacturar[indice][0])+"")
+   print("FACT#",cur.fetchone()[0],"generada con exito")
+
+
+
+
 
 #Programa Principal
 imprimirMenuPrincipalInvitado()
