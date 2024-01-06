@@ -404,6 +404,11 @@ def AccionarUsuario(opcion,user):
        verventas(user)
        input("\nPresione ENTER para regresar -->")
        limpiarPantalla()
+
+    if opcion == 13:
+       limpiarPantalla()
+       responderpregunta(user)
+       limpiarPantalla()
    
       
 def mostrarcaratula():
@@ -442,9 +447,10 @@ def imprimirMenuPrincipalUsuario(nomuser):
        print("9. Mis Facturas")
        print("10. Vender")
        print("11. Mis Ventas")
-       print('12. Ver Publicaciones')
+       print("12. Ver Publicaciones")
+       print("13. Responder Preguntas")
        print('0. SALIR')
-       op = validaropcion(0,12)
+       op = validaropcion(0,13)
 
        AccionarUsuario(op,nomuser)
 
@@ -1373,6 +1379,46 @@ def verventas(user): #funcion parametrizada
     else:
         limpiarPantalla()
         print("Por ahora usted no tiene ordenes realizadas")
+
+
+def responderpregunta(userid): #funcion parametrizada
+    cur.execute("SELECT IDPREGUNTA,CONTENIDO,MENSAJERESPUESTA,IDCLIENTE FROM PREGUNTA WHERE IDVENDEDOR = '"+ userid +"';")
+    preguntas = cur.fetchall()
+    for pregunta in preguntas:
+        idpregunta,contenido,respuesta,cliente = pregunta
+        print("")
+        print("Id: " + str(idpregunta))
+        print("Pregunta: " + contenido)
+        print("By: " + cliente)
+        if respuesta != None:
+            print("Respuesta: " + respuesta)
+        else:
+            print("¡No hay respuesta!")
+    print("") 
+    responder = input("Desea responder algún comentario\nSI/NO\n").lower()
+    
+    while(responder == "si"):
+        print("Ids disponibles : ", end= "")
+        cur.execute("SELECT IDPREGUNTA FROM PREGUNTA WHERE IDVENDEDOR = '"+ userid +"';")
+        lIdPreg = cur.fetchall()
+        idDisponibles = []
+        c = 0
+        for ids in lIdPreg:
+            c+=1
+            print(ids[0],end="")
+            idDisponibles.append(ids[0])
+            if(c != len(lIdPreg)):
+                print(" , ", end= "")
+        preg = input("\nSeleccione el id de la pregunta que desea responder: \n")
+        while(int(preg) not in idDisponibles):
+            print("¡ID no encontrado!")
+            preg = input("Seleccione el id de la pregunta que desea responder: \n")
+        newrespuesta = input("Escriba su respuesta: \n")
+        cur.execute("UPDATE PREGUNTA SET MENSAJERESPUESTA = '"+newrespuesta+"' where idpregunta = "+preg+";")
+        cur.execute("UPDATE PREGUNTA SET FECHAHORARESPUESTA = NOW() where idpregunta = "+preg+";")
+        responder = input("¿Desea responder otro comentario?\nSI/NO\n").lower()
+        mercadolibreconnection.commit()
+
 
 
 
