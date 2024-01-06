@@ -315,6 +315,36 @@ def AccionarUsuario(opcion,user):
 
        if (opdir == 2):
           eliminarDireccion(user)
+
+    if opcion == 8:
+       limpiarPantalla()
+       mostrarcompras(user)
+       print("\n1. Calificar Compra")
+       print("2. Ver Mensajes")
+       print("0. SALIR")
+       opt = validaropcion(0,2)
+
+       if opt == 0:
+          limpiarPantalla()
+          return
+       
+       if opt == 1 or opt == 2:
+          print("\nSeleccione Compra")
+          while True:
+             comp = opcionnumerica()
+             cur.execute("SELECT * FROM ORDEN WHERE ORDERID = "+comp+" AND IDCLIENTE = '"+user+"'")
+             if(cur.fetchone() == None):
+               print("\nNo corresponde, intenta de nuevo")
+             else:
+                break
+            
+
+
+       if opt == 1:
+          calificarCompra(comp,user)
+
+       if opt == 2:
+          mostrarMensajesArchivados(comp,user)
           
 
       
@@ -350,8 +380,10 @@ def imprimirMenuPrincipalUsuario(nomuser):
        print('5. Mis Cupones')
        print('6. Mi Perfil')
        print('7. Direcciones registradas')
+       print('8. Mis Compras')
+       print("9. Mis Facturas")
        print('0. SALIR')
-       op = validaropcion(0,7)
+       op = validaropcion(0,8)
        AccionarUsuario(op,nomuser)
 
 def mostrarPublicaciones():
@@ -752,7 +784,83 @@ def eliminarDireccion(user):
 
    print("Direccion eliminada exitosamente")
 
+def mostrarcompras(user):
+   print("--- MIS COMPRAS ---\n")
+   cur.execute("SELECT * FROM ORDEN WHERE IDCLIENTE = '"+user+"'")
+   listacompras = cur.fetchall()
+   
+   for i in range(len(listacompras)):
+      print("---------------------------------------------")
+      print("COMPRA #",listacompras[i][0])
+      print("Fecha:",listacompras[i][1])
+      print("Estado:",listacompras[i][2])
+      print("Unidad:",listacompras[i][3])
+      print("Envio: ",listacompras[i][5])
+      print("Importe:",listacompras[i][4])
 
+      cur.execute("SELECT NOMBRE FROM PRODUCTO WHERE PRODUCTID ="+str(listacompras[i][11])+"")
+      print("Producto:",cur.fetchone()[0])
+
+      cur.execute("SELECT NOMBREPUBLICACION FROM PUBLICACION WHERE NOPUBLICACION ="+str(listacompras[i][16])+"")
+      print("Publicacion:",cur.fetchone()[0])
+
+      print("Vendedor:",listacompras[i][14])
+
+def calificarCompra(comp,user):
+   print("\n--- CALIFICAR COMPRA #"+comp+" ---\n")
+   cur.execute("SELECT ORDERID, ESTADO, ESTRELLASPRODUCTO, ESTRELLASVENDEDOR, COMENTARIO, IDVENDEDOR FROM ORDEN WHERE ORDERID = "+comp+" AND IDCLIENTE = '"+user+"'")
+   detallesorden = cur.fetchone()
+
+   if (detallesorden[1] == 'Completada'):
+      if(detallesorden[2] == None and detallesorden[3] == None and detallesorden[4] == None):
+         print("Estimado usuario, la encuesta esta disponible para su calificacion")
+      else:
+         limpiarPantalla()
+         print("Estimado "+user+", Su compra ya fue calificada!")
+         return
+   else:
+      limpiarPantalla()
+      print("Estimado usuario, solo puede calificar ordenes completadas, 6 para SALIR")
+      return
+   
+   print("\n-- Estado del producto")
+   print("Del 0 al 5 califique el estado del producto")
+   estrellasproducto = validaropcion(0,6)
+
+   if(estrellasproducto == 6):
+      limpiarPantalla()
+      return
+
+   print("\n-- Calificacion del Vendedor")
+   print("¿Que tal le parecio la atencion del vendedor "+detallesorden[5]+"?")
+   print("Califique del 0 al 5")
+   estrellasvendedor = validaropcion(0,6)
+
+   if(estrellasvendedor == 6):
+      limpiarPantalla()
+      return
+   
+   while True:
+      comentario = input("Escriba un comentario (Max.100), caso contrario ENTER, para salir escriba EXIT: ")
+      if(len(comentario)<=100):
+         break
+      else:
+         print("Ha excedido los 100 caracteres, intente de nuevo\n")
+
+   if comentario.lower() == 'exit':
+      limpiarPantalla()
+      return
+   
+   if comentario == "":
+      comentario = None
+
+   cur.execute("UPDATE ORDEN SET ESTRELLASPRODUCTO = "+str(estrellasproducto)+", ESTRELLASVENDEDOR = "+str(estrellasvendedor)+", COMENTARIO = '"+comentario+"' WHERE ORDERID = "+comp+"")
+   mercadolibreconnection.commit()
+
+   limpiarPantalla()
+   print("\nOrden calificada!")
+
+   
 
 
 #Programa Principal
