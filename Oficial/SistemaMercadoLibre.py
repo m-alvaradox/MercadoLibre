@@ -15,6 +15,7 @@ import time
 
 # Conexion a la base de datos de mercadolibre
 mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure.com", user='invitado', passwd= 'root', db='mercadolibre')
+#mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 'root', db='mercadolibre')
 cur = mercadolibreconnection.cursor()
 
 #funciones
@@ -266,7 +267,7 @@ def AccionarUsuario(opcion,user):
       print("Sesion cerrada exitosamente")
       imprimirMenuPrincipalInvitado()
 
-    if opcion == 2:
+    if opcion == 11:
        mostrarPublicaciones()
        print("\nSeleccione la publicacion de su interés\nPara SALIR digite 0")
        pub = opcionnumerica()
@@ -278,8 +279,17 @@ def AccionarUsuario(opcion,user):
           generarOrden(pub,user)
           imprimirMenuPrincipalUsuario(user)
 
+    if opcion == 2:
+       limpiarPantalla()
+       conduser = actualizarUsuario(user)
+
+       if (conduser != None):
+          user = conduser
+          imprimirMenuPrincipalUsuario(user)
+
     if opcion == 3:
-       mostrarPublicaciones2023()
+       limpiarPantalla()
+       eliminarUsuario(user)
 
     if opcion == 4:
        limpiarPantalla()
@@ -410,8 +420,8 @@ def imprimirMenuPrincipalUsuario(nomuser):
        mostrarcaratula()
        print("Hola!",cur.fetchone()[0])
        print('1. Cerrar Sesion')
-       print('2. Ver Publicaciones')
-       print('3. Ver Recientes Publicaciones 2023')
+       print('2. Modificar Cuenta')
+       print('3. Eliminar Cuenta')
        print('4. Reclamos')
        print('5. Mis Cupones')
        print('6. Mi Perfil')
@@ -419,8 +429,9 @@ def imprimirMenuPrincipalUsuario(nomuser):
        print('8. Mis Compras')
        print("9. Mis Facturas")
        print("10. Vender")
+       print('11. Ver Publicaciones')
        print('0. SALIR')
-       op = validaropcion(0,10)
+       op = validaropcion(0,11)
 
        AccionarUsuario(op,nomuser)
 
@@ -1229,6 +1240,55 @@ def realizarReclamo(comp,user):
 def mostrarReclamos(user):
    limpiarPantalla()
    print("--- RECLAMOS ---\n")
+
+
+def validarUsuario(usuario):
+    cur.execute("SELECT USERID FROM USUARIO")
+    usuarios = []
+    for user in cur.fetchall():
+        usuarios.append(user[0])
+    if usuario in usuarios:
+        return True
+    else:
+        return False
+    
+def actualizarUsuario(user): #Javier
+    print("\n--- MODIFICAR CUENTA ---")
+    print("Enter para SALIR\n")
+
+    dato = input("Ingrese el dato que desea actualizar\nUserID, Email, Pass, Nombre, Apellido, Telefono:\n").lower()
+    if dato == "":
+       limpiarPantalla()
+       return
+    newvalue = input("Ingrese el/la nuevo/a "+ dato + ":\n")
+
+    if newvalue == "":
+       limpiarPantalla()
+       return
+
+    if dato == "userid":
+        while validarUsuario(newvalue):
+            print("Este usuario ya se encuentra registrado")
+            newvalue = input("Ingrese el nuevo usuario:\n")
+
+            if newvalue == "":
+               limpiarPantalla()
+               return
+    try:
+        cur.execute("UPDATE USUARIO SET " + dato.upper()+ "= %s WHERE USERID = %s",(newvalue,user))
+        mercadolibreconnection.commit()
+
+        limpiarPantalla()
+        print("¡Su " + dato +" ha sido cambiado con éxito!")
+
+        if dato == "userid":
+           return newvalue
+        else:
+           return None
+
+    except Exception as e:
+        print(f"Error: {e}")
+    cur.close()
 
 #Programa Principal
 imprimirMenuPrincipalInvitado()
