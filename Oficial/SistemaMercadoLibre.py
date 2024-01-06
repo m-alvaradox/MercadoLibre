@@ -58,11 +58,16 @@ def es_mayor_de_edad(fecha_nacimiento):
 def IniciarSesion():
    while True:
       print("-- INICIAR SESION --")
-      print("Inicie sesion con sus credenciales, doble ENTER para salir")
+      print("Inicie sesion con sus credenciales, ENTER para salir")
       userName = input("\nIngrese su nombre de usuario: ")
+
+      if userName == "":
+         limpiarPantalla()
+         return   
+
       password = input("Ingrese su contraseña: ")
 
-      if userName == "" and password == "":
+      if password == "":
          limpiarPantalla()
          return   
       
@@ -289,7 +294,10 @@ def AccionarUsuario(opcion,user):
 
     if opcion == 3:
        limpiarPantalla()
-       eliminarUsuario(user)
+       conduser2 = eliminarUsuario(user)
+
+       if(conduser2 == None):
+          imprimirMenuPrincipalInvitado()
 
     if opcion == 4:
        limpiarPantalla()
@@ -1252,7 +1260,7 @@ def validarUsuario(usuario):
     else:
         return False
     
-def actualizarUsuario(user): #Javier
+def actualizarUsuario(user): #Javier #funcion parametrizada
     print("\n--- MODIFICAR CUENTA ---")
     print("Enter para SALIR\n")
 
@@ -1289,6 +1297,51 @@ def actualizarUsuario(user): #Javier
     except Exception as e:
         print(f"Error: {e}")
     cur.close()
+
+
+def eliminarUsuario(user): #funcion parametrizada
+    print("--- ELIMINAR CUENTA "+user+" ---")
+    print("Te echaremos de menos :(\n")
+    
+    validacion = input("¿Está seguro que quiere eliminar su cuenta?\n¡Esta acción no se puede revertir!\nEscriba 'si' para confirmar\nENTER para SALIR\n")
+    if validacion.lower() == "si":
+        try:
+            print("Eliminando usuario...")
+            mercadolibreconnection.begin()
+            cur.execute("DELETE FROM VISUALIZACION_PUBLICACIONES WHERE USERID = '"+ user +"' or NOPUBLICACION IN (SELECT NOPUBLICACION FROM PUBLICACION WHERE IDVENDEDOR = '"+ user +"');")
+            cur.execute("DELETE FROM FACTURA WHERE IDCLIENTE = '"+ user +"' OR IDVENDEDOR = '"+ user +"';")
+            cur.execute("DELETE FROM RECLAMO WHERE CLIENTEID = '"+ user +"' OR VENDEDORID = '"+ user +"';")
+            cur.execute("DELETE FROM ORDEN WHERE IDCLIENTE = '"+ user +"' OR IDVENDEDOR = '"+ user +"';")
+            cur.execute("DELETE FROM PAGO WHERE IDCLIENTE = '"+ user +"';")
+            cur.execute("DELETE FROM DIRECCION WHERE USERID = '"+ user +"';")
+            cur.execute("DELETE FROM CUPON WHERE CLIENTEID = '"+ user +"';")
+            cur.execute("DELETE FROM PREGUNTA WHERE IDCLIENTE = '"+ user +"' OR IDVENDEDOR = '"+ user +"';")
+            cur.execute("DELETE FROM PUBLICACION WHERE  IDVENDEDOR = '"+ user +"';")
+            cur.execute("DELETE FROM CLIENTE WHERE USERID = '"+ user +"';")
+            cur.execute("DELETE FROM VENDEDOR WHERE USERID = '"+ user +"';")
+            cur.execute("DELETE FROM USUARIO WHERE USERID = '"+ user +"';")
+            mercadolibreconnection.commit()
+            
+
+            limpiarPantalla()
+            print("¡Usuario eliminado con éxito!")
+            print("Vuelve pronto :), estamos para servirte!")
+            return None
+
+        except Exception as e:
+            print(f"Error: {e}")
+            mercadolibreconnection.rollback()
+    else:
+        limpiarPantalla()
+        print("Acción cancelada")
+        return user
+
+
+
+
+
+
+
 
 #Programa Principal
 imprimirMenuPrincipalInvitado()
