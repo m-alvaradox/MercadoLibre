@@ -920,7 +920,7 @@ def crearpublicacion(user):
     lusuarios.append(USERID[0])
 
    print("\n-- ¡Hola! Antes que nada cuéntanos, ¿Cómo quieres que se muestre tu publicación?")
-   print("\n   1. Gratuita \n2.Clásica \n3.Premium")
+   print("\n1.Gratuita \n2.Clásica \n3.Premium")
    print("ENTER para salir\n")
    while True:
       tipoExposicion = input("Ingrese el número de la opción de tu preferencia: ")
@@ -934,7 +934,7 @@ def crearpublicacion(user):
       elif(tipoExposicion == "2"):
          tipoExposicion == "Clásica"
          break
-      elif(tipoExposicion == "2"):
+      elif(tipoExposicion == "3"): #Premium op3
          tipoExposicion == "Premium"
          break
       else:
@@ -943,53 +943,77 @@ def crearpublicacion(user):
 
    print("\n-- Busquemos tu producto en nuestro catálogo, si tu producto a vender no esta en lista, ingresalo 0 para agregarlo")
    print("\nEnter para SALIR")
-   mostrarProductos()
+   #mostrarProductos() eliminado
+   
+   #mod
 
-   lproductos = []
-
-   cur.execute("SELECT PRODUCTID FROM PRODUCTO")
-   for PRODUCTOID in cur.fetchall():
-      lproductos.append(USERID[0])
    while True:
+      lproductos = []
+
+      cur.execute("SELECT PRODUCTID FROM PRODUCTO")
+      for PRODUCTOID in cur.fetchall():
+         lproductos.append(PRODUCTOID[0]) #lproductos almacena productid
+
+
       mostrarProductos()
       idProducto = input("Ingrese el ID del producto o ingrese 0 para agregar uno nuevo:")
+      
+      # ENTER para SALIR
+      if(idProducto == ""):
+         limpiarPantalla()
+         print("Operacion cancelada!")
+         return
+      
+      
       if(idProducto!= "0"):
-         if(idProducto in lproductos):
+         if(int(idProducto) in lproductos): #ProductID es un atributo tipo entero
             break
          else:
             print("\n ingrese una ID existente")
       else:
          print("\nRegistrando Producto")
+         
+         # ProductID es auto incremental
+         """
          idProducto = input("Ingrese un ID para el producto: ")
          if idProducto == "":
             limpiarPantalla()
             return
          if(idProducto in lproductos):
             idProducto = input("\nIngrese un ID no existente: ")
+
+         """
+
          nProducto = input("Ingrese el nombre del producto: ")
          if nProducto == "":
             limpiarPantalla()
+            print("Operacion cancelada!")
             return
          
          mProducto = input("Ingrese la marca del producto: ")
          if mProducto == "":
             limpiarPantalla()
+            print("Operacion cancelada!")
             return
          
          cProducto = input("Ingrese la categoria del producto: ")
          if cProducto == "":
             limpiarPantalla()
+            print("Operacion cancelada!")
             return
          
          scProducto = input("Ingrese la subcategoria del producto: ")
          if scProducto == "":
             limpiarPantalla()
+            print("Operacion cancelada!")
             return
          
+         #id del producto es autoincremental
          print("\nRegistrando Producto")
-         query = "INSERT INTO PRODUCTO (PRODUCTID,NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA) VALUES (%s, %s, %s, %s, %s)"
-         values = (idProducto,nProducto, mProducto, cProducto, scProducto)
+         query = "INSERT INTO PRODUCTO (NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA) VALUES (%s, %s, %s, %s)"
+         values = (nProducto, mProducto, cProducto, scProducto)
          cur.execute(query, values)
+         mercadolibreconnection.commit() # no se insertaba en la bd por esto
          
          print("\nProducto registrado existosamente")
       
@@ -1009,6 +1033,8 @@ def crearpublicacion(user):
    if(user not in lVenderdores):
          cur.execute("INSERT INTO VENDEDOR VALUES ('"+user+"','0')")
 
+   limpiarPantalla()
+   print("Creando Publicacion...")
    cur.execute("INSERT INTO PUBLICACION (DESCRIPCION,TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,FECHAPUBLICACION,NOMBREPUBLICACION,STOCK) VALUES ('"+descrpicion+"','"+tipoExposicion+"','"+idProducto+"','"+user+"','"+precio+"','Activa','"+str(now)+"','"+nombrePublicacion+"','"+stock+"')")
    mercadolibreconnection.commit()
    print("\nHas publicado tu venta")
