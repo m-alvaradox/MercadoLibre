@@ -2,7 +2,7 @@ import pymysql
 from datetime import datetime
 
 # Conexion a la base de datos de mercadolibre
-mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 'user2', db='mercadolibre')
+mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 'Walboli-18', db='mercadolibre')
 cur = mercadolibreconnection.cursor()
 
 def validarUsuario(usuario):
@@ -103,4 +103,47 @@ def  verventas():
     else:
         print("Por ahora usted no tiene ordenes realizadas")
 
+# -- Preguntas: El usuario vendedor puede revisar las preguntas que hacen los clientes en cada publicacion, 
+# -- asimismo puede enviar una respuesta, considerar enviar la fecha/hora de respuesta. Consultas, Modificaciones tabla preguntas
+def responderpregunta():
+    userid = input("Ingrese su usuario actual:\n")
+    while not validarUsuario(userid):
+        print("Usuario invalido")
+        userid = input("Ingrese su usuario:\n")
+    cur.execute("SELECT IDPREGUNTA,CONTENIDO,MENSAJERESPUESTA,IDCLIENTE FROM PREGUNTA WHERE IDVENDEDOR = '"+ userid +"';")
+    preguntas = cur.fetchall()
+    for pregunta in preguntas:
+        idpregunta,contenido,respuesta,cliente = pregunta
+        print("")
+        print("Id: " + str(idpregunta))
+        print("Pregunta: " + contenido)
+        print("By: " + cliente)
+        if respuesta != None:
+            print("Respuesta: " + respuesta)
+        else:
+            print("¡No hay respuesta!")
+    print("") 
+    responder = input("Desea responder algún comentario\nSI/NO\n").lower()
+    while(responder == "si"):
+        print("Ids disponibles : ", end= "")
+        cur.execute("SELECT IDPREGUNTA FROM PREGUNTA WHERE IDVENDEDOR = '"+ userid +"';")
+        lIdPreg = cur.fetchall()
+        idDisponibles = []
+        c = 0
+        for ids in lIdPreg:
+            c+=1
+            print(ids[0],end="")
+            idDisponibles.append(ids[0])
+            if(c != len(lIdPreg)):
+                print(" , ", end= "")
+        preg = input("\nSeleccione el id de la pregunta que desea responder: \n")
+        while(int(preg) not in idDisponibles):
+            print("¡ID no encontrado!")
+            preg = input("Seleccione el id de la pregunta que desea responder: \n")
+        newrespuesta = input("Escriba su respuesta: \n")
+        cur.execute("UPDATE PREGUNTA SET MENSAJERESPUESTA = '"+newrespuesta+"' where idpregunta = "+preg+";")
+        cur.execute("UPDATE PREGUNTA SET FECHAHORARESPUESTA = NOW() where idpregunta = "+preg+";")
+        responder = input("¿Desea responder otro comentario?\nSI/NO\n").lower()
+        mercadolibreconnection.commit()
 
+responderpregunta()
