@@ -320,31 +320,29 @@ def AccionarUsuario(opcion,user):
        limpiarPantalla()
        mostrarcompras(user)
        print("\n1. Calificar Compra")
-       print("2. Ver Mensajes")
        print("0. SALIR")
-       opt = validaropcion(0,2)
+       opt = validaropcion(0,1)
 
        if opt == 0:
           limpiarPantalla()
           return
        
-       if opt == 1 or opt == 2:
-          print("\nSeleccione Compra")
+       if opt == 1:
+          print("\nSeleccione Compra, 0 para SALIR")
           while True:
              comp = opcionnumerica()
+
+             if comp == "0":
+                limpiarPantalla()
+                return
+
              cur.execute("SELECT * FROM ORDEN WHERE ORDERID = "+comp+" AND IDCLIENTE = '"+user+"'")
              if(cur.fetchone() == None):
                print("\nNo corresponde, intenta de nuevo")
              else:
+                calificarCompra(comp,user)
                 break
-            
 
-
-       if opt == 1:
-          calificarCompra(comp,user)
-
-       if opt == 2:
-          mostrarMensajesArchivados(comp,user)
           
 
       
@@ -820,7 +818,7 @@ def calificarCompra(comp,user):
          return
    else:
       limpiarPantalla()
-      print("Estimado usuario, solo puede calificar ordenes completadas, 6 para SALIR")
+      print("Estimado usuario, solo puede calificar ordenes completadas")
       return
    
    print("\n-- Estado del producto")
@@ -859,8 +857,6 @@ def calificarCompra(comp,user):
 
    limpiarPantalla()
    print("\nOrden calificada!")
-
-   
 
 
 #Programa Principal
