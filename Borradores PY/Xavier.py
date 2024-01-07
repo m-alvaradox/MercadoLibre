@@ -117,7 +117,7 @@ def listarAtributosClientes(cur):
   productos = []
   marcas = []
   vendedores = []
-  cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE CATEGORIA = %s AND ESTADO = ACTIVA", (categoria,))
+  cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE ESTADO = ACTIVA")
   for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
     categorias.append(CATEGORIA)
     productos.append(PRODUCTO.NOMBRE)
@@ -188,5 +188,42 @@ def mostrarPublicacionProductoMarca(prod=None, marc=None, categ=None, vend=None,
           '\n-----------------------------------')
 
 #
-def preguntaClienteVendedor(idCliente, idVendedor, contenido, noPubli, cur):
+def pregunta(idCliente, cur):
+  print("Si quiere saber mas sobre una publicacion, puede hacerle una pregunta al vendedor.")
+  val = input("¿Tiene alguna pregunta sobre una publicación que le interesa? (Si/No) -> " )
+  if val == "Si":
+    vendedor = input("Ingrese el nombre del vendedor: ")
+    publicacion = input("Ingrese el nombre de la publicacion: ")
+    producto = input("Ingrese el atributo (producto) sobre el que desea consultarle: ")
+    mensaje = input("Ingrese el contenido del mensaje que desea enviarle al vendedor:\n")
+    cur.execute("SELECT IDVENDEDOR, NOMBREPUBLICACION, PRODUCTO.NOMBRE FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE ESTADO = ACTIVA")
+    lista = []
+    for IDVENDEDOR, NOMBREPUBLICACION, PRODUCTO.NOMBRE in cur.fetchall():
+      lista.append(IDVENDEDOR)
+      lista.append(NOMBREPUBLICACION)
+      lista.append(PRODUCTO.NOMBRE)
+    i = 0
+    while (lista[i] != vendedor and lista[i + 1] != publicacion and lista[i + 2] != producto):
+      if i > len(lista):
+        i = 0
+        print("Ingrese datos validos para enviar correctamente la pregunta.\nVerifique el nombre del vendedor, el de la publicacion y el del atributo por el que pregunta.")
+        vendedor = input("Ingrese el nombre del vendedor: ")
+        publicacion = input("Ingrese el nombre de la publicacion: ")
+        producto = input("Ingrese el atributo (producto) sobre el que desea consultarle: ")
+        mensaje = input("Ingrese el contenido del mensaje que desea enviarle al vendedor:\n")
+      i += 3
+    
+    cur.execute(f"SELECT NOPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE ESTADO = ACTIVA AND IDVENDEDOR = '{vendedor}' AND NOMBREPUBLICACION = {publicacion} AND PRODUCTO.NOMBRE = {producto}")
+    noPublicacion = ''
+    for NOPUBLICACION in cur.fetchall():
+      noPublicacion = NOPUBLICACION
+      
+
+
+           
+        
+        
+       
+    
+
   
