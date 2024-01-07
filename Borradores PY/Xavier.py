@@ -188,5 +188,5 @@ def mostrarPublicacionProductoMarca(prod=None, marc=None, categ=None, vend=None,
           '\n-----------------------------------')
 
 #
-def preguntaClienteVendedor(idCliente, idVendedor, contenido, noPubli):
+def preguntaClienteVendedor(idCliente, idVendedor, contenido, noPubli, cur):
   
