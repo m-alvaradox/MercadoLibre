@@ -191,7 +191,7 @@ def mostrarPublicacionProductoMarca(prod=None, marc=None, categ=None, vend=None,
 def pregunta(idCliente, cur):
   print("Si quiere saber mas sobre una publicacion, puede hacerle una pregunta al vendedor.")
   val = input("¿Tiene alguna pregunta sobre una publicación que le interesa? (Si/No) -> " )
-  if val == "Si":
+  while ( val == "Si"):
     vendedor = input("Ingrese el nombre del vendedor: ")
     publicacion = input("Ingrese el nombre de la publicacion: ")
     producto = input("Ingrese el atributo (producto) sobre el que desea consultarle: ")
@@ -217,7 +217,11 @@ def pregunta(idCliente, cur):
     noPublicacion = ''
     for NOPUBLICACION in cur.fetchall():
       noPublicacion = NOPUBLICACION
-      
+    cur.execute("INSERT INTO PREGUNTA (CONTENIDO, TIEMPOENVIADO, IDCLIENTE, IDVENDEDOR, NOPUBLICACION) VALUES (%s, %s, %s, %s)", (mensaje, datetime.now(), idCliente, vendedor))
+    mercadolibre.commit()
+    print("La pregunta ha sido enviada correctamente.\n")
+    val = input("¿Tiene alguna otra pregunta sobre una publicación que le interesa? (Si/No) -> " )
+  print("Muchas gracias por su tiempo, esperemos que sus dudas sean resueltas lo mas pronto posible.\nLe deseamos un excelente dia.")
 
 
            
