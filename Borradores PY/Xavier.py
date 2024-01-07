@@ -117,84 +117,65 @@ def listarAtributosClientes(cur):
   productos = []
   marcas = []
   vendedores = []
-  precios = []
   cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE CATEGORIA = %s AND ESTADO = ACTIVA", (categoria,))
   for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
     categorias.append(CATEGORIA)
     productos.append(PRODUCTO.NOMBRE)
     marcas.append(PRODUCTO.MARCA)
     vendedores.append(IDVENDEDOR)
-    precios.append(PRECIOVENTA)
-  return categorias, productos, marcas, vendedores, precios
+  return categorias, productos, marcas, vendedores
 
 def mostrarPublicacionCliente(cur):
-  cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE CATEGORIA = %s AND ESTADO = ACTIVA", (categoria,))
-  print("\n-- PUBLICACIONES --\n")
+  cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE ESTADO = ACTIVA")
   for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
-  print('Categoria:', CATEGORIA,
-        '\nNombre:',NOMBREPUBLICACION,
-        '\nProducto:',PRODUCTO.NOMBRE,
-        '\nMarca:',PRODUCTO.MARCA,
-        '\nDescripcion:',DESCRIPCION,
-        '\nPrecio:',PRECIOVENTA,
-        '\nVendedor:',IDVENDEDOR,
-        '\nStock:',STOCK,
-        '\nPublicado el:',FECHAPUBLICACION,
-        '\n-----------------------------------')
-  
-def mostrarPublicacionCategoria(categoria, cur):
-  cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE CATEGORIA = %s", (categoria,))
-  print("\n-- PUBLICACIONES --\n")
-  for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
-  print('Categoria:', CATEGORIA,
-        '\nNombre:',NOMBREPUBLICACION,
-        '\nProducto:',PRODUCTO.NOMBRE,
-        '\nMarca:',PRODUCTO.MARCA,
-        '\nDescripcion:',DESCRIPCION,
-        '\nPrecio:',PRECIOVENTA,
-        '\nVendedor:',IDVENDEDOR,
-        '\nStock:',STOCK,
-        '\nPublicado el:',FECHAPUBLICACION,
-        '\n-----------------------------------')
+    print('Categoria:', CATEGORIA,
+          '\nNombre:',NOMBREPUBLICACION,
+          '\nProducto:',PRODUCTO.NOMBRE,
+          '\nMarca:',PRODUCTO.MARCA,
+          '\nDescripcion:',DESCRIPCION,
+          '\nPrecio:',PRECIOVENTA,
+          '\nVendedor:',IDVENDEDOR,
+          '\nStock:',STOCK,
+          '\nPublicado el:',FECHAPUBLICACION,
+          '\n-----------------------------------')
 
-def mostrarPublicacionOrdFecha(arg, cur):
-  if (arg == "Mas reciente"):
-    cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO ORDER BY FECHAPUBLICACION DESC")
-    print("\n-- PUBLICACIONES --\n")
-    for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
-    print('Categoria:', CATEGORIA,
-          '\nNombre:',NOMBREPUBLICACION,
-          '\nProducto:',PRODUCTO.NOMBRE,
-          '\nMarca:',PRODUCTO.MARCA,
-          '\nDescripcion:',DESCRIPCION,
-          '\nPrecio:',PRECIOVENTA,
-          '\nVendedor:',IDVENDEDOR,
-          '\nStock:',STOCK,
-          '\nPublicado el:',FECHAPUBLICACION,
-          '\n-----------------------------------')
-  elif (arg == "Mas antigua"):
-    cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO ORDER BY FECHAPUBLICACION ASC")
-    print("\n-- PUBLICACIONES --\n")
-    for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
-    print('Categoria:', CATEGORIA,
-          '\nNombre:',NOMBREPUBLICACION,
-          '\nProducto:',PRODUCTO.NOMBRE,
-          '\nMarca:',PRODUCTO.MARCA,
-          '\nDescripcion:',DESCRIPCION,
-          '\nPrecio:',PRECIOVENTA,
-          '\nVendedor:',IDVENDEDOR,
-          '\nStock:',STOCK,
-          '\nPublicado el:',FECHAPUBLICACION,
-          '\n-----------------------------------')
-  else:
+def mostrarPublicacionProductoMarca(prod=None, marc=None, categ=None, vend=None, ord=None, prec=None, ord_price=None, cur):
+  print("\n-- PUBLICACIONES --\n")
+  categorias, productos, marcas, vendedores= listarAtributosClientes(cur)
+  consulta = "SELECT PRODUCTO.CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE ESTADO = ACTIVA"
+  contador = 0
+  if prod is not None and prod in productos:
+    consulta += f" AND PRODUCTO.NOMBRE = '{prod}'"
+    contador += 1
+  if marc is not None and marc in marcas:
+    consulta += f" AND PRODUCTO.MARCA = '{marc}'"
+    contador += 1
+  if categ is not None and categ in categorias:
+    consulta += f" AND PRODUCTO.CATEGORIA = '{categ}'"
+    contador += 1
+  if vend is not None and vend in vendedores:
+    consulta += f" AND IDVENDEDOR = '{vend}'"
+    contador += 1
+  if prec is not None and ord_price is not None:
+    if ord_price == "Mayor":
+      consulta += f"AND PRECIOVENTA >= '{prec}'"
+      contador += 1
+    elif ord_price == "Menor":
+      consulta += f"AND PRECIOVENTA <= '{prec}'"
+      contador += 1
+  if ord is not None:
+    if ord == "Mas reciente":
+      consulta += " ORDER BY FECHAPUBLICACION DESC"
+      contador += 1
+    elif ord == "Mas antigua":
+      consulta += "ORDER BY FECHAPUBLICACION ASC"
+      contador += 1
+      
+  if contador == 0:
     mostrarPublicacionCliente(cur)
-
-def mostrarPublicacionProductoMarca(prod, marc, categ, vend, ord, prec, ord_price, cur):
-  print("\n-- PUBLICACIONES --\n")
-  categorias, productos, marcas, vendedores, precios = listarAtributosClientes(cur)
-  if ((prod in productos) and (marc in marcas) and (categ in categorias) and (vend in vendedores) and (ord == "Mas reciente") and (prec in precios) and (ord_price == "Mayor")):
-    cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE CATEGORIA = %s AND ESTADO = ACTIVO AND PRODUCTO.NOMBRE = %s AND PRODUCTO.MARCA = %s AND IDVENDEDOR = %s AND PRECIOVENTA >= %s ORDER BY FECHAPUBLICACION DESC", (categ, prod, marc, vend, prec))
-    for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
+  
+  cur.execute(consulta)
+  for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
     print('Categoria:', CATEGORIA,
           '\nNombre:',NOMBREPUBLICACION,
           '\nProducto:',PRODUCTO.NOMBRE,
@@ -205,17 +186,3 @@ def mostrarPublicacionProductoMarca(prod, marc, categ, vend, ord, prec, ord_pric
           '\nStock:',STOCK,
           '\nPublicado el:',FECHAPUBLICACION,
           '\n-----------------------------------')
-  elif ((prod in productos) and (marc in marcas) and (categ in categorias) and (vend in vendedores) and (ord == "Mas antiguo") and (prec in precios) and (ord_price == "Menor")):
-    cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE CATEGORIA = %s AND ESTADO = ACTIVO AND PRODUCTO.NOMBRE = %s AND PRODUCTO.MARCA = %s AND IDVENDEDOR = %s AND PRECIOVENTA <= %s ORDER BY FECHAPUBLICACION ASC", (categ, prod, marc, vend, prec))
-    for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
-    print('Categoria:', CATEGORIA,
-          '\nNombre:',NOMBREPUBLICACION,
-          '\nProducto:',PRODUCTO.NOMBRE,
-          '\nMarca:',PRODUCTO.MARCA,
-          '\nDescripcion:',DESCRIPCION,
-          '\nPrecio:',PRECIOVENTA,
-          '\nVendedor:',IDVENDEDOR,
-          '\nStock:',STOCK,
-          '\nPublicado el:',FECHAPUBLICACION,
-          '\n-----------------------------------')
-    
