@@ -186,3 +186,7 @@ def mostrarPublicacionProductoMarca(prod=None, marc=None, categ=None, vend=None,
           '\nStock:',STOCK,
           '\nPublicado el:',FECHAPUBLICACION,
           '\n-----------------------------------')
+
+#
+def preguntaClienteVendedor(idCliente, idVendedor, contenido, noPubli):
+  
