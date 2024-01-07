@@ -2,7 +2,7 @@ import pymysql
 from datetime import datetime
 
 # Conexion a la base de datos de mercadolibre
-mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 'user2', db='mercadolibre')
+mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 'Walboli-18', db='mercadolibre')
 cur = mercadolibreconnection.cursor()
 
 def validarUsuario(usuario):
@@ -167,3 +167,99 @@ def verReclamos(userid):
         print("Vendedor: " + vendedorid)
         print("")
     print("")
+
+# Publicaciones: El usuario puede conocer las publicaciones que ha realizado (activas, no activas, etc) modificar y eliminar publicaciones. 
+# Es necesario hacer joins con otras tablas para el efecto Eliminacion, modificaciones
+    
+def imprimirPublicaciones(userid,estado):
+    cur.execute("select nopublicacion, nombrepublicacion,descripcion,precioventa, estado, stock from Publicacion where idvendedor = '"+userid+"' and estado = '"+estado+"';")
+    publicaciones= cur.fetchall()
+    palabra = ""
+    if(estado.lower() == "activa"):
+        palabra = "ACTIVAS"
+    elif(estado.lower()=="agotado"):
+        palabra = "AGOTADAS"
+    elif(estado.lower()=="no activa"):
+        palabra = "NO ACTIVAS"
+    if(len(publicaciones)):
+        print("-- PUBLICACIONES "+palabra+" --")
+    for pub in publicaciones:
+        id, producto,descripcion,precio,estado,stock = pub
+        print("Id: " + str(id))
+        print("Producto: " + producto)
+        print("Descripcion: " + descripcion)
+        print("Precio: $" + str(precio))
+        print("Estado " + estado)
+        print("Stock: " + str(stock))
+    print("")
+
+def editarPublicacion(idPublicacion):
+    campoNumero = input("Seleccione el campo que desee modificar:\n1=Producto -- 2=Descripcion -- 3=Precio -- 4=Estado -- 5=Stock \nPresione otra tecla para volver\n")
+    while campoNumero in ["1","2","3","4","5"]:
+        campo = ""
+        if campoNumero == "1":
+            campo = 'nombrepublicacion'
+        elif campoNumero == "2":
+            campo = 'descripcion'
+        elif campoNumero == "3":
+            campo = 'precioventa'
+        elif campoNumero == "4":
+            campo = 'estado'
+        elif campoNumero == "5":
+            campo = 'stock'
+        valor = input("Escriba el nuevo valor\n")
+        cur.execute("UPDATE PUBLICACION SET "+campo+" = '"+valor+"' where nopublicacion = " + str(idPublicacion))
+        campoNumero = input("Seleccione el campo que desee modificar:\n1 = Producto -- 2 = Descripcion -- 3 = Precio -- 4 = Estado -- 5 = Stock \nPresione otra tecla para volver\n")
+    mercadolibreconnection.commit()
+    print("¡Datos actualizados correctamente!")
+
+
+def eliminarPublicacion(idpublicacion):
+    try:
+        mercadolibreconnection.begin()
+        cur.execute("delete from pregunta where nopublicacion = "+idpublicacion+";")
+        cur.execute("delete from factura where idorden = (select orderid from orden where idpublicacion = "+idpublicacion+");")
+        cur.execute("delete from reclamo where orderid = (select orderid from orden where idpublicacion = "+idpublicacion+");")
+        cur.execute("delete from orden where idpublicacion = "+idpublicacion+";")
+        cur.execute("delete from visualizacion_publicaciones where nopublicacion = "+idpublicacion+";")
+        cur.execute("delete from publicacion where nopublicacion = "+idpublicacion+";")
+        mercadolibreconnection.commit()
+    except Exception as e:
+        print(f"Error{e}")
+        mercadolibreconnection.rollback()
+
+
+def verPublicacion(userid):
+    cur.execute("SELECT NOPUBLICACION FROM PUBLICACION WHERE IDVENDEDOR = '" + userid + "';")
+    registros = cur.fetchall()
+    lids = []
+    for registro in registros:
+        lids.append(str(registro[0]))
+    totalpublicaciones = len(registros)
+
+    if totalpublicaciones > 0: 
+        print("")
+        imprimirPublicaciones(userid,"Activa")
+        imprimirPublicaciones(userid,"Agotado")
+        imprimirPublicaciones(userid,"No Activa")
+        editar = input("¿Desea editar/eliminar alguna publicacion?\nEditar/Eliminar/VOLVER\n").lower()
+        while(editar in ["editar","eliminar"]):
+            if editar == "editar":
+                idpub = input("Seleccione el id de la publicacion\n")
+                while idpub not in lids:
+                    idpub = input("¡Id invalido! Intente nuevamente:\n")
+                editarPublicacion(idpub)
+            elif editar == "eliminar":
+                idpub = input("Seleccione el id de la publicacion a eliminar\n")
+                conf = input("¿Seguro que quiere eliminar la publicación? (Esta acción no se puede revertir)\nSI/NO\n").lower()
+                if conf == "si":
+                    eliminarPublicacion(idpub)
+                    print("¡Publicación eliminada con éxito!")
+            else:
+                print("Acción finalizada")
+            editar = input("¿Desea editar/eliminar otra publicacion?\nEditar/Eliminar/Volver\n").lower()  
+        print("¡Cambios realizados correctamente!")
+    else:
+        print("Usted no tiene productos publicados")
+
+verPublicacion("javirod")
