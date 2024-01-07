@@ -287,10 +287,32 @@ def AccionarUsuario(opcion,user):
           limpiarPantalla()
           return
        else:
-          registrarVisualizacion(user,pub)
-          generarOrden(pub,user)
-          imprimirMenuPrincipalUsuario(user)
+          cond = registrarVisualizacion(user,pub)
+          if cond == False:
+             return
 
+          print("\n1. GENERAR ORDEN")
+          print("2. VER INFORMACION DEL VENDEDOR")
+          print("O. SALIR")
+          option1 = validaropcion(0,2)
+
+          if option1 == 0:
+             limpiarPantalla()
+             return
+          
+          if option1 == 1:
+            generarOrden(pub,user)
+            imprimirMenuPrincipalUsuario(user)
+
+          if option1 == 2:
+             cur.execute("SELECT IDVENDEDOR FROM PUBLICACION WHERE NOPUBLICACION = "+str(pub)+"")
+             resultado1 = cur.fetchone()
+             if(resultado1 != None):
+               limpiarPantalla()
+               mostrarReputacion(resultado1[0])
+             else:
+                print("\nPublicacion no encontrada, intente de nuevo")
+          
     if opcion == 2:
        limpiarPantalla()
        conduser = actualizarUsuario(user)
@@ -432,6 +454,14 @@ def AccionarUsuario(opcion,user):
     if opcion == 16:
        limpiarPantalla()
        mostrarPublicacionesDeInteres(user)
+       input("\nPresione ENTER para regresar -->")
+       limpiarPantalla()
+
+    if opcion == 17:
+       limpiarPantalla()
+       mostrarReputacion(user)
+       input("\nPresione ENTER para regresar -->")
+       limpiarPantalla()
    
       
 def mostrarcaratula():
@@ -476,8 +506,9 @@ def imprimirMenuPrincipalUsuario(nomuser):
        print("14. Ver Recientes Publicaciones 2023")
        print("15. Productos existentes de categoria Autos")
        print("16. Publicaciones vistas recientemente")
+       print("17. Mi Reputacion")
        print('0. SALIR')
-       op = validaropcion(0,16)
+       op = validaropcion(0,17)
 
        AccionarUsuario(op,nomuser)
 
@@ -1101,8 +1132,17 @@ def crearpublicacion(user):
 def registrarVisualizacion(user,noPublicacion):
    fecha_actual = date.today()
    fecha_actual_str = fecha_actual.strftime('%Y-%m-%d')
+   cur.execute("SELECT NOPUBLICACION FROM PUBLICACION WHERE NOPUBLICACION = "+str(noPublicacion)+"")
+
+   if cur.fetchone() == None:
+      limpiarPantalla()
+      print("\nPublicacion no encontrada")
+      return False
+   
    cur.execute("INSERT INTO VISUALIZACION_PUBLICACIONES (USERID, NOPUBLICACION, FECHA) VALUES ('"+user+"',"+noPublicacion+",'"+fecha_actual_str+"')")
    mercadolibreconnection.commit()
+
+   return True
 
 def mostrarPublicacionesDeInteres(user):
    cur.execute("SELECT p.NOPUBLICACION, p.NOMBREPUBLICACION, p.IDVENDEDOR, p.PRECIOVENTA, p.FECHAPUBLICACION, FECHA from VISUALIZACION_PUBLICACIONES vp JOIN PUBLICACION p USING (NOPUBLICACION) WHERE USERID = '"+user+"'")
@@ -1487,6 +1527,27 @@ def verReclamos(userid):
         print("Vendedor:", reclamo[4])
         print("")
     print("")
+
+def mostrarReputacion(user):
+   print ("--- REPUTACION ---")
+   print("La reputacion se calcula en base al promedio de estrellas en todas las ordenes\n")
+
+   cur.execute("SELECT * FROM VENDEDOR WHERE USERID = '"+user+"'")
+   resultado = cur.fetchone()
+
+   if(resultado == None):
+      limpiarPantalla()
+      print(user," no tiene reputacion disponible porque no es un vendedor")
+      print("Empiece a vender!")
+      return
+
+   if resultado[1] == None:
+      limpiarPantalla()
+      print("Reputacion no disponible por el momento")
+      return()
+   else:
+      print("-- Reputacion de ",resultado[0])
+      print("Promedio: ",resultado[1])
 
 
 #Programa Principal
