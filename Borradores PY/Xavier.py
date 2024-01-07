@@ -112,9 +112,23 @@ while (usuario != 'salir'):
       print('Nombre del producto: ' + NOMBRE, 'Marca: ' + MARCA, 'Categoria: ' + CATEGORIA, 'Precio: ' + PRECIO)
 
 #Aplicacion - Ver publicaciones (vista del cliente)
+def listarAtributosClientes(cur):
+  categorias = []
+  productos = []
+  marcas = []
+  vendedores = []
+  precios = []
+  cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE CATEGORIA = %s AND ESTADO = ACTIVA", (categoria,))
+  for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
+    categorias.append(CATEGORIA)
+    productos.append(PRODUCTO.NOMBRE)
+    marcas.append(PRODUCTO.MARCA)
+    vendedores.append(IDVENDEDOR)
+    precios.append(PRECIOVENTA)
+  return categorias, productos, marcas, vendedores, precios
 
 def mostrarPublicacionCliente(cur):
-  cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE CATEGORIA = %s", (categoria,))
+  cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE CATEGORIA = %s AND ESTADO = ACTIVA", (categoria,))
   print("\n-- PUBLICACIONES --\n")
   for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
   print('Categoria:', CATEGORIA,
@@ -175,5 +189,33 @@ def mostrarPublicacionOrdFecha(arg, cur):
   else:
     mostrarPublicacionCliente(cur)
 
-def mostrarPublicacionProductoMarca(prod, marca, cur):
-  
+def mostrarPublicacionProductoMarca(prod, marc, categ, vend, ord, prec, ord_price, cur):
+  print("\n-- PUBLICACIONES --\n")
+  categorias, productos, marcas, vendedores, precios = listarAtributosClientes(cur)
+  if ((prod in productos) and (marc in marcas) and (categ in categorias) and (vend in vendedores) and (ord == "Mas reciente") and (prec in precios) and (ord_price == "Mayor")):
+    cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE CATEGORIA = %s AND ESTADO = ACTIVO AND PRODUCTO.NOMBRE = %s AND PRODUCTO.MARCA = %s AND IDVENDEDOR = %s AND PRECIOVENTA >= %s ORDER BY FECHAPUBLICACION DESC", (categ, prod, marc, vend, prec))
+    for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
+    print('Categoria:', CATEGORIA,
+          '\nNombre:',NOMBREPUBLICACION,
+          '\nProducto:',PRODUCTO.NOMBRE,
+          '\nMarca:',PRODUCTO.MARCA,
+          '\nDescripcion:',DESCRIPCION,
+          '\nPrecio:',PRECIOVENTA,
+          '\nVendedor:',IDVENDEDOR,
+          '\nStock:',STOCK,
+          '\nPublicado el:',FECHAPUBLICACION,
+          '\n-----------------------------------')
+  elif ((prod in productos) and (marc in marcas) and (categ in categorias) and (vend in vendedores) and (ord == "Mas antiguo") and (prec in precios) and (ord_price == "Menor")):
+    cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE CATEGORIA = %s AND ESTADO = ACTIVO AND PRODUCTO.NOMBRE = %s AND PRODUCTO.MARCA = %s AND IDVENDEDOR = %s AND PRECIOVENTA <= %s ORDER BY FECHAPUBLICACION ASC", (categ, prod, marc, vend, prec))
+    for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
+    print('Categoria:', CATEGORIA,
+          '\nNombre:',NOMBREPUBLICACION,
+          '\nProducto:',PRODUCTO.NOMBRE,
+          '\nMarca:',PRODUCTO.MARCA,
+          '\nDescripcion:',DESCRIPCION,
+          '\nPrecio:',PRECIOVENTA,
+          '\nVendedor:',IDVENDEDOR,
+          '\nStock:',STOCK,
+          '\nPublicado el:',FECHAPUBLICACION,
+          '\n-----------------------------------')
+    
