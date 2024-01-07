@@ -287,6 +287,7 @@ def AccionarUsuario(opcion,user):
           limpiarPantalla()
           return
        else:
+          registrarVisualizacion(user,pub)
           generarOrden(pub,user)
           imprimirMenuPrincipalUsuario(user)
 
@@ -427,6 +428,10 @@ def AccionarUsuario(opcion,user):
        mostrarAccesoriosAutos()
        input("\nPresione ENTER para regresar -->")
        limpiarPantalla()
+
+    if opcion == 16:
+       limpiarPantalla()
+       mostrarPublicacionesDeInteres(user)
    
       
 def mostrarcaratula():
@@ -470,8 +475,9 @@ def imprimirMenuPrincipalUsuario(nomuser):
        print("13. Responder Preguntas")
        print("14. Ver Recientes Publicaciones 2023")
        print("15. Productos existentes de categoria Autos")
+       print("16. Publicaciones vistas recientemente")
        print('0. SALIR')
-       op = validaropcion(0,15)
+       op = validaropcion(0,16)
 
        AccionarUsuario(op,nomuser)
 
@@ -1093,19 +1099,22 @@ def crearpublicacion(user):
 #Visualizacion de publicaciones
 #Esta funcion debe ser llamada despues de abrir a detalle una publicacion de eleccion del user, recuperando el numero de
 def registrarVisualizacion(user,noPublicacion):
-   cur.execute("INSERT INTO VISUALIZACION_PUBLICACIONES (USERID, NOPUBLICACION, FECHA) VALUES ('"+user+"','"+noPublicacion+"','"+str(datetime.now)+"')")
+   fecha_actual = date.today()
+   fecha_actual_str = fecha_actual.strftime('%Y-%m-%d')
+   cur.execute("INSERT INTO VISUALIZACION_PUBLICACIONES (USERID, NOPUBLICACION, FECHA) VALUES ('"+user+"',"+noPublicacion+",'"+fecha_actual_str+"')")
    mercadolibreconnection.commit()
 
 def mostrarPublicacionesDeInteres(user):
-   cur.execute("SELECT p.NOPUBLICACION, p.NOMBREPUBLICACION, p.IDVENDEDOR, p.PRECIOVENTA, p.FECHAPUBLICACION from VISUALIZACION_PUBLICACIONES vp JOIN PUBLICACION p USING (NOPUBLICACION) WHERE USERID = '"+user+"'")
+   cur.execute("SELECT p.NOPUBLICACION, p.NOMBREPUBLICACION, p.IDVENDEDOR, p.PRECIOVENTA, p.FECHAPUBLICACION, FECHA from VISUALIZACION_PUBLICACIONES vp JOIN PUBLICACION p USING (NOPUBLICACION) WHERE USERID = '"+user+"'")
+   resultado = cur.fetchall()
    print("\nPubliicaciones Visitadas")
-   for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION, FECHA in cur.fetchall():
-      print('Publicacion #',NOPUBLICACION,
-          '\nNombre: ',NOMBREPUBLICACION,
-          '\nVendedor: ',IDVENDEDOR,
-          '\nPrecio: ',PRECIOVENTA,
-          '\nPublicado el: ',FECHAPUBLICACION,
-          '\nVista el: ',FECHA,
+   for historial in range(len(resultado)):
+      print('Publicacion #',resultado[historial][0],
+          '\nNombre: ',resultado[historial][1],
+          '\nVendedor: ',resultado[historial][2],
+          '\nPrecio: ',resultado[historial][3],
+          '\nPublicado el: ',resultado[historial][4],
+          '\nVista el: ',resultado[historial][5],
           '\n-----------------------------------\n')
 
 
