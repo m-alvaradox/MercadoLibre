@@ -277,7 +277,7 @@ def AccionarUsuario(opcion,user):
       print("Sesion cerrada exitosamente")
       imprimirMenuPrincipalInvitado()
 
-    if opcion == 12:
+    if opcion == 9:
        mostrarPublicaciones()
        print("\nSeleccione la publicacion de su interés\nPara SALIR digite 0")
        pub = opcionnumerica()
@@ -289,11 +289,14 @@ def AccionarUsuario(opcion,user):
           cond = registrarVisualizacion(user,pub)
           if cond == False:
              return
+          mostrarDetallesPublicacion(pub)
+          #nuevafuncion
 
           print("\n1. GENERAR ORDEN")
           print("2. VER INFORMACION DEL VENDEDOR")
+          print("3. REALIZAR UNA PREGUNTA")
           print("O. SALIR")
-          option1 = validaropcion(0,2)
+          option1 = validaropcion(0,3)
 
           if option1 == 0:
              limpiarPantalla()
@@ -301,71 +304,101 @@ def AccionarUsuario(opcion,user):
           
           if option1 == 1:
             generarOrden(pub,user)
-            imprimirMenuPrincipalUsuario(user)
+            #imprimirMenuPrincipalUsuario(user)
 
           if option1 == 2:
-             cur.execute("SELECT IDVENDEDOR FROM PUBLICACION WHERE NOPUBLICACION = "+str(pub)+"")
+             limpiarPantalla()
+             cur.execute("SELECT IDVENDEDOR, NOMBRE FROM PUBLICACION JOIN VENDEDOR ON IDVENDEDOR = USERID JOIN USUARIO USING(USERID) WHERE NOPUBLICACION = "+str(pub)+"")
              resultado1 = cur.fetchone()
-             if(resultado1 != None):
-               limpiarPantalla()
-               mostrarReputacion(resultado1[0])
-             else:
-                print("\nPublicacion no encontrada, intente de nuevo")
+             print("\nMostrando reputacion de ",resultado1[1])
+             mostrarReputacion(resultado1[0])
+
+          if option1 == 3:
+             realizarPregunta(pub,user)
+             
           
     if opcion == 2:
        limpiarPantalla()
-       conduser = actualizarUsuario(user)
+       print("--- MI CUENTA ---\n")
+       mostrarPerfil(user)
+       print("\n1. Actualizar Cuenta")
+       print("2. Eliminar Cuenta")
+       print("3. Direcciones Registradas")
+       print("4. Cupones Registrados")
+       print("5. Metodos de Pago Registrados")
+       print("0. SALIR")
+       opc4 = validaropcion(0,5)
+       
+       if opc4 == 0:
+          limpiarPantalla()
+          return
+       
+       if opc4 == 1:
+         limpiarPantalla()
+         conduser = actualizarUsuario(user)
 
-       if (conduser != None):
-          user = conduser
-          imprimirMenuPrincipalUsuario(user)
+         if (conduser != None):
+            user = conduser
+            imprimirMenuPrincipalUsuario(user)
 
-    if opcion == 3:
-       limpiarPantalla()
-       conduser2 = eliminarUsuario(user)
+       if opc4 == 2:
+        limpiarPantalla()
+        conduser2 = eliminarUsuario(user)        
+        if(conduser2 == None):
+           imprimirMenuPrincipalInvitado()
 
-       if(conduser2 == None):
-          imprimirMenuPrincipalInvitado()
+       if opc4 == 3:
+         limpiarPantalla()
+         mostrarDirecciones(user)
+         print("\n1. Añadir direccion")
+         print("2. Eliminar direccion")
+         print("0. SALIR")
+         opdir = validaropcion(0,2)
 
-    if opcion == 4:
+         if (opdir == 0):
+            limpiarPantalla()
+            return
+       
+         if (opdir == 1):
+            limpiarPantalla()
+            anadirDireccion(user)
+
+         if (opdir == 2):
+            eliminarDireccion(user)
+
+       if opc4 == 4:
+         limpiarPantalla()
+         mostrarCupones(user)
+         input("\nPresione ENTER para regresar -->")
+         limpiarPantalla()
+
+       if opc4 == 5:
+          limpiarPantalla()
+          mostrarMetodosPago(user)
+          print("\n1. Añadir Tarjeta")
+          print("2. Eliminar Tarjeta")
+          print("0. SALIR")
+          opdmet = validaropcion(0,2)
+
+          if (opdmet == 0):
+            limpiarPantalla()
+            return
+       
+          if (opdmet == 1):
+            limpiarPantalla()
+            registrarTarjeta(user)
+
+          if (opdmet == 2):
+            eliminarTarjeta(user)
+          
+          
+    if opcion == 7:
        limpiarPantalla()
        verReclamos(user)
        input("\nPresione ENTER para regresar -->")
        limpiarPantalla()
 
-
     if opcion == 5:
-       limpiarPantalla()
-       mostrarCupones(user)
-       input("\nPresione ENTER para regresar -->")
-       limpiarPantalla()
-
-    if opcion == 6:
-       limpiarPantalla()
-       mostrarPerfil(user)
-       input("\nPresione ENTER para regresar -->")
-       limpiarPantalla()
-
-    if opcion == 7:
-       limpiarPantalla()
-       mostrarDirecciones(user)
-       print("\n1. Añadir direccion")
-       print("2. Eliminar direccion")
-       print("0. SALIR")
-       opdir = validaropcion(0,2)
-
-       if (opdir == 0):
-          limpiarPantalla()
-          return
-       
-       if (opdir == 1):
-          limpiarPantalla()
-          anadirDireccion(user)
-
-       if (opdir == 2):
-          eliminarDireccion(user)
-
-    if opcion == 8:
        limpiarPantalla()
        mostrarcompras(user)
        print("\n1. Calificar Compra")
@@ -398,7 +431,7 @@ def AccionarUsuario(opcion,user):
        if opt == 2:
           realizarReclamo(comp,user)
              
-    if opcion == 9:
+    if opcion == 8:
        print('1. Facturas Recibidas')
        print('2. Facturas Emitidas')
        print('3. Emitir Factura')
@@ -423,20 +456,45 @@ def AccionarUsuario(opcion,user):
        if optc == 3:
           EmitirFactura(user)
 
-    if opcion == 10:
+    if opcion == 4:
        limpiarPantalla()
        crearpublicacion(user)
 
-    if opcion == 11:
+    if opcion == 6:
        limpiarPantalla()
-       verventas(user)
-       input("\nPresione ENTER para regresar -->")
-       limpiarPantalla()
+       print("--- VENTAS ---\n")
+       print("1. Ver Ventas")
+       print("2. Preguntas")
+       print("3. Reputacion")
+       print("4. Publicaciones")
+       print("0. SALIR")
+       opven = validaropcion(0,4)
 
-    if opcion == 13:
-       limpiarPantalla()
-       responderpregunta(user)
-       limpiarPantalla()
+       if opven == 0:
+          limpiarPantalla()
+          return
+       
+       if opven == 1:
+         limpiarPantalla()
+         verventas(user)
+         input("\nPresione ENTER para regresar -->")
+         limpiarPantalla()
+         
+       if opven == 2:
+          limpiarPantalla()
+          responderpregunta(user)
+          limpiarPantalla()
+
+       if opven == 3:
+         limpiarPantalla()
+         mostrarReputacion(user)
+         input("\nPresione ENTER para regresar -->")
+         limpiarPantalla()
+
+       if opven == 4:
+         limpiarPantalla()
+         gestionarPublicaciones(user)
+               
 
     if opcion == 14:
        limpiarPantalla()
@@ -450,19 +508,13 @@ def AccionarUsuario(opcion,user):
        input("\nPresione ENTER para regresar -->")
        limpiarPantalla()
 
-    if opcion == 16:
+    if opcion == 3:
        limpiarPantalla()
        mostrarPublicacionesDeInteres(user)
        input("\nPresione ENTER para regresar -->")
        limpiarPantalla()
 
-    if opcion == 17:
-       limpiarPantalla()
-       mostrarReputacion(user)
-       input("\nPresione ENTER para regresar -->")
-       limpiarPantalla()
-   
-      
+
 def mostrarcaratula():
    print("\n----- MERCADO LIBRE -----")
    print("Compra más facil y seguro")
@@ -490,29 +542,21 @@ def imprimirMenuPrincipalUsuario(nomuser):
        mostrarcaratula()
        print("Hola!",cur.fetchone()[0])
        print('1. Cerrar Sesion')
-       print('2. Modificar Cuenta')
-       print('3. Eliminar Cuenta')
-       print('4. Reclamos')
-       print('5. Mis Cupones')
-       print('6. Mi Perfil')
-       print('7. Direcciones registradas')
-       print('8. Mis Compras')
-       print("9. Mis Facturas")
-       print("10. Vender")
-       print("11. Mis Ventas")
-       print("12. Ver Publicaciones")
-       print("13. Responder Preguntas")
-       print("14. Ver Recientes Publicaciones 2023")
-       print("15. Productos existentes de categoria Autos")
-       print("16. Publicaciones vistas recientemente")
-       print("17. Mi Reputacion")
+       print('2. Cuenta')
+       print("3. Historial")
+       print("4. Vender")
+       print('5. Compras')
+       print("6. Ventas")
+       print('7. Reclamos') 
+       print("8. Facturacion")
+       print("9. Publicaciones")
        print('0. SALIR')
-       op = validaropcion(0,17)
+       op = validaropcion(0,9)
 
        AccionarUsuario(op,nomuser)
 
 def mostrarPublicaciones():
-   cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION, STOCK from PUBLICACION")
+   cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION, STOCK from PUBLICACION ORDER BY FECHAPUBLICACION DESC")
    print("\n-- PUBLICACIONES --\n")
    for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION, STOCK in cur.fetchall():
     print('Publicacion #',NOPUBLICACION,
@@ -525,7 +569,7 @@ def mostrarPublicaciones():
    
 
 def mostrarPublicaciones2023():
- cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION from PUBLICACION WHERE YEAR(FECHAPUBLICACION) = 2023")
+ cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION from PUBLICACION WHERE YEAR(FECHAPUBLICACION) = 2023 ORDER BY FECHAPUBLICACION DESC")
  for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION in cur.fetchall():
     print('Publicacion #',NOPUBLICACION,
           '\nNombre: ',NOMBREPUBLICACION,
@@ -658,6 +702,7 @@ def generarOrden(nopublicacion, user):
 
     subtotal = detallespublicacion[2] * cantidad
     total = subtotal + costoenvio
+    total = round(total,2)
     print("\nUsted desea adquirir:",detallespublicacion[0])
     print("Cantidad:",cantidad)
     print("Subtotal:",subtotal)
@@ -698,6 +743,7 @@ def generarOrden(nopublicacion, user):
                idCupon = detallescupon[0]
                descuento = subtotal * (detallescupon[2]/100)
                total = subtotal + costoenvio - descuento
+               total = round(total,2)
                print("Cupon ingresado correctamente")
                print("\nUsted desea adquirir:",detallespublicacion[0])
                print("Cantidad:",cantidad)
@@ -715,10 +761,82 @@ def generarOrden(nopublicacion, user):
       limpiarPantalla()
       print("Orden Cancelada")
       return
+    
+    tarjeta = None
 
     if op3 == 1:
       print("\n-- PAGO")
-      while True:
+      print("Escoja un método de pago")
+      print("1. Tarjeta de Credito")
+      print("2. Transferencia Bancaria")
+      print("0. SALIR")
+      opti = validaropcion(0,2)
+
+      detallespago = None
+
+      if opti == 0:
+         limpiarPantalla()
+         print("Orden Cancelada")
+         return
+      
+      if opti == 1:
+         cur.execute("SELECT * FROM TARJETA WHERE USERID = '"+user+"'")
+         tarjetas = cur.fetchall()
+
+         if (len(tarjetas) == 0):
+            print("\nNo tiene ninguna tarjeta asociada a su cuenta!")
+            print("Desea asociar una tarjeta?")
+            print("1. SI\n0. CANCELAR")
+            asop = validaropcion(0,1)
+
+            if asop == 0:
+               limpiarPantalla()
+               print("Orden Cancelada")
+               return
+            
+            if asop == 1:
+               print("")
+               tarjeta = registrarTarjeta(user)
+               if tarjeta == None:
+                  limpiarPantalla()
+                  print("Orden Cancelada")
+                  return
+         else:
+            contador = 0
+            for card in range(len(tarjetas)):
+               contador += 1
+               print("\nMetodo de Pago # ",contador)
+               print("Tarjeta No.",tarjetas[card][1])
+               print(tarjetas[card][2])
+               print("Vence:",tarjetas[card][4])
+               print("--------------------------------")
+
+            print("Escoja un metodo de pago\n0 para SALIR")
+            metodo = validaropcion(0,contador)
+
+            if metodo == 0:
+               limpiarPantalla()
+               print("Orden Cancelada")
+               return
+            
+            metodo = metodo -1
+            
+            fechavencestr = tarjetas[metodo][4].strftime("%Y-%m-%d")
+
+            anio, mes, dia = fechavencestr.split("-")
+            print(anio, mes, dia)
+
+            if int(anio) >= fecha_actual.year and int(mes) > fecha_actual.month:
+               tarjeta = tarjetas[metodo][1]
+            else:
+               limpiarPantalla()
+               print("Su tarjeta esta vencida, cancelando compra...")
+               print("Orden Cancelada")
+               return
+
+         print("Validando Transaccion...")
+            
+      if opti == 2:
          print("Asocie un numero de transaccion para generar la orden, 0 para CANCELAR")
          trans = opcionnumerica()
 
@@ -727,8 +845,7 @@ def generarOrden(nopublicacion, user):
             print("Orden Cancelada")
             return
 
-
-         cur.execute("SELECT TRANSID, METODO, MONTO, CUOTA, CARDNUMBER FROM PAGO WHERE TRANSID = "+trans+" AND MONTO = "+str(total)+" AND IDCLIENTE = '"+user+"'")
+         cur.execute("SELECT TRANSID, METODO, MONTO, CUOTA, CARDNUMBER FROM PAGO WHERE TRANSID = "+trans+" AND ROUND(MONTO,2) = "+str(total)+" AND IDCLIENTE = '"+user+"'")
          detallespago = cur.fetchone()
 
          print("Validando Transaccion...")
@@ -743,45 +860,64 @@ def generarOrden(nopublicacion, user):
             print("TRANSACCION RECHAZADA")
             print("Lo sentimos, no tiene ningún pago asociado por el momento o fue usado en otra orden, intente de nuevo\n")
             return
-         else:
-            limpiarPantalla()
-            print("\n--- Transaccion valida")
-            print("\nDetalles de la transaccion:")
-            print("No.Transaccion:",detallespago[0])
-            print("Metodo:",detallespago[1])
-            print("Monto:",detallespago[2])
-            print("Cuota:",detallespago[3])
-            print("Tarjeta No.",detallespago[4])
+         
+    
+    limpiarPantalla()
 
-            print("\nGenerando orden...")
+    if tarjeta == None:
+      metod = 'Depósito'
+      transid = detallespago[0]
+      importe = detallespago[2]
+      cuota = detallespago[3]
+      creditcard = None
 
-            if(idCupon == None):
-               idCupon = 'NULL'
+    else:
+      metod = 'Crédito'
+      importe = total
+      cuota = 1
+      creditcard = tarjeta
+      cur.execute("INSERT INTO PAGO (METODO, MONTO, CUOTA, CARDNUMBER, IDCLIENTE) VALUES ('"+metod+"',"+str(importe)+","+str(cuota)+",'"+creditcard+"','"+user+"')")
+      cur.execute("SELECT LAST_INSERT_ID()")
+      transid = cur.fetchone()[0]
+      mercadolibreconnection.commit()
+
+
+    print("\n--- Transaccion valida")
+    print("\nDetalles de la transaccion:")
+    print("No.Transaccion:",transid)
+    print("Metodo:",metod)
+    print("Monto:",importe)
+    print("Cuota:",cuota)
+    print("Tarjeta No.",creditcard)
+
+
+    print("\nGenerando orden...")
+
+    if(idCupon == None):
+      idCupon = 'NULL'
             
-            if(direccionid == None):
-               direccionid = 'NULL'
+    if(direccionid == None):
+      direccionid = 'NULL'
 
-            if(fechaentrega == None):
-               fechaentrega = 'NULL'
-            else:
-               fechaentrega = "'"+fechaentrega.strftime('%Y-%m-%d')+"'"
+    if(fechaentrega == None):
+      fechaentrega = 'NULL'
+    else:
+      fechaentrega = "'"+fechaentrega.strftime('%Y-%m-%d')+"'"
 
 
             
-            fecha_actual_str = fecha_actual.strftime('%Y-%m-%d')
+    fecha_actual_str = fecha_actual.strftime('%Y-%m-%d')
             
 
 
-            cur.execute("INSERT INTO ORDEN (FECHACREACION,ESTADO,IDCUPON,PRODUCTID,IDPAGO,CANTIDADPRODUCTO,IDPUBLICACION,IDCLIENTE,IDVENDEDOR,IMPORTE,IDDIRECCION,COSTOENVIO,FECHAENTREGA) VALUES "+
-                        "('"+fecha_actual_str+"','Pendiente',"+str(idCupon)+","+str(detallespublicacion[3])+","+str(detallespago[0])+","+str(cantidad)+","+str(nopublicacion)+",'"+user+"','"+detallespublicacion[4]+"',"+str(total)+","+str(direccionid)+","+str(costoenvio)+","+fechaentrega+")")
+    cur.execute("INSERT INTO ORDEN (FECHACREACION,ESTADO,IDCUPON,PRODUCTID,IDPAGO,CANTIDADPRODUCTO,IDPUBLICACION,IDCLIENTE,IDVENDEDOR,IMPORTE,IDDIRECCION,COSTOENVIO,FECHAENTREGA) VALUES "+
+               "('"+fecha_actual_str+"','Pendiente',"+str(idCupon)+","+str(detallespublicacion[3])+","+str(transid)+","+str(cantidad)+","+str(nopublicacion)+",'"+user+"','"+detallespublicacion[4]+"',"+str(importe)+","+str(direccionid)+","+str(costoenvio)+","+fechaentrega+")")
             
-            mercadolibreconnection.commit()
-
-            cur.execute("SELECT ORDERID FROM ORDEN WHERE IDCLIENTE = '"+user+"' ORDER BY ORDERID DESC LIMIT 1")
-            ordenes = cur.fetchone()
-            print("Orden",ordenes[0],"realizada con éxito!")
-            print("Gracias por comprar en Mercado Libre :)")
-            break
+    cur.execute("SELECT LAST_INSERT_ID()")
+    orderid = cur.fetchone()[0]
+    print("Orden",orderid,"realizada con éxito!")
+    mercadolibreconnection.commit()
+    print("Gracias por comprar en Mercado Libre :)")
 
 def anadirDireccion(user):
    print("--- NUEVA DIRECCION ---\n")
@@ -926,8 +1062,13 @@ def mostrarcompras(user):
       cur.execute("SELECT NOMBRE FROM PRODUCTO WHERE PRODUCTID ="+str(listacompras[i][11])+"")
       print("Producto:",cur.fetchone()[0])
 
-      cur.execute("SELECT NOMBREPUBLICACION FROM PUBLICACION WHERE NOPUBLICACION ="+str(listacompras[i][16])+"")
-      print("Publicacion:",cur.fetchone()[0])
+      if listacompras[i][16] == None:
+         nompublicacion = "Eliminada o no disponible"
+      else:
+         cur.execute("SELECT NOMBREPUBLICACION FROM PUBLICACION WHERE NOPUBLICACION ="+str(listacompras[i][16])+"")
+         nompublicacion = cur.fetchone()[0]
+         
+      print("Publicacion:",nompublicacion)
 
       print("Vendedor:",listacompras[i][14])
 
@@ -955,15 +1096,17 @@ def calificarCompra(comp,user):
    if(estrellasproducto == 6):
       limpiarPantalla()
       return
+   
+   estrellasvendedor = None
+   if detallesorden[5] != None:
+      print("\n-- Calificacion del Vendedor")
+      print("¿Que tal le parecio la atencion del vendedor "+detallesorden[5]+"?")
+      print("Califique del 0 al 5")
+      estrellasvendedor = validaropcion(0,6)
 
-   print("\n-- Calificacion del Vendedor")
-   print("¿Que tal le parecio la atencion del vendedor "+detallesorden[5]+"?")
-   print("Califique del 0 al 5")
-   estrellasvendedor = validaropcion(0,6)
-
-   if(estrellasvendedor == 6):
-      limpiarPantalla()
-      return
+      if(estrellasvendedor == 6):
+         limpiarPantalla()
+         return
    
    while True:
       comentario = input("Escriba un comentario (Max.100), caso contrario ENTER, para salir escriba EXIT: ")
@@ -978,6 +1121,11 @@ def calificarCompra(comp,user):
    
    if comentario == "":
       comentario = None
+
+   if estrellasvendedor == None:
+      estrellasvendedor = 'NULL'
+
+   
 
    cur.execute("UPDATE ORDEN SET ESTRELLASPRODUCTO = "+str(estrellasproducto)+", ESTRELLASVENDEDOR = "+str(estrellasvendedor)+", COMENTARIO = '"+comentario+"' WHERE ORDERID = "+comp+"")
    mercadolibreconnection.commit()
@@ -1138,13 +1286,21 @@ def registrarVisualizacion(user,noPublicacion):
       print("\nPublicacion no encontrada")
       return False
    
-   cur.execute("INSERT INTO VISUALIZACION_PUBLICACIONES (USERID, NOPUBLICACION, FECHA) VALUES ('"+user+"',"+noPublicacion+",'"+fecha_actual_str+"')")
+   cur.execute("SELECT REGID, USERID, NOPUBLICACION, FECHA FROM VISUALIZACION_PUBLICACIONES WHERE NOPUBLICACION = "+str(noPublicacion)+" AND USERID = '"+user+"'")
+   resultado = cur.fetchone()
+
+   if(resultado == None):
+      cur.execute("INSERT INTO VISUALIZACION_PUBLICACIONES (USERID, NOPUBLICACION, FECHA) VALUES ('"+user+"',"+noPublicacion+",'"+fecha_actual_str+"')")
+
+   else:
+      cur.execute("UPDATE VISUALIZACION_PUBLICACIONES SET FECHA = now() WHERE NOPUBLICACION = "+noPublicacion+" AND USERID = '"+user+"'")
+
    mercadolibreconnection.commit()
 
    return True
 
 def mostrarPublicacionesDeInteres(user):
-   cur.execute("SELECT p.NOPUBLICACION, p.NOMBREPUBLICACION, p.IDVENDEDOR, p.PRECIOVENTA, p.FECHAPUBLICACION, FECHA from VISUALIZACION_PUBLICACIONES vp JOIN PUBLICACION p USING (NOPUBLICACION) WHERE USERID = '"+user+"'")
+   cur.execute("SELECT p.NOPUBLICACION, p.NOMBREPUBLICACION, p.IDVENDEDOR, p.PRECIOVENTA, p.FECHAPUBLICACION, FECHA from VISUALIZACION_PUBLICACIONES vp JOIN PUBLICACION p USING (NOPUBLICACION) WHERE USERID = '"+user+"' ORDER BY FECHA DESC")
    resultado = cur.fetchall()
    print("\nPubliicaciones Visitadas")
    for historial in range(len(resultado)):
@@ -1302,6 +1458,7 @@ def realizarReclamo(comp,user):
       print("Estado:",resultado[2])
       print("Vendedor:",resultado[3])
       print("Producto:",resultado[4])
+      return
 
    while True:
       tipo = input("Especifique TIPO: ")
@@ -1330,8 +1487,14 @@ def realizarReclamo(comp,user):
    cur.execute("SELECT IDVENDEDOR FROM ORDEN WHERE ORDERID = "+comp+" AND IDCLIENTE = '"+user+"'")
    idvendedor = cur.fetchone()[0]
 
+   if idvendedor == None:
+      idvendedor = 'NULL'
+   else:
+      idvendedor = "'"+idvendedor+"'"
+
    cur.execute("INSERT INTO RECLAMO (TIPO, ESTADO, CLIENTEID, VENDEDORID, ORDERID, FECHAINGRESO) VALUES"+
-               "('"+tipo+"','Abierto','"+user+"','"+idvendedor+"',"+comp+",now())")
+               "('"+tipo+"','Abierto','"+user+"',"+idvendedor+","+comp+",now())")
+   
    mercadolibreconnection.commit()
    cur.execute("SELECT ID FROM RECLAMO WHERE ORDERID = "+comp+" AND CLIENTEID = '"+user+"'")
    print("Reclamo #"+str(cur.fetchone()[0])+" generado con exito!")
@@ -1396,6 +1559,7 @@ def eliminarUsuario(user): #funcion parametrizada
         try:
             print("Eliminando usuario...")
             mercadolibreconnection.begin()
+            """
             cur.execute("DELETE FROM VISUALIZACION_PUBLICACIONES WHERE USERID = '"+ user +"' or NOPUBLICACION IN (SELECT NOPUBLICACION FROM PUBLICACION WHERE IDVENDEDOR = '"+ user +"');")
             cur.execute("DELETE FROM FACTURA WHERE IDCLIENTE = '"+ user +"' OR IDVENDEDOR = '"+ user +"';")
             cur.execute("DELETE FROM RECLAMO WHERE CLIENTEID = '"+ user +"' OR VENDEDORID = '"+ user +"';")
@@ -1406,8 +1570,8 @@ def eliminarUsuario(user): #funcion parametrizada
             cur.execute("DELETE FROM PREGUNTA WHERE IDCLIENTE = '"+ user +"' OR IDVENDEDOR = '"+ user +"';")
             cur.execute("DELETE FROM PUBLICACION WHERE  IDVENDEDOR = '"+ user +"';")
             cur.execute("DELETE FROM CLIENTE WHERE USERID = '"+ user +"';")
-            cur.execute("DELETE FROM VENDEDOR WHERE USERID = '"+ user +"';")
-            cur.execute("DELETE FROM USUARIO WHERE USERID = '"+ user +"';")
+            cur.execute("DELETE FROM VENDEDOR WHERE USERID = '"+ user +"';") """
+            cur.execute("DELETE FROM USUARIO WHERE USERID = '"+ user +"';") 
             mercadolibreconnection.commit()
             
 
@@ -1454,6 +1618,32 @@ def verventas(user): #funcion parametrizada
     else:
         limpiarPantalla()
         print("Por ahora usted no tiene ordenes realizadas")
+
+def realizarPregunta(pub,user):
+   print("\n--- REALIZAR PREGUNTA ---")
+   print("Presione ENTER para SALIR\n")
+
+   while True:
+      mensaje = input("Ingrese el contenido del mensaje que desea enviarle al vendedor: ")
+
+      if mensaje == "":
+         limpiarPantalla()
+         return
+      
+      if (len(mensaje) > 50):
+         print("Estimado usuario, solo es permitido hasta 50 caracteres\n")
+
+      else:
+         break
+
+   cur.execute("SELECT IDVENDEDOR FROM PUBLICACION WHERE NOPUBLICACION = "+pub+"")
+   vendedor = cur.fetchone()[0]
+   cur.execute("INSERT INTO PREGUNTA (CONTENIDO, TIEMPOENVIADO, IDCLIENTE, IDVENDEDOR, NOPUBLICACION) VALUES (%s, %s, %s, %s, %s)", (mensaje, datetime.now(), user, vendedor, pub))
+   mercadolibreconnection.commit()
+   
+   limpiarPantalla()
+   print("La pregunta ha sido enviada correctamente.")
+
 
 
 def responderpregunta(userid): #funcion parametrizada
@@ -1548,8 +1738,276 @@ def mostrarReputacion(user):
       print("-- Reputacion de ",resultado[0])
       print("Promedio: ",resultado[1])
 
+# Javier
+      
+def imprimirPublicaciones(userid,estado):
+    cur.execute("select nopublicacion, nombrepublicacion, descripcion, precioventa, estado, stock from Publicacion where idvendedor = '"+userid+"' and estado = '"+estado+"';")
+    publicaciones= cur.fetchall()
+    palabra = ""
+    if(estado.lower() == "activa"):
+        palabra = "ACTIVAS"
+    elif(estado.lower()=="agotado"):
+        palabra = "AGOTADAS"
+    elif(estado.lower()=="no activa"):
+        palabra = "NO ACTIVAS"
+    if(len(publicaciones)):
+        print("-- PUBLICACIONES "+palabra+" --")
+    else:
+        print("No dispone de publicaciones",palabra)
+        return
+   
+    for pub in publicaciones:
+        id, producto,descripcion,precio,estado,stock = pub
+        print("Id: " + str(id))
+        print("Publicacion: " + producto)
+        print("Descripcion: " + descripcion)
+        print("Precio: $" + str(precio))
+        print("Estado " + estado)
+        print("Stock: " + str(stock))
+
+    print("")
+
+def editarPublicacion(idPublicacion):
+    campoNumero = input("Seleccione el campo que desee modificar:\n1=NombrePublicacion -- 2=Descripcion -- 3=Precio -- 4=Estado -- 5=Stock \nPresione otra tecla para volver\n")
+    while campoNumero in ["1","2","3","4","5"]:
+        campo = ""
+        if campoNumero == "1":
+            campo = 'nombrepublicacion'
+        elif campoNumero == "2":
+            campo = 'descripcion'
+        elif campoNumero == "3":
+            campo = 'precioventa'
+        elif campoNumero == "4":
+            campo = 'estado'
+        elif campoNumero == "5":
+            campo = 'stock'
+        valor = input("Escriba el nuevo valor\n")
+        cur.execute("UPDATE PUBLICACION SET "+campo+" = '"+valor+"' where nopublicacion = " + str(idPublicacion))
+        campoNumero = input("Seleccione el campo que desee modificar:\n1 = Producto -- 2 = Descripcion -- 3 = Precio -- 4 = Estado -- 5 = Stock \nPresione otra tecla para volver\n")
+    cur.execute("CALL ACTUALIZARSTOCK("+str(idPublicacion)+")")
+    mercadolibreconnection.commit()
+    print("¡Datos actualizados correctamente!")
+
+def eliminarPublicacion(idpublicacion): # Creacion de Trigger
+    try:
+        mercadolibreconnection.begin()
+        cur.execute("delete from publicacion where nopublicacion = "+str(idpublicacion)+";")
+        mercadolibreconnection.commit()
+    except Exception as e:
+        print(f"Error{e}")
+        mercadolibreconnection.rollback()
+
+def gestionarPublicaciones(userid):
+    cur.execute("SELECT NOPUBLICACION FROM PUBLICACION WHERE IDVENDEDOR = '" + userid + "';")
+    registros = cur.fetchall()
+    lids = []
+    for registro in registros:
+        lids.append(str(registro[0]))
+    totalpublicaciones = len(registros)
+
+    if totalpublicaciones > 0: 
+        print("")
+        imprimirPublicaciones(userid,"Activa")
+        imprimirPublicaciones(userid,"Agotado")
+        imprimirPublicaciones(userid,"No Activa")
+        editar = input("\n¿Desea editar/eliminar alguna publicacion?\nEditar/Eliminar/VOLVER\n").lower()
+        while(editar in ["editar","eliminar"]):
+            if editar == "editar":
+                idpub = input("Seleccione el id de la publicacion\n")
+                while idpub not in lids:
+                    idpub = input("¡Id invalido! Intente nuevamente:\n")
+                editarPublicacion(idpub)
+            elif editar == "eliminar":
+                while True:
+                  idpub = input("Seleccione el id de la publicacion a eliminar\n")
+                  if(idpub not in lids):
+                     print("Id Invalido! Intente nuevamente\n")
+                  else:
+                     break
+                conf = input("¿Seguro que quiere eliminar la publicación? (Esta acción no se puede revertir)\nSI/NO\n").lower()
+                if conf == "si":
+                    eliminarPublicacion(idpub)
+                    print("¡Publicación eliminada con éxito!")
+            else:
+                print("Acción finalizada")
+            editar = input("¿Desea editar/eliminar otra publicacion?\nEditar/Eliminar/Volver\n").lower()  
+        print("¡Cambios realizados correctamente!")
+    else:
+        print("Usted no tiene productos publicados")
+
+def registrarTarjeta(user):
+   print ("\n--- REGISTRAR METODO PAGO ---")
+   print("American Express (3)") #primera cifra
+   print("Visa (4)")
+   print("MasterCard (5)")
+   print("17 cifras")
+   print("ENTER PARA SALIR")
+
+   cur.execute("SELECT ID, NUMERO FROM TARJETA WHERE USERID = '"+user+"'")
+   listatarjetas = []
+   for ID, NUMERO in cur.fetchall():
+      listatarjetas.append(NUMERO)
+   
+   while True:
+      creditcard = input("Numero de Tarjeta XXXXXXXXXXXXXXXXX: ")
+      if creditcard == "":
+         limpiarPantalla()
+         return None
+
+
+      if len(creditcard) != 17 or creditcard.isnumeric() == False or creditcard[0] not in ['3','4','5']:
+         print("\nError, intente de nuevo")
+
+      else:
+         creditcard = separarDigitos(creditcard)
+         if creditcard in listatarjetas:
+            print("\nEsta tarjeta ya ha sido asociada a su cuenta, agregue otra")
+         else:
+            break
+   
+
+   if creditcard[0] == '3':
+      tipo = "AMERICAN EXPRESS"
+
+   if creditcard[0] == '4':
+      tipo = "VISA"
+
+   if creditcard[0] == '5':
+      tipo = "MASTERCARD"
+
+   while True:
+      print("CVV, O PARA SALIR")
+      cvv = opcionnumerica()
+      
+      if cvv == "0":
+         limpiarPantalla()
+         return None
+
+      if len(cvv) != 3:
+         print("CVV debe ser de 3 cifras\n")
+      else:
+         break
+   
+   while True:
+      fecha_actual = datetime.now()
+
+      print("\nMes de Vencimiento")
+      mes = opcionnumerica()
+      print("\nAnio de Vencimiento: ")
+      anio = opcionnumerica()
+
+      if 1 <= int(mes) <= 12 and anio.isnumeric() == True:
+         if int(mes) > fecha_actual.month and int(anio) >= fecha_actual.year:
+            break
+         else:
+            limpiarPantalla()
+            print("Esta tarjeta esta vencida, intente de nuevo")
+            return None
+      else:
+         print("Ingrese el mes y anio correcto")
+
+   print("\nAgregando Tarjeta...")
+
+   cur.execute("INSERT INTO TARJETA (NUMERO, MARCA, CVV, FECHAVENCIMIENTO, USERID) VALUES ('"+creditcard+"','"+tipo+"',"+cvv+",'"+anio+"-"+mes+"-01','"+user+"')")
+   mercadolibreconnection.commit()
+
+   print("Tarjeta Agregada con éxito!")
+   return creditcard
+
+
+def separarDigitos(tarjeta):
+   numbercard = ""
+   espacios = 0
+   contador = 1
+
+   for i in tarjeta:
+      if espacios == 3:
+         numbercard = numbercard+i
+
+      elif contador !=4:
+         numbercard = numbercard+i
+         contador += 1
+      else:
+         numbercard = numbercard+i+" "
+         espacios += 1
+         contador = 1
+
+   return numbercard
+
+def mostrarMetodosPago(user):
+   print("--- METODOS DE PAGO REGISTRADOS ---")
+   cur.execute("SELECT * FROM TARJETA WHERE USERID = '"+user+"'")
+   tarjetas = cur.fetchall()
+
+   if len(tarjetas) == 0:
+      print("\nNo tiene ninguna tarjeta asociada a su cuenta!")
+
+   else:
+      contador = 0
+      for card in range(len(tarjetas)):
+         contador += 1
+         print("\nMetodo de Pago # ",contador)
+         print("Tarjeta No.",tarjetas[card][1])
+         print(tarjetas[card][2])
+         print("Vence:",tarjetas[card][4])
+         print("--------------------------------")
+
+def eliminarTarjeta(user):
+   print("\n--- ELIMINAR METODO PAGO ---")
+
+   while True:
+         print("Seleccione el metodo a eliminar, 0 para cancelar")
+         opc = int(opcionnumerica())
+
+         if opc == 0:
+            limpiarPantalla()
+            return
+         
+         cur.execute("SELECT ID FROM TARJETA WHERE USERID = '"+user+"'")
+         resultado = cur.fetchall()
+
+         if(opc > len(resultado)):
+            print("Error. Seleccione la opcion correcta\n")
+         else:
+            tarjetaid = resultado[opc-1][0]
+            break
+
+   print("¿Seguro que desea eliminar el metodo #",opc,"?")
+   print("1. SI"+
+         "\n0. CANCELAR")
+   
+   opconf = validaropcion(0,1)
+
+   if opconf == 0:
+      limpiarPantalla()
+      return
+   
+   limpiarPantalla()
+   print("Eliminando metodo de pago...")
+
+   cur.execute("DELETE FROM TARJETA WHERE ID = "+str(tarjetaid)+"")
+   mercadolibreconnection.commit()
+
+   print("Metodo Pago eliminado exitosamente")
+
+#Xavier
+def mostrarDetallesPublicacion(pub):
+  print("\n-- DETALLE PUBLICACION")
+  cur.execute(f"SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION JOIN PRODUCTO ON PUBLICACION.PRODUCTID=PRODUCTO.PRODUCTID WHERE NOPUBLICACION = "+pub+"")
+  for CATEGORIA, NOMBREPUBLICACION, NOMBRE, MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
+    print('Categoria:', CATEGORIA,
+          '\nNombre:',NOMBREPUBLICACION,
+          '\nProducto:',NOMBRE,
+          '\nMarca:',MARCA,
+          '\nDescripcion:',DESCRIPCION,
+          '\nPrecio:',PRECIOVENTA,
+          '\nVendedor:',IDVENDEDOR,
+          '\nStock:',STOCK,
+          '\nPublicado el:',FECHAPUBLICACION)
+
 
 #Programa Principal
+
 imprimirMenuPrincipalInvitado()
 
 
