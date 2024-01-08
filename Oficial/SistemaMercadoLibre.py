@@ -248,23 +248,26 @@ def AccionarInvitado(opcion):
        imprimirMenuPrincipalUsuario(usuario)
 
     if opcion == 3:
-       limpiarPantalla()
-       mostrarPublicaciones()
-       print("\nPara generar una orden, debe iniciar sesión o crear una cuenta en Mercado Libre")
-       input("Presione ENTER para regresar -->")
-       limpiarPantalla()
+      print("\n1. Buscar Publicaciones")
+      print("2. Todas las publicaciones")
+      print("0. SALIR")
+      filt1 = validaropcion(0,2)
 
-    if opcion == 4:
-       limpiarPantalla()
-       mostrarPublicaciones2023()
-       input("\nPresione ENTER para regresar -->")
-       limpiarPantalla()
+      if filt1 == 0:
+          limpiarPantalla()
+       
+      if filt1 == 1:
+          filtrarPublicaciones()
+          input("\nPresione ENTER para REGRESAR -->")
+          limpiarPantalla()
+      
+      if filt1 == 2:
+         mostrarPublicaciones()
+         input("\nPresione ENTER para REGRESAR -->")
+         limpiarPantalla()
 
-    if opcion == 5:
-       limpiarPantalla()
-       mostrarAccesoriosAutos()
-       input("\nPresione ENTER para regresar -->")
-       limpiarPantalla()
+
+
 
 def AccionarUsuario(opcion,user):
     
@@ -278,43 +281,59 @@ def AccionarUsuario(opcion,user):
       imprimirMenuPrincipalInvitado()
 
     if opcion == 9:
-       mostrarPublicaciones()
-       print("\nSeleccione la publicacion de su interés\nPara SALIR digite 0")
-       pub = opcionnumerica()
+       print("\n1. Buscar Publicaciones")
+       print("2. Escoger Publicacion")
+       print("0. SALIR")
+       filt = validaropcion(0,2)
 
-       if(pub == "0"):
+       if filt == 0:
           limpiarPantalla()
           return
-       else:
-          cond = registrarVisualizacion(user,pub)
-          if cond == False:
-             return
-          mostrarDetallesPublicacion(pub)
-          #nuevafuncion
-
-          print("\n1. GENERAR ORDEN")
-          print("2. VER INFORMACION DEL VENDEDOR")
-          print("3. REALIZAR UNA PREGUNTA")
-          print("O. SALIR")
-          option1 = validaropcion(0,3)
-
-          if option1 == 0:
-             limpiarPantalla()
-             return
+       
+       if filt == 1:
+          filtrarPublicaciones()
+          input("\nPresione ENTER para REGRESAR -->")
+          limpiarPantalla()
+          return
           
-          if option1 == 1:
-            generarOrden(pub,user)
-            #imprimirMenuPrincipalUsuario(user)
+       if filt == 2:
+         mostrarPublicaciones()
+         print("\nSeleccione la publicacion de su interés\nPara SALIR digite 0")
+         pub = opcionnumerica()
 
-          if option1 == 2:
-             limpiarPantalla()
-             cur.execute("SELECT IDVENDEDOR, NOMBRE FROM PUBLICACION JOIN VENDEDOR ON IDVENDEDOR = USERID JOIN USUARIO USING(USERID) WHERE NOPUBLICACION = "+str(pub)+"")
-             resultado1 = cur.fetchone()
-             print("\nMostrando reputacion de ",resultado1[1])
-             mostrarReputacion(resultado1[0])
+         if(pub == "0"):
+            limpiarPantalla()
+            return
+         else:
+            cond = registrarVisualizacion(user,pub)
+            if cond == False:
+               return
+            mostrarDetallesPublicacion(pub)
+            #nuevafuncion
 
-          if option1 == 3:
-             realizarPregunta(pub,user)
+            print("\n1. GENERAR ORDEN")
+            print("2. VER INFORMACION DEL VENDEDOR")
+            print("3. REALIZAR UNA PREGUNTA")
+            print("O. SALIR")
+            option1 = validaropcion(0,3)
+
+            if option1 == 0:
+               limpiarPantalla()
+               return
+          
+            if option1 == 1:
+               generarOrden(pub,user)
+               #imprimirMenuPrincipalUsuario(user)
+
+            if option1 == 2:
+               limpiarPantalla()
+               cur.execute("SELECT IDVENDEDOR, NOMBRE FROM PUBLICACION JOIN VENDEDOR ON IDVENDEDOR = USERID JOIN USUARIO USING(USERID) WHERE NOPUBLICACION = "+str(pub)+"")
+               resultado1 = cur.fetchone()
+               print("\nMostrando reputacion de ",resultado1[1])
+               mostrarReputacion(resultado1[0])
+
+            if option1 == 3:
+               realizarPregunta(pub,user)
              
           
     if opcion == 2:
@@ -527,11 +546,8 @@ def imprimirMenuPrincipalInvitado():
         print('1. Iniciar sesión')
         print('2. Crear Cuenta')
         print('3. Ver Publicaciones')
-        print('4. Ver Recientes Publicaciones 2023')
-        print('5. Productos existentes de categoria Autos')
-
         print('0. SALIR')
-        op = validaropcion(0,6)
+        op = validaropcion(0,3)
         AccionarInvitado(op)
     
 
@@ -568,8 +584,8 @@ def mostrarPublicaciones():
           '\n-----------------------------------')
    
 
-def mostrarPublicaciones2023():
- cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION from PUBLICACION WHERE YEAR(FECHAPUBLICACION) = 2023 ORDER BY FECHAPUBLICACION DESC")
+def mostrarPublicaciones2024():
+ cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION from PUBLICACION WHERE YEAR(FECHAPUBLICACION) = 2024 ORDER BY FECHAPUBLICACION DESC")
  for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION in cur.fetchall():
     print('Publicacion #',NOPUBLICACION,
           '\nNombre: ',NOMBREPUBLICACION,
@@ -1643,6 +1659,7 @@ def realizarPregunta(pub,user):
    
    limpiarPantalla()
    print("La pregunta ha sido enviada correctamente.")
+   print("Muchas gracias por su tiempo, esperamos que sus dudas sean resueltas lo mas pronto posible.\nAdios.")
 
 
 
@@ -2004,6 +2021,177 @@ def mostrarDetallesPublicacion(pub):
           '\nVendedor:',IDVENDEDOR,
           '\nStock:',STOCK,
           '\nPublicado el:',FECHAPUBLICACION)
+
+#sep filtrado
+    
+#Aplicacion - Ver publicaciones (vista del cliente)
+def listarAtributosClientes(cur):
+  categorias = []
+  productos = []
+  marcas = []
+  vendedores = []
+  activa = "Activa"
+  cur.execute(f"SELECT CATEGORIA, NOMBRE, MARCA, IDVENDEDOR FROM PUBLICACION JOIN PRODUCTO ON PUBLICACION.PRODUCTID=PRODUCTO.PRODUCTID WHERE ESTADO = '{activa}'")
+  for CATEGORIA, NOMBRE, MARCA, IDVENDEDOR in cur.fetchall():
+    categorias.append(CATEGORIA)
+    productos.append(NOMBRE)
+    marcas.append(MARCA)
+    vendedores.append(IDVENDEDOR)
+  return categorias, productos, marcas, vendedores
+
+def mostrarPublicacionCliente(cur):
+  activa = "Activa"
+  cur.execute(f"SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION JOIN PRODUCTO ON PUBLICACION.PRODUCTID=PRODUCTO.PRODUCTID WHERE ESTADO = '{activa}'")
+  for CATEGORIA, NOMBREPUBLICACION, NOMBRE, MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
+    print('Categoria:', CATEGORIA,
+          '\nNombre:',NOMBREPUBLICACION,
+          '\nProducto:',NOMBRE,
+          '\nMarca:',MARCA,
+          '\nDescripcion:',DESCRIPCION,
+          '\nPrecio:',PRECIOVENTA,
+          '\nVendedor:',IDVENDEDOR,
+          '\nStock:',STOCK,
+          '\nPublicado el:',FECHAPUBLICACION,
+          '\n-----------------------------------')
+
+def mostrarPublicacionfiltrada(cur, prod=None, marc=None, categ=None, vend=None, ord=None, prec=None, ord_price=None):
+  print("\n-- PUBLICACIONES --\n")
+  categorias, productos, marcas, vendedores= listarAtributosClientes(cur)
+  activa = "Activa"
+  consulta = f"SELECT PRODUCTO.CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION JOIN PRODUCTO ON PUBLICACION.PRODUCTID=PRODUCTO.PRODUCTID WHERE ESTADO = '{activa}'"
+  contador = 0
+  if prod is not None and prod in productos:
+    consulta += f" AND PRODUCTO.NOMBRE = '{prod}'"
+    contador += 1
+  if marc is not None and marc in marcas:
+    consulta += f" AND PRODUCTO.MARCA = '{marc}'"
+    contador += 1
+  if categ is not None and categ in categorias:
+    consulta += f" AND PRODUCTO.CATEGORIA = '{categ}'"
+    contador += 1
+  if vend is not None and vend in vendedores:
+    consulta += f" AND IDVENDEDOR = '{vend}'"
+    contador += 1
+  if prec is not None and ord_price is not None:
+    if ord_price == "Mayor":
+      consulta += f"AND PRECIOVENTA >= '{prec}'"
+      contador += 1
+    elif ord_price == "Menor":
+      consulta += f"AND PRECIOVENTA <= '{prec}'"
+      contador += 1
+  if ord is not None:
+    if ord == "Mas reciente":
+      consulta += " ORDER BY FECHAPUBLICACION DESC"
+      contador += 1
+    elif ord == "Mas antigua":
+      consulta += "ORDER BY FECHAPUBLICACION ASC"
+      contador += 1
+
+  if contador == 0:
+    mostrarPublicacionCliente(cur)
+
+  cur.execute(consulta)
+  for CATEGORIA, NOMBREPUBLICACION, NOMBRE, MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
+    print('Categoria:', CATEGORIA,
+          '\nNombre:',NOMBREPUBLICACION,
+          '\nProducto:',NOMBRE,
+          '\nMarca:',MARCA,
+          '\nDescripcion:',DESCRIPCION,
+          '\nPrecio:',PRECIOVENTA,
+          '\nVendedor:',IDVENDEDOR,
+          '\nStock:',STOCK,
+          '\nPublicado el:',FECHAPUBLICACION,
+          '\n-----------------------------------')
+
+def filtrarPublicaciones():
+   print("\n--- FILTRADO\n")
+   print("1. Filtrar por PRODUCTO")
+   print("2. Filtrar por MARCA")
+   print("3. Filtrar por CATEGORIA")
+   print("4. Filtrar por Vendedor")
+   print("5. Filtrar por MAS RECIENTE")
+   print("6. Filtrar por MAS ANTIGUA")
+   print("7. Filtrar por PRECIO")
+   print("8. PUBLICACIONES 2024")
+   print("9. COSAS PARA TU CARRO")
+   print("0. SALIR")
+   
+   op = validaropcion(0,9)
+
+   if (op == 0):
+      return
+   
+   if op == 8:
+      mostrarPublicaciones2024()
+      return
+
+   if op == 9:
+      mostrarAccesoriosAutos()
+      return
+   
+   if op == 7:
+      while True:
+         precio = input("Ingrese precio (ENTER PARA SALIR): ")
+         if (precio == ""):
+            return
+         
+         if precio.isnumeric() == True:
+            break
+         else:
+            print("\nError, Ingrese un numero entero")
+
+      print("1. Orden MAYOR")
+      print("2. Orden MENOR")
+      print("0. SALIR")
+      opti = validaropcion(0,2)
+
+      if opti == 0:
+         return
+      
+      if opti == 1:
+         cond = 'Mayor'
+      
+      if opti == 2:
+         cond = 'Menor'
+
+      limpiarPantalla()
+      mostrarPublicacionfiltrada(cur,prec = precio, ord_price = cond)
+      return
+
+   if op == 5 or op == 6:
+      if op == 5:
+         condvis = 'Mas reciente'
+
+      if op == 6:
+         condvis = 'Mas antigua'
+
+      limpiarPantalla()
+      mostrarPublicacionfiltrada(cur, ord = condvis)
+      return
+   
+   
+   busq = input("\nIngrese palabra para BUSCAR: ")
+   limpiarPantalla()
+   
+   if op == 1:
+      mostrarPublicacionfiltrada(cur,prod = busq)
+      return
+   
+   if op == 2:
+      mostrarPublicacionfiltrada(cur, marc= busq)
+      return
+   
+   if op == 3:
+      mostrarPublicacionfiltrada(cur, categ = busq)
+      return
+   
+   if op == 4:
+      mostrarPublicacionfiltrada(cur,vend = busq)
+      
+
+      
+   
+   
 
 
 #Programa Principal
