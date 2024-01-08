@@ -117,21 +117,23 @@ def listarAtributosClientes(cur):
   productos = []
   marcas = []
   vendedores = []
-  cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE ESTADO = ACTIVA")
-  for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
+  activa = "Activa"
+  cur.execute(f"SELECT CATEGORIA, NOMBRE, MARCA, IDVENDEDOR FROM PUBLICACION JOIN PRODUCTO ON PUBLICACION.PRODUCTID=PRODUCTO.PRODUCTID WHERE ESTADO = '{activa}'")
+  for CATEGORIA, NOMBRE, MARCA, IDVENDEDOR in cur.fetchall():
     categorias.append(CATEGORIA)
-    productos.append(PRODUCTO.NOMBRE)
-    marcas.append(PRODUCTO.MARCA)
+    productos.append(NOMBRE)
+    marcas.append(MARCA)
     vendedores.append(IDVENDEDOR)
   return categorias, productos, marcas, vendedores
 
 def mostrarPublicacionCliente(cur):
-  cur.execute("SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE ESTADO = ACTIVA")
-  for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
+  activa = "Activa"
+  cur.execute(f"SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION JOIN PRODUCTO ON PUBLICACION.PRODUCTID=PRODUCTO.PRODUCTID WHERE ESTADO = '{activa}'")
+  for CATEGORIA, NOMBREPUBLICACION, NOMBRE, MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
     print('Categoria:', CATEGORIA,
           '\nNombre:',NOMBREPUBLICACION,
-          '\nProducto:',PRODUCTO.NOMBRE,
-          '\nMarca:',PRODUCTO.MARCA,
+          '\nProducto:',NOMBRE,
+          '\nMarca:',MARCA,
           '\nDescripcion:',DESCRIPCION,
           '\nPrecio:',PRECIOVENTA,
           '\nVendedor:',IDVENDEDOR,
@@ -139,10 +141,11 @@ def mostrarPublicacionCliente(cur):
           '\nPublicado el:',FECHAPUBLICACION,
           '\n-----------------------------------')
 
-def mostrarPublicacionProductoMarca(prod=None, marc=None, categ=None, vend=None, ord=None, prec=None, ord_price=None, cur):
+def mostrarPublicacion(cur, prod=None, marc=None, categ=None, vend=None, ord=None, prec=None, ord_price=None):
   print("\n-- PUBLICACIONES --\n")
   categorias, productos, marcas, vendedores= listarAtributosClientes(cur)
-  consulta = "SELECT PRODUCTO.CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE ESTADO = ACTIVA"
+  activa = "Activa"
+  consulta = f"SELECT PRODUCTO.CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION JOIN PRODUCTO ON PUBLICACION.PRODUCTID=PRODUCTO.PRODUCTID WHERE ESTADO = '{activa}'"
   contador = 0
   if prod is not None and prod in productos:
     consulta += f" AND PRODUCTO.NOMBRE = '{prod}'"
@@ -170,16 +173,16 @@ def mostrarPublicacionProductoMarca(prod=None, marc=None, categ=None, vend=None,
     elif ord == "Mas antigua":
       consulta += "ORDER BY FECHAPUBLICACION ASC"
       contador += 1
-      
+
   if contador == 0:
     mostrarPublicacionCliente(cur)
-  
+
   cur.execute(consulta)
-  for CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
+  for CATEGORIA, NOMBREPUBLICACION, NOMBRE, MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
     print('Categoria:', CATEGORIA,
           '\nNombre:',NOMBREPUBLICACION,
-          '\nProducto:',PRODUCTO.NOMBRE,
-          '\nMarca:',PRODUCTO.MARCA,
+          '\nProducto:',NOMBRE,
+          '\nMarca:',MARCA,
           '\nDescripcion:',DESCRIPCION,
           '\nPrecio:',PRECIOVENTA,
           '\nVendedor:',IDVENDEDOR,
@@ -187,7 +190,7 @@ def mostrarPublicacionProductoMarca(prod=None, marc=None, categ=None, vend=None,
           '\nPublicado el:',FECHAPUBLICACION,
           '\n-----------------------------------')
 
-#
+
 def pregunta(idCliente, cur):
   print("Si quiere saber mas sobre una publicacion, puede hacerle una pregunta al vendedor.")
   val = input("¿Tiene alguna pregunta sobre una publicación que le interesa? (Si/No) -> " )
@@ -196,12 +199,13 @@ def pregunta(idCliente, cur):
     publicacion = input("Ingrese el nombre de la publicacion: ")
     producto = input("Ingrese el atributo (producto) sobre el que desea consultarle: ")
     mensaje = input("Ingrese el contenido del mensaje que desea enviarle al vendedor:\n")
-    cur.execute("SELECT IDVENDEDOR, NOMBREPUBLICACION, PRODUCTO.NOMBRE FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE ESTADO = ACTIVA")
+    activa = "Activa"
+    cur.execute(f"SELECT IDVENDEDOR, NOMBREPUBLICACION, PRODUCTO.NOMBRE FROM PUBLICACION JOIN PRODUCTO ON PUBLICACION.PRODUCTID=PRODUCTO.PRODUCTID WHERE ESTADO = '{activa}'")
     lista = []
-    for IDVENDEDOR, NOMBREPUBLICACION, PRODUCTO.NOMBRE in cur.fetchall():
+    for IDVENDEDOR, NOMBREPUBLICACION, NOMBRE in cur.fetchall():
       lista.append(IDVENDEDOR)
       lista.append(NOMBREPUBLICACION)
-      lista.append(PRODUCTO.NOMBRE)
+      lista.append(NOMBRE)
     i = 0
     while (lista[i] != vendedor and lista[i + 1] != publicacion and lista[i + 2] != producto):
       if i > len(lista):
@@ -212,18 +216,16 @@ def pregunta(idCliente, cur):
         producto = input("Ingrese el atributo (producto) sobre el que desea consultarle: ")
         mensaje = input("Ingrese el contenido del mensaje que desea enviarle al vendedor:\n")
       i += 3
-    
-    cur.execute(f"SELECT NOPUBLICACION FROM PUBLICACION NATURAL JOIN PRODUCTO WHERE ESTADO = ACTIVA AND IDVENDEDOR = '{vendedor}' AND NOMBREPUBLICACION = {publicacion} AND PRODUCTO.NOMBRE = {producto}")
+
+    cur.execute("SELECT NOPUBLICACION FROM PUBLICACION JOIN PRODUCTO ON PUBLICACION.PRODUCTID=PRODUCTO.PRODUCTID WHERE ESTADO = %s AND IDVENDEDOR = %s AND NOMBREPUBLICACION = %s AND PRODUCTO.NOMBRE = %s", (activa, vendedor, publicacion, producto))
     noPublicacion = ''
     for NOPUBLICACION in cur.fetchall():
       noPublicacion = NOPUBLICACION
-    cur.execute("INSERT INTO PREGUNTA (CONTENIDO, TIEMPOENVIADO, IDCLIENTE, IDVENDEDOR, NOPUBLICACION) VALUES (%s, %s, %s, %s)", (mensaje, datetime.now(), idCliente, vendedor))
-    mercadolibre.commit()
+    cur.execute("INSERT INTO PREGUNTA (CONTENIDO, TIEMPOENVIADO, IDCLIENTE, IDVENDEDOR, NOPUBLICACION) VALUES (%s, %s, %s, %s, %s)", (mensaje, datetime.now(), idCliente, vendedor, noPublicacion))
+    mercadolibreconnection.commit()
     print("La pregunta ha sido enviada correctamente.\n")
     val = input("¿Tiene alguna otra pregunta sobre una publicación que le interesa? (Si/No) -> " )
   print("Muchas gracias por su tiempo, esperemos que sus dudas sean resueltas lo mas pronto posible.\nLe deseamos un excelente dia.")
-
-
            
         
         
