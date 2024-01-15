@@ -54,8 +54,8 @@ Importar
 
 ✅ [Mario Alvarado](https://youtu.be/gdNrYXfaYRY?si=e9v5kZab8WWBae3k "Mario Alvarado")
 
-✅ [Xavier Camacho](https://espolec-my.sharepoint.com/personal/maragile_espol_edu_ec/_layouts/15/stream.aspx?id=%2Fpersonal%2Fmaragile%5Fespol%5Fedu%5Fec%2FDocuments%2FCompartido%2FAvance02%5FG3%5FBD%20Par%2E1%2D101%2FVideos%2FXavierCamacho%5FPublicaciones%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview "Xavier Camacho")
+✅ [Xavier Camacho](https://youtu.be/gRWXYBnd6tQ)
 
-✅ [Javier Rodriguez](https://espolec-my.sharepoint.com/personal/maragile_espol_edu_ec/_layouts/15/stream.aspx?id=%2Fpersonal%2Fmaragile%5Fespol%5Fedu%5Fec%2FDocuments%2FCompartido%2FAvance02%5FG3%5FBD%20Par%2E1%2D101%2FVideos%2Fvideo%5FJavierRodriguez%2Emkv&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview "Javier Rodriguez")
+✅ [Javier Rodriguez](https://youtu.be/pDOvr27WRfU)
 
-✅ [Owuen Yagual](https://espolec-my.sharepoint.com/personal/maragile_espol_edu_ec/_layouts/15/stream.aspx?id=%2Fpersonal%2Fmaragile%5Fespol%5Fedu%5Fec%2FDocuments%2FCompartido%2FAvance02%5FG3%5FBD%20Par%2E1%2D101%2FVideos%2FOwuen%5FYagual%2Emkv&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview "Owuen Yagual")
+✅ [Owuen Yagual](https://youtu.be/LoSyB6z7-c8)
