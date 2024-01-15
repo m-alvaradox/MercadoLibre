@@ -11,6 +11,10 @@ import pymysql
 from datetime import datetime, date, timedelta
 import os
 import time
+import pandas as pd
+import warnings
+
+warnings.filterwarnings('ignore')
 
 
 # Conexion a la base de datos de mercadolibre
@@ -266,9 +270,6 @@ def AccionarInvitado(opcion):
          input("\nPresione ENTER para REGRESAR -->")
          limpiarPantalla()
 
-
-
-
 def AccionarUsuario(opcion,user):
     
     if opcion == 0:
@@ -282,7 +283,7 @@ def AccionarUsuario(opcion,user):
 
     if opcion == 9:
        print("\n1. Buscar Publicaciones")
-       print("2. Escoger Publicacion")
+       print("2. Todas las publicaciones (Escoger)")
        print("0. SALIR")
        filt = validaropcion(0,2)
 
@@ -309,7 +310,6 @@ def AccionarUsuario(opcion,user):
             if cond == False:
                return
             mostrarDetallesPublicacion(pub)
-            #nuevafuncion
 
             print("\n1. GENERAR ORDEN")
             print("2. VER INFORMACION DEL VENDEDOR")
@@ -323,7 +323,6 @@ def AccionarUsuario(opcion,user):
           
             if option1 == 1:
                generarOrden(pub,user)
-               #imprimirMenuPrincipalUsuario(user)
 
             if option1 == 2:
                limpiarPantalla()
@@ -331,6 +330,8 @@ def AccionarUsuario(opcion,user):
                resultado1 = cur.fetchone()
                print("\nMostrando reputacion de ",resultado1[1])
                mostrarReputacion(resultado1[0])
+               input("\nPresione ENTER para REGRESAR -->")
+               limpiarPantalla()
 
             if option1 == 3:
                realizarPregunta(pub,user)
@@ -419,7 +420,11 @@ def AccionarUsuario(opcion,user):
 
     if opcion == 5:
        limpiarPantalla()
-       mostrarcompras(user)
+       val = mostrarcompras(user)
+
+       if val == False:
+          return
+
        print("\n1. Calificar Compra")
        print("2. Hacer un reclamo")
        print("0. SALIR")
@@ -515,24 +520,11 @@ def AccionarUsuario(opcion,user):
          gestionarPublicaciones(user)
                
 
-    if opcion == 14:
-       limpiarPantalla()
-       mostrarPublicaciones2023()
-       input("\nPresione ENTER para regresar -->")
-       limpiarPantalla()
-
-    if opcion == 15:
-       limpiarPantalla()
-       mostrarAccesoriosAutos()
-       input("\nPresione ENTER para regresar -->")
-       limpiarPantalla()
-
     if opcion == 3:
        limpiarPantalla()
        mostrarPublicacionesDeInteres(user)
        input("\nPresione ENTER para regresar -->")
        limpiarPantalla()
-
 
 def mostrarcaratula():
    print("\n----- MERCADO LIBRE -----")
@@ -550,7 +542,6 @@ def imprimirMenuPrincipalInvitado():
         op = validaropcion(0,3)
         AccionarInvitado(op)
     
-
 def imprimirMenuPrincipalUsuario(nomuser):
     op = ""
     while op !=0:
@@ -572,55 +563,27 @@ def imprimirMenuPrincipalUsuario(nomuser):
        AccionarUsuario(op,nomuser)
 
 def mostrarPublicaciones():
-   cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION, STOCK from PUBLICACION ORDER BY FECHAPUBLICACION DESC")
    print("\n-- PUBLICACIONES --\n")
-   for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION, STOCK in cur.fetchall():
-    print('Publicacion #',NOPUBLICACION,
-          '\nNombre:',NOMBREPUBLICACION,
-          '\nVendedor:',IDVENDEDOR,
-          '\nPrecio:',PRECIOVENTA,
-          '\nStock:',STOCK,
-          '\nPublicado el:',FECHAPUBLICACION,
-          '\n-----------------------------------')
    
-
-def mostrarPublicaciones2024():
- cur.execute("SELECT NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION from PUBLICACION WHERE YEAR(FECHAPUBLICACION) = 2024 ORDER BY FECHAPUBLICACION DESC")
- for NOPUBLICACION, NOMBREPUBLICACION, IDVENDEDOR, PRECIOVENTA, FECHAPUBLICACION in cur.fetchall():
-    print('Publicacion #',NOPUBLICACION,
-          '\nNombre: ',NOMBREPUBLICACION,
-          '\nVendedor: ',IDVENDEDOR,
-          '\nPrecio: ',PRECIOVENTA,
-          '\nPublicado el: ',FECHAPUBLICACION,
-          '\n-----------------------------------\n')
+   query = "SELECT NOPUBLICACION AS PUB, NOMBREPUBLICACION AS NOMBRE, IDVENDEDOR AS VENDEDOR, PRECIOVENTA AS PRECIO, FECHAPUBLICACION AS PUBLICADO, STOCK from PUBLICACION ORDER BY FECHAPUBLICACION DESC"
+   data = pd.read_sql(query, mercadolibreconnection)
+   print(data.to_string(index=False, show_dimensions=False))
+   
+def mostrarPublicaciones2024():    
+ query = "SELECT NOPUBLICACION AS PUB, NOMBREPUBLICACION AS NOMBRE, IDVENDEDOR AS VENDEDOR, PRECIOVENTA AS PRECIO, FECHAPUBLICACION AS PUBLICADO from PUBLICACION WHERE YEAR(FECHAPUBLICACION) = 2024 ORDER BY FECHAPUBLICACION DESC"
+ data = pd.read_sql(query, mercadolibreconnection)
+ print(data.to_string(index=False, show_dimensions=False))
     
 def mostrarCupones(user):
-  cur.execute("SELECT ID, NOMBRE, DESCUENTO, FECHAVENCIMIENTO,CLIENTEID, VECES FROM CUPON WHERE CLIENTEID ='"+user+"'")
-  resultado = cur.fetchall()
+  query = "SELECT ID AS COD, NOMBRE, DESCUENTO, FECHAVENCIMIENTO AS VENCE,CLIENTEID AS CLIENTE, VECES AS DISPONIBLE FROM CUPON WHERE CLIENTEID ='"+user+"'"
+  data = pd.read_sql(query, mercadolibreconnection)
 
-  if(len(resultado) == 0):
+  if data.empty:
      print("No tiene cupones disponibles")
      return
   else:
      print("\nSus cupones\n")
-
-  for ID,NOMBRE,DESCUENTO,FECHAVENCIMIENTO,CLIENTEID, VECES in resultado:
-          print('Cupon #',ID,
-          '\nNombre:',NOMBRE,
-          '\nDescuento:',DESCUENTO,
-          '\nVence:',FECHAVENCIMIENTO,
-          '\nPuede usarlo:',VECES,'veces',
-          '\n-----------------------------------\n')
-
-def mostrarAccesoriosAutos():
-  cur.execute("SELECT PRODUCTID, NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA FROM PRODUCTO WHERE CATEGORIA LIKE 'AUTOS'")
-  for PRODUCTID, NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA in cur.fetchall():
-          print('ID#',PRODUCTID,
-          '\nNombre: ',NOMBRE,
-          '\nMarca: ',MARCA,
-          '\nCategoria: ',CATEGORIA,
-          '\nSubcategoria: ',SUBCATEGORIA,
-          '\n-----------------------------------\n')
+     print(data.to_string(index=False, show_dimensions=False))
 
 def mostrarPerfil(user):
    print("--Mi Perfil--")
@@ -1063,30 +1026,15 @@ def eliminarDireccion(user):
 
 def mostrarcompras(user):
    print("--- MIS COMPRAS ---\n")
-   cur.execute("SELECT * FROM ORDEN WHERE IDCLIENTE = '"+user+"'")
-   listacompras = cur.fetchall()
-   
-   for i in range(len(listacompras)):
-      print("---------------------------------------------")
-      print("COMPRA #",listacompras[i][0])
-      print("Fecha:",listacompras[i][1])
-      print("Estado:",listacompras[i][2])
-      print("Unidad:",listacompras[i][3])
-      print("Envio: ",listacompras[i][5])
-      print("Importe:",listacompras[i][4])
+   query = "SELECT ORDERID AS ORDEN, FECHACREACION AS CREADO, ORD.ESTADO, CANTIDADPRODUCTO AS CANTIDAD, COSTOENVIO AS ENVIO, IMPORTE, NOMBRE AS PRODUCTO, NOMBREPUBLICACION AS PUBLICACION FROM ORDEN ORD JOIN PRODUCTO USING(PRODUCTID) LEFT JOIN PUBLICACION USING (PRODUCTID) WHERE IDCLIENTE = '"+user+"'"
+   data = pd.read_sql(query, mercadolibreconnection)
 
-      cur.execute("SELECT NOMBRE FROM PRODUCTO WHERE PRODUCTID ="+str(listacompras[i][11])+"")
-      print("Producto:",cur.fetchone()[0])
-
-      if listacompras[i][16] == None:
-         nompublicacion = "Eliminada o no disponible"
-      else:
-         cur.execute("SELECT NOMBREPUBLICACION FROM PUBLICACION WHERE NOPUBLICACION ="+str(listacompras[i][16])+"")
-         nompublicacion = cur.fetchone()[0]
-         
-      print("Publicacion:",nompublicacion)
-
-      print("Vendedor:",listacompras[i][14])
+   if data.empty:
+      print("Hasta el momento, no ha realizado compras!")
+      return False
+   else:
+     print(data.to_string(index=False, show_dimensions=False))
+     return True
 
 def calificarCompra(comp,user):
    print("\n--- CALIFICAR COMPRA #"+comp+" ---\n")
@@ -1150,19 +1098,11 @@ def calificarCompra(comp,user):
    print("\nOrden calificada!")
 
 def mostrarProductos():
-   print("--- PRODUCTOS ---\n")
-   cur.execute("SELECT * FROM PRODUCTO")
-   listaProductos = cur.fetchall()
-   
-   for i in range(len(listaProductos)):
-      print("---------------------------------------------")
-      print("ID",listaProductos[i][0])
-      print("Nombre:",listaProductos[i][1])
-      print("Marca:",listaProductos[i][2])
-      print("Categoria:",listaProductos[i][3])
-      print("Subcategoria: ",listaProductos[i][4])
+   print("\n--- PRODUCTOS ---\n")
+   query = "SELECT PRODUCTID AS ID, NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA FROM PRODUCTO"
+   data = pd.read_sql(query, mercadolibreconnection)
+   print(data.to_string(index=False, show_dimensions=False))
 
-# Publicaciones
 def crearpublicacion(user):
    print("\n--- VENDER ---\n")
    lusuarios = []
@@ -1185,31 +1125,27 @@ def crearpublicacion(user):
       elif(tipoExposicion == "2"):
          tipoExposicion == "Clásica"
          break
-      elif(tipoExposicion == "3"): #Premium op3
+      elif(tipoExposicion == "3"):
          tipoExposicion == "Premium"
          break
       else:
          print("Ingrese una opción válida")
          
 
-   print("\n-- Busquemos tu producto en nuestro catálogo, si tu producto a vender no esta en lista, ingresalo 0 para agregarlo")
-   print("\nEnter para SALIR")
-   #mostrarProductos() eliminado
-   
-   #mod
+   print("\n-- Busquemos tu producto en nuestro catálogo, si tu producto a vender no esta en lista, ingresa 0 para agregarlo")
+
 
    while True:
       lproductos = []
 
       cur.execute("SELECT PRODUCTID FROM PRODUCTO")
       for PRODUCTOID in cur.fetchall():
-         lproductos.append(PRODUCTOID[0]) #lproductos almacena productid
+         lproductos.append(PRODUCTOID[0])
 
 
       mostrarProductos()
-      idProducto = input("Ingrese el ID del producto o ingrese 0 para agregar uno nuevo:")
+      idProducto = input("\nIngrese el ID del producto o ingrese 0 para agregar uno nuevo, ENTER para SALIR: ")
       
-      # ENTER para SALIR
       if(idProducto == ""):
          limpiarPantalla()
          print("Operacion cancelada!")
@@ -1217,23 +1153,13 @@ def crearpublicacion(user):
       
       
       if(idProducto!= "0"):
-         if(int(idProducto) in lproductos): #ProductID es un atributo tipo entero
+         if(int(idProducto) in lproductos):
             break
          else:
-            print("\n ingrese una ID existente")
+            print("\nIngrese una ID existente")
       else:
          print("\nRegistrando Producto")
          
-         # ProductID es auto incremental
-         """
-         idProducto = input("Ingrese un ID para el producto: ")
-         if idProducto == "":
-            limpiarPantalla()
-            return
-         if(idProducto in lproductos):
-            idProducto = input("\nIngrese un ID no existente: ")
-
-         """
 
          nProducto = input("Ingrese el nombre del producto: ")
          if nProducto == "":
@@ -1259,17 +1185,16 @@ def crearpublicacion(user):
             print("Operacion cancelada!")
             return
          
-         #id del producto es autoincremental
          print("\nRegistrando Producto")
          query = "INSERT INTO PRODUCTO (NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA) VALUES (%s, %s, %s, %s)"
          values = (nProducto, mProducto, cProducto, scProducto)
          cur.execute(query, values)
-         mercadolibreconnection.commit() # no se insertaba en la bd por esto
+         mercadolibreconnection.commit()
          
          print("\nProducto registrado existosamente")
       
    nombrePublicacion = input("Ingresa el nombre para tu publicación: ")
-   descrpicion = input(" Redacta la descripción que deseas que los clientes observen en tu publicación: ")
+   descrpicion = input("Redacta la descripción que deseas que los clientes observen en tu publicación: ")
    precio = input("Ingresa el precio de venta al público: $")
    stock = input("Ingresa la cantidad de stock que posees: ")
    now = datetime.now()
@@ -1290,8 +1215,6 @@ def crearpublicacion(user):
    mercadolibreconnection.commit()
    print("\nHas publicado tu venta")
 
-#Visualizacion de publicaciones
-#Esta funcion debe ser llamada despues de abrir a detalle una publicacion de eleccion del user, recuperando el numero de
 def registrarVisualizacion(user,noPublicacion):
    fecha_actual = date.today()
    fecha_actual_str = fecha_actual.strftime('%Y-%m-%d')
@@ -1316,85 +1239,55 @@ def registrarVisualizacion(user,noPublicacion):
    return True
 
 def mostrarPublicacionesDeInteres(user):
-   cur.execute("SELECT p.NOPUBLICACION, p.NOMBREPUBLICACION, p.IDVENDEDOR, p.PRECIOVENTA, p.FECHAPUBLICACION, FECHA from VISUALIZACION_PUBLICACIONES vp JOIN PUBLICACION p USING (NOPUBLICACION) WHERE USERID = '"+user+"' ORDER BY FECHA DESC")
-   resultado = cur.fetchall()
-   print("\nPubliicaciones Visitadas")
-   for historial in range(len(resultado)):
-      print('Publicacion #',resultado[historial][0],
-          '\nNombre: ',resultado[historial][1],
-          '\nVendedor: ',resultado[historial][2],
-          '\nPrecio: ',resultado[historial][3],
-          '\nPublicado el: ',resultado[historial][4],
-          '\nVista el: ',resultado[historial][5],
-          '\n-----------------------------------\n')
+   print("--- HISTORIAL ---\n") 
+   query = "SELECT p.NOPUBLICACION AS PUB, p.NOMBREPUBLICACION AS NOMBRE, p.IDVENDEDOR AS VENDEDOR, p.PRECIOVENTA AS PRECIO, p.FECHAPUBLICACION AS PUBLICADO, FECHA AS VISTO from VISUALIZACION_PUBLICACIONES vp JOIN PUBLICACION p USING (NOPUBLICACION) WHERE USERID = '"+user+"' ORDER BY FECHA DESC"
+   data = pd.read_sql(query, mercadolibreconnection)
 
+   if data.empty:
+      print("Historial vacio")
+   else:
+     print(data.to_string(index=False, show_dimensions=False))
 
-# Facturas
-   
 def mostrarFacturas(user):
    limpiarPantalla()
    print("\n--- MIS FACTURAS ---\n")
+   query = "SELECT FACTID AS FACTURA, FECHA AS EMITIDO, DESCRIPCION, FACT.IDVENDEDOR AS VENDEDOR, FACT.IDCLIENTE AS CLIENTE, FACT.IDORDEN AS ORDEN, NOMBRE AS PRODUCTO FROM FACTURA FACT JOIN ORDEN USING (IDCLIENTE) JOIN PRODUCTO USING (PRODUCTID) WHERE FACT.IDCLIENTE = '"+user+"'"
+   data = pd.read_sql(query, mercadolibreconnection)
 
-   cur.execute("SELECT FACTID, FECHA, DESCRIPCION, FACT.IDVENDEDOR, FACT.IDCLIENTE, FACT.IDORDEN, NOMBRE FROM FACTURA FACT JOIN ORDEN USING (IDCLIENTE) JOIN PRODUCTO USING (PRODUCTID) WHERE FACT.IDCLIENTE = '"+user+"'")
-   detallesfacturas = cur.fetchall()
-
-   if (len(detallesfacturas) == 0):
-      limpiarPantalla()
-      print("No hay facturas")
-      return
+   if data.empty:
+      print("No hay Facturas")
+   else:
+     print(data.to_string(index=False, show_dimensions=False))
    
-   for factura in detallesfacturas:
-      print("FACT #",factura[0])
-      print("Fecha Emision:",factura[1])
-      print("Descripcion: ",factura[2])
-      print("Vendedor:",factura[3])
-      print("Cliente:",factura[4])
-      print("Orden:",factura[5])
-      print("Producto:",factura[6])
-      print("-------------------------------")
-
-
 def mostrarFacturasEmitidas(user):
-   print("--- FACTURAS EMITIDAS ---")
-   cur.execute("SELECT FACTID, FECHA, DESCRIPCION, FACT.IDCLIENTE, FACT.IDORDEN, NOMBRE FROM PRODUCTO PROD JOIN ORDEN ORD USING(PRODUCTID) JOIN FACTURA FACT ON IDORDEN = ORDERID JOIN VENDEDOR V ON FACT.IDVENDEDOR = USERID WHERE FACT.IDVENDEDOR ='"+user+"'")
-   resultado = cur.fetchall()
+   limpiarPantalla()
+   print("--- FACTURAS EMITIDAS ---\n")
 
-   if len(resultado) == 0:
-      limpiarPantalla()
-      print("No dispone de facturas emitidas actualmente!")
-      return
+   query = "SELECT FACTID AS FACTURA, FECHA AS EMITIDO, DESCRIPCION, FACT.IDCLIENTE AS CLIENTE, FACT.IDORDEN AS ORDEN, NOMBRE AS PRODUCTO FROM PRODUCTO PROD JOIN ORDEN ORD USING(PRODUCTID) JOIN FACTURA FACT ON IDORDEN = ORDERID JOIN VENDEDOR V ON FACT.IDVENDEDOR = USERID WHERE FACT.IDVENDEDOR ='"+user+"'"
+   data = pd.read_sql(query, mercadolibreconnection)
    
-   for i in resultado:
-      print("FACT #",i[0])
-      print("Fecha Emision:",i[1])
-      print("Descripcion: ",i[2])
-      print("Cliente:",i[3])
-      print("Orden:",i[4])
-      print("Producto:",i[5])
-      print("-------------------------------")
-
+   if data.empty:
+      print("No dispone de facturas emitidas actualmente!")
+   else:
+     print(data.to_string(index=False, show_dimensions=False))
+   
 def EmitirFactura(user):
+   limpiarPantalla()
    print("\n--- EMISION DE FACTURA ---\n")
+   query = "SELECT ORDERID AS ORDEN, FACT.IDORDEN, ORDEN.IDCLIENTE AS CLIENTE, ORDEN.IDVENDEDOR, ESTADO, NOMBRE AS PRODUCTO FROM FACTURA FACT RIGHT JOIN  ORDEN ON IDORDEN = ORDERID NATURAL JOIN PRODUCTO WHERE FACT.IDORDEN IS NULL AND ORDEN.IDVENDEDOR = '"+user+"' AND ESTADO = 'Completada'"
+   data = pd.read_sql(query, mercadolibreconnection)
+   columnasmostrar = ['ORDEN', 'PRODUCTO','CLIENTE','ESTADO']
+   data2 = data[columnasmostrar]
 
-   cur.execute("SELECT ORDERID, FACT.IDORDEN, ORDEN.IDCLIENTE, ORDEN.IDVENDEDOR, ESTADO"+
-               " FROM FACTURA FACT RIGHT JOIN  ORDEN ON IDORDEN = ORDERID"+
-               " WHERE FACT.IDORDEN IS NULL AND ORDEN.IDVENDEDOR = '"+user+"' AND ESTADO = 'Completada'")
-
-   ordenespendientesfacturar = cur.fetchall()
-
-   if(len(ordenespendientesfacturar) == 0):
-      limpiarPantalla()
-      print("Estimado usuario, no tiene ordenes que facturar!\n")
+   if data.empty:
+      print("Estimado usuario, no tiene ordenes que facturar!")
       return
+   else:
+     print("Estimado usuario, les presentamos las siguientes ordenes a facturar\n")
+     print(data2.to_string(index=False, show_dimensions=False))
 
-   print("Estimado usuario, les presentamos las siguientes ordenes a facturar\n")
-   for orden in ordenespendientesfacturar:
-      cur.execute("SELECT NOMBRE FROM ORDEN JOIN PRODUCTO USING(PRODUCTID) WHERE ORDERID ="+str(orden[0]))
-      print("ORDEN #",orden[0])
-      print("Producto:",cur.fetchone()[0])
-      print("Cliente:",orden[2])
-      print("Estado Orden:",orden[4])
-      print("--------------------------------")
+   cur.execute(query)
+   ordenespendientesfacturar = cur.fetchall()
 
    cond = False
    indice = None
@@ -1452,13 +1345,12 @@ def EmitirFactura(user):
    limpiarPantalla()
    print("Generando Factura...")
    cur.execute("INSERT INTO FACTURA (FECHA, DESCRIPCION, IDVENDEDOR, IDCLIENTE, IDORDEN) VALUES ('"+fecha_actual_str+"',"+descripcion+",'"+str(ordenespendientesfacturar[indice][3])+"','"+str(ordenespendientesfacturar[indice][2])+"',"+str(ordenespendientesfacturar[indice][0])+")")
-   mercadolibreconnection.commit()
-   cur.execute("SELECT FACTID FROM FACTURA WHERE IDORDEN = "+str(ordenespendientesfacturar[indice][0])+"")
-   print("FACT#",cur.fetchone()[0],"generada con exito")
-
-
-# Reclamos
    
+   cur.execute("SELECT LAST_INSERT_ID()")
+   factid = cur.fetchone()[0]
+   print("FACT#",factid,"generada con exito")
+   mercadolibreconnection.commit()
+ 
 def realizarReclamo(comp,user):
    print("\n--- EMITIR RECLAMO COMPRA #",comp,"---")
    print("ENTER para SALIR\n")
@@ -1511,9 +1403,10 @@ def realizarReclamo(comp,user):
    cur.execute("INSERT INTO RECLAMO (TIPO, ESTADO, CLIENTEID, VENDEDORID, ORDERID, FECHAINGRESO) VALUES"+
                "('"+tipo+"','Abierto','"+user+"',"+idvendedor+","+comp+",now())")
    
+   cur.execute("SELECT LAST_INSERT_ID()")
+   reclamoid = cur.fetchone()[0]
+   print("Reclamo #"+str(reclamoid)+" generado con exito!")
    mercadolibreconnection.commit()
-   cur.execute("SELECT ID FROM RECLAMO WHERE ORDERID = "+comp+" AND CLIENTEID = '"+user+"'")
-   print("Reclamo #"+str(cur.fetchone()[0])+" generado con exito!")
 
 def validarUsuario(usuario):
     cur.execute("SELECT USERID FROM USUARIO")
@@ -1524,10 +1417,8 @@ def validarUsuario(usuario):
         return True
     else:
         return False
-
-#Funciones Javier
         
-def actualizarUsuario(user):  #funcion parametrizada
+def actualizarUsuario(user):
     print("\n--- MODIFICAR CUENTA ---")
     print("Enter para SALIR\n")
 
@@ -1565,8 +1456,7 @@ def actualizarUsuario(user):  #funcion parametrizada
         print(f"Error: {e}")
     cur.close()
 
-
-def eliminarUsuario(user): #funcion parametrizada
+def eliminarUsuario(user):
     print("--- ELIMINAR CUENTA "+user+" ---")
     print("Te echaremos de menos :(\n")
     
@@ -1575,18 +1465,6 @@ def eliminarUsuario(user): #funcion parametrizada
         try:
             print("Eliminando usuario...")
             mercadolibreconnection.begin()
-            """
-            cur.execute("DELETE FROM VISUALIZACION_PUBLICACIONES WHERE USERID = '"+ user +"' or NOPUBLICACION IN (SELECT NOPUBLICACION FROM PUBLICACION WHERE IDVENDEDOR = '"+ user +"');")
-            cur.execute("DELETE FROM FACTURA WHERE IDCLIENTE = '"+ user +"' OR IDVENDEDOR = '"+ user +"';")
-            cur.execute("DELETE FROM RECLAMO WHERE CLIENTEID = '"+ user +"' OR VENDEDORID = '"+ user +"';")
-            cur.execute("DELETE FROM ORDEN WHERE IDCLIENTE = '"+ user +"' OR IDVENDEDOR = '"+ user +"';")
-            cur.execute("DELETE FROM PAGO WHERE IDCLIENTE = '"+ user +"';")
-            cur.execute("DELETE FROM DIRECCION WHERE USERID = '"+ user +"';")
-            cur.execute("DELETE FROM CUPON WHERE CLIENTEID = '"+ user +"';")
-            cur.execute("DELETE FROM PREGUNTA WHERE IDCLIENTE = '"+ user +"' OR IDVENDEDOR = '"+ user +"';")
-            cur.execute("DELETE FROM PUBLICACION WHERE  IDVENDEDOR = '"+ user +"';")
-            cur.execute("DELETE FROM CLIENTE WHERE USERID = '"+ user +"';")
-            cur.execute("DELETE FROM VENDEDOR WHERE USERID = '"+ user +"';") """
             cur.execute("DELETE FROM USUARIO WHERE USERID = '"+ user +"';") 
             mercadolibreconnection.commit()
             
@@ -1621,7 +1499,7 @@ def imprimirOrden(registros):
     except Exception as e:
         print(f"Error: {e}")
 
-def verventas(user): #funcion parametrizada
+def verventas(user):
     cur.execute("select  idvendedor from orden o natural join producto p where idvendedor = '"+user+"';")
     if(len(cur.fetchall())) > 0:
         print("--- REPORTE DE ORDENES ---")
@@ -1661,9 +1539,7 @@ def realizarPregunta(pub,user):
    print("La pregunta ha sido enviada correctamente.")
    print("Muchas gracias por su tiempo, esperamos que sus dudas sean resueltas lo mas pronto posible.\nAdios.")
 
-
-
-def responderpregunta(userid): #funcion parametrizada
+def responderpregunta(userid):
     cur.execute("SELECT IDPREGUNTA,CONTENIDO,MENSAJERESPUESTA,IDCLIENTE FROM PREGUNTA WHERE IDVENDEDOR = '"+ userid +"';")
     preguntas = cur.fetchall()
     for pregunta in preguntas:
@@ -1710,7 +1586,6 @@ def verReclamos(userid):
     else:
         print("¡Usted no ha generado reclamos!")
     for reclamo in reclamosGenerados:
-        #id,tipo,estado,clienteid, vendedorid,orderid = reclamo # ?
         print("ID DEL RECLAMO:",reclamo[0])
         print("Tipo:",reclamo[1])
         print("Estado:",reclamo[2]) 
@@ -1725,7 +1600,6 @@ def verReclamos(userid):
     else:
         print("¡Usted no tiene reclamos!")
     for reclamo in reclamosPorResolver:
-        #id,tipo,estado,clienteid, vendedorid,orderid = reclamo # ?
         print("ID DEL RECLAMO:",reclamo[0])
         print("Tipo:",reclamo[1])
         print("Estado:",reclamo[2]) 
@@ -1754,8 +1628,6 @@ def mostrarReputacion(user):
    else:
       print("-- Reputacion de ",resultado[0])
       print("Promedio: ",resultado[1])
-
-# Javier
       
 def imprimirPublicaciones(userid,estado):
     cur.execute("select nopublicacion, nombrepublicacion, descripcion, precioventa, estado, stock from Publicacion where idvendedor = '"+userid+"' and estado = '"+estado+"';")
@@ -1805,7 +1677,7 @@ def editarPublicacion(idPublicacion):
     mercadolibreconnection.commit()
     print("¡Datos actualizados correctamente!")
 
-def eliminarPublicacion(idpublicacion): # Creacion de Trigger
+def eliminarPublicacion(idpublicacion):
     try:
         mercadolibreconnection.begin()
         cur.execute("delete from publicacion where nopublicacion = "+str(idpublicacion)+";")
@@ -1931,7 +1803,6 @@ def registrarTarjeta(user):
    print("Tarjeta Agregada con éxito!")
    return creditcard
 
-
 def separarDigitos(tarjeta):
    numbercard = ""
    espacios = 0
@@ -2007,7 +1878,6 @@ def eliminarTarjeta(user):
 
    print("Metodo Pago eliminado exitosamente")
 
-#Xavier
 def mostrarDetallesPublicacion(pub):
   print("\n-- DETALLE PUBLICACION")
   cur.execute(f"SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION JOIN PRODUCTO ON PUBLICACION.PRODUCTID=PRODUCTO.PRODUCTID WHERE NOPUBLICACION = "+pub+"")
@@ -2021,10 +1891,7 @@ def mostrarDetallesPublicacion(pub):
           '\nVendedor:',IDVENDEDOR,
           '\nStock:',STOCK,
           '\nPublicado el:',FECHAPUBLICACION)
-
-#sep filtrado
     
-#Aplicacion - Ver publicaciones (vista del cliente)
 def listarAtributosClientes(cur):
   categorias = []
   productos = []
@@ -2038,27 +1905,12 @@ def listarAtributosClientes(cur):
     marcas.append(MARCA)
     vendedores.append(IDVENDEDOR)
   return categorias, productos, marcas, vendedores
-
-def mostrarPublicacionCliente(cur):
-  activa = "Activa"
-  cur.execute(f"SELECT CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION JOIN PRODUCTO ON PUBLICACION.PRODUCTID=PRODUCTO.PRODUCTID WHERE ESTADO = '{activa}'")
-  for CATEGORIA, NOMBREPUBLICACION, NOMBRE, MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
-    print('Categoria:', CATEGORIA,
-          '\nNombre:',NOMBREPUBLICACION,
-          '\nProducto:',NOMBRE,
-          '\nMarca:',MARCA,
-          '\nDescripcion:',DESCRIPCION,
-          '\nPrecio:',PRECIOVENTA,
-          '\nVendedor:',IDVENDEDOR,
-          '\nStock:',STOCK,
-          '\nPublicado el:',FECHAPUBLICACION,
-          '\n-----------------------------------')
-
+    
 def mostrarPublicacionfiltrada(cur, prod=None, marc=None, categ=None, vend=None, ord=None, prec=None, ord_price=None):
   print("\n-- PUBLICACIONES --\n")
   categorias, productos, marcas, vendedores= listarAtributosClientes(cur)
   activa = "Activa"
-  consulta = f"SELECT PRODUCTO.CATEGORIA, NOMBREPUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION FROM PUBLICACION JOIN PRODUCTO ON PUBLICACION.PRODUCTID=PRODUCTO.PRODUCTID WHERE ESTADO = '{activa}'"
+  consulta = f"SELECT PRODUCTO.CATEGORIA, NOMBREPUBLICACION AS PUBLICACION, PRODUCTO.NOMBRE, PRODUCTO.MARCA, DESCRIPCION, PRECIOVENTA AS PRECIO, IDVENDEDOR AS VENDEDOR, STOCK, FECHAPUBLICACION AS PUBLICADO FROM PUBLICACION JOIN PRODUCTO ON PUBLICACION.PRODUCTID=PRODUCTO.PRODUCTID WHERE ESTADO = '{activa}'"
   contador = 0
   if prod is not None and prod in productos:
     consulta += f" AND PRODUCTO.NOMBRE = '{prod}'"
@@ -2087,21 +1939,10 @@ def mostrarPublicacionfiltrada(cur, prod=None, marc=None, categ=None, vend=None,
       consulta += "ORDER BY FECHAPUBLICACION ASC"
       contador += 1
 
-  if contador == 0:
-    mostrarPublicacionCliente(cur)
-
-  cur.execute(consulta)
-  for CATEGORIA, NOMBREPUBLICACION, NOMBRE, MARCA, DESCRIPCION, PRECIOVENTA, IDVENDEDOR, STOCK, FECHAPUBLICACION in cur.fetchall():
-    print('Categoria:', CATEGORIA,
-          '\nNombre:',NOMBREPUBLICACION,
-          '\nProducto:',NOMBRE,
-          '\nMarca:',MARCA,
-          '\nDescripcion:',DESCRIPCION,
-          '\nPrecio:',PRECIOVENTA,
-          '\nVendedor:',IDVENDEDOR,
-          '\nStock:',STOCK,
-          '\nPublicado el:',FECHAPUBLICACION,
-          '\n-----------------------------------')
+  data = pd.read_sql(consulta, mercadolibreconnection)
+  columnasmostrar1 = ['PUBLICACION', 'MARCA', 'PRECIO','VENDEDOR','STOCK','PUBLICADO']
+  data2 = data[columnasmostrar1]
+  print(data2.to_string(index=False, show_dimensions=False))
 
 def filtrarPublicaciones():
    print("\n--- FILTRADO\n")
@@ -2113,20 +1954,15 @@ def filtrarPublicaciones():
    print("6. Filtrar por MAS ANTIGUA")
    print("7. Filtrar por PRECIO")
    print("8. PUBLICACIONES 2024")
-   print("9. COSAS PARA TU CARRO")
    print("0. SALIR")
    
-   op = validaropcion(0,9)
+   op = validaropcion(0,8)
 
    if (op == 0):
       return
    
    if op == 8:
       mostrarPublicaciones2024()
-      return
-
-   if op == 9:
-      mostrarAccesoriosAutos()
       return
    
    if op == 7:
@@ -2188,15 +2024,8 @@ def filtrarPublicaciones():
    if op == 4:
       mostrarPublicacionfiltrada(cur,vend = busq)
       
-
-      
-   
-   
-
-
 #Programa Principal
 
 imprimirMenuPrincipalInvitado()
-
 
 mercadolibreconnection.close()
