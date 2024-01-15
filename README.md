@@ -16,6 +16,8 @@ Proyecto de Bases de Datos II PAO-2023
 
 *Desarrollado en: Python*
 
+*Conectado al servidor de la BD en Azure*
+
 **Script de la Base de Datos Mercado Libre**
 
 [ScriptMercadoLibre](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/ScriptMercadoLibre.sql "Script Mercado Libre")
