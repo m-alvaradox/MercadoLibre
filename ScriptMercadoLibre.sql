@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS USUARIO (
   ESCLIENTE BOOLEAN NOT NULL,
   ESVENDEDOR BOOLEAN NOT NULL,
   EMAIL VARCHAR(50) NOT NULL,
-  TELEFONO VARCHAR(10) NOT NULL
+  TELEFONO VARCHAR(10) NOT NULL,
+  GENERO ENUM('Masculino','Femenino','LGBTI') NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS CLIENTE (
@@ -189,22 +190,22 @@ CONSTRAINT fk_userid_tarjeta FOREIGN KEY (USERID) REFERENCES USUARIO(USERID) ON 
 
 -- Insercion Datos
 
-insert into USUARIO values('ownyag','12345','Owen','Yagual','2002-01-10',true,true,'ownyag@live.com','0987654321'); 
-insert into USUARIO values('malvaradox','54321','Mario','Alvarado','2003-11-14',true,true,'malvaradox@live.com','0912345678');
-insert into USUARIO values('xavicam','aaaaa','Xavier','Camacho','2002-04-01',true,true,'xavicam@live.com','0913246587');
-insert into USUARIO values('javirod','11111','Javier','Rodriguez','2005-03-01',true,true,'javirod@live.com','0915364875');
-insert into USUARIO values('naybor','12222222','Nayeli','Borbor','2001-02-01',true,false,'naybor@live.com','0958455652');
-insert into USUARIO values('luchoont','12229871','Luis','Ontaneda','1990-05-01',true,false,'luchont@yahoo.com','0985128912');
-insert into USUARIO values('nickfigu','122253','Nick','Figueroa','2002-07-09',true,false,'nickfigur@hotmail.com','0921289128');
-insert into USUARIO values('charlesrod','1256ga22','Carlos','Rodriguez','2010-05-12',true,false,'charlesrod@gmail.com','0989125982');
-insert into USUARIO values('joelvill','1asdsa2222','Joel','Villon','2004-04-01',true,false,'joelvilla@gmail.com','0985181891');
-insert into USUARIO values('angivel','122xv2092','Angie','Velastegui','2007-04-01',true,false,'angivel@live.com','0985181895');
-insert into USUARIO values('angon','oiadsa','Angel','Ontaneda','2011-05-01',true,true,'angon@live.com','0923748372');
-insert into USUARIO values('ferchon','5ioqw','Fernando','Chacon','2015-03-01',true,true,'ferchon@live.com','1234365465');
-insert into USUARIO values('jorgquij','aasdaaaa','Jorge','Quijije','2002-09-01',true,true,'jorguijij@icloud.com','0998724354');
-insert into USUARIO values('arperez','11ads','Ariana','Perez','2002-12-01',true,true,'arperez@live.com','3432345676');
-insert into USUARIO values('fiotorres','1x23zx45','Fiorella','Torres','1980-05-07',true,true,'fiotorres@live.com','0983546753');
-insert into USUARIO values('daniroca','5s43bcds21','Daniela','Roca','1980-10-05',true,true,'daniroca@outlook.es','0956473847');
+insert into USUARIO values('ownyag','12345','Owen','Yagual','2002-01-10',true,true,'ownyag@live.com','0987654321','Masculino'); 
+insert into USUARIO values('malvaradox','54321','Mario','Alvarado','2003-11-14',true,true,'malvaradox@live.com','0912345678', 'Masculino');
+insert into USUARIO values('xavicam','aaaaa','Xavier','Camacho','2002-04-01',true,true,'xavicam@live.com','0913246587', 'Masculino');
+insert into USUARIO values('javirod','11111','Javier','Rodriguez','2005-03-01',true,true,'javirod@live.com','0915364875','Masculino');
+insert into USUARIO values('naybor','12222222','Nayeli','Borbor','2001-02-01',true,false,'naybor@live.com','0958455652', 'Femenino');
+insert into USUARIO values('luchoont','12229871','Luis','Ontaneda','1990-05-01',true,false,'luchont@yahoo.com','0985128912','LGBTI');
+insert into USUARIO values('nickfigu','122253','Nick','Figueroa','2002-07-09',true,false,'nickfigur@hotmail.com','0921289128','Masculino');
+insert into USUARIO values('charlesrod','1256ga22','Carlos','Rodriguez','2010-05-12',true,false,'charlesrod@gmail.com','0989125982','Masculino');
+insert into USUARIO values('joelvill','1asdsa2222','Joel','Villon','2004-04-01',true,false,'joelvilla@gmail.com','0985181891','Masculino');
+insert into USUARIO values('angivel','122xv2092','Angie','Velastegui','2007-04-01',true,false,'angivel@live.com','0985181895','Femenino');
+insert into USUARIO values('angon','oiadsa','Angel','Ontaneda','2011-05-01',true,true,'angon@live.com','0923748372','LGBTI');
+insert into USUARIO values('ferchon','5ioqw','Fernando','Chacon','2015-03-01',true,true,'ferchon@live.com','1234365465','Masculino');
+insert into USUARIO values('jorgquij','aasdaaaa','Jorge','Quijije','2002-09-01',true,true,'jorguijij@icloud.com','0998724354','Masculino');
+insert into USUARIO values('arperez','11ads','Ariana','Perez','2002-12-01',true,true,'arperez@live.com','3432345676', 'Femenino');
+insert into USUARIO values('fiotorres','1x23zx45','Fiorella','Torres','1980-05-07',true,true,'fiotorres@live.com','0983546753','LGBTI');
+insert into USUARIO values('daniroca','5s43bcds21','Daniela','Roca','1980-10-05',true,true,'daniroca@outlook.es','0956473847','Femenino');
 
 insert into CLIENTE values
 ('ownyag'),('malvaradox'),('xavicam'),('javirod'),('naybor'),('luchoont'),('nickfigu'),('charlesrod'),('joelvill'),('angivel'),('angon'),('ferchon'),('jorgquij'),('arperez'),('fiotorres'),('daniroca');

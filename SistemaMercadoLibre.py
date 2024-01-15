@@ -18,7 +18,8 @@ warnings.filterwarnings('ignore')
 
 
 # Conexion a la base de datos de mercadolibre
-mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure.com", user='invitado', passwd= 'root', db='mercadolibre')
+#mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure.com", user='invitado', passwd= 'root', db='mercadolibre')
+mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 'root', db='mercadolibre')
 cur = mercadolibreconnection.cursor()
 
 #funciones
@@ -171,6 +172,32 @@ def CrearCuenta():
     else:
       print("La fecha no es válida\n")
 
+  print("\n-- Autoidentificacion de genero")
+  print("1. Masculino")
+  print("2. Femenino")
+  print("3. LGBTI")
+  print("0. SALIR")
+  
+  optgen = validaropcion(0,3)
+  genero = None
+
+  if optgen == 0:
+     limpiarPantalla()
+     return
+  
+  if optgen == 1:
+     genero = 'Masculino'
+
+  if optgen == 2:
+     genero = 'Femenino'
+
+  if optgen == 3:
+     genero = 'LGBTI'
+     
+  
+  print("\n-- Datos de contacto")
+  print("ENTER para SALIR\n")
+
   while True:
      telefono = input("Ingrese su numero de telefono (10 digitos): ")
 
@@ -198,6 +225,10 @@ def CrearCuenta():
         print("Incorrecto, vuelva a intentarlo\n")
 
   email = email.lower()
+  
+  print("\n-- Seguridad")
+  print("ENTER para SALIR\n")
+  
   while True:
      password = input("Ingrese su contraseña (Max. 16 caracteres): ")
      
@@ -219,7 +250,7 @@ def CrearCuenta():
      else:
         print("Contraseñas no coinciden, intente de nuevo\n")
         
-  cur.execute("INSERT INTO USUARIO(USERID,PASS,NOMBRE,APELLIDO,FECHANACIMIENTO,ESCLIENTE,ESVENDEDOR,EMAIL,TELEFONO) VALUES ('"+userName+"','"+password+"','"+nombre+"','"+apellido+"','"+fechanacimiento+"',true,false,'"+email+"','"+telefono+"')")
+  cur.execute("INSERT INTO USUARIO(USERID,PASS,NOMBRE,APELLIDO,FECHANACIMIENTO,ESCLIENTE,ESVENDEDOR,EMAIL,TELEFONO,GENERO) VALUES ('"+userName+"','"+password+"','"+nombre+"','"+apellido+"','"+fechanacimiento+"',true,false,'"+email+"','"+telefono+"','"+genero+"')")
   cur.execute("INSERT INTO CLIENTE VALUES ('"+userName+"')")
   mercadolibreconnection.commit()
   limpiarPantalla()
@@ -588,7 +619,7 @@ def mostrarCupones(user):
 def mostrarPerfil(user):
    print("--Mi Perfil--")
 
-   cur.execute ("SELECT USERID, EMAIL, NOMBRE, APELLIDO, TELEFONO FROM USUARIO WHERE USERID = '"+user+"'")
+   cur.execute ("SELECT USERID, EMAIL, NOMBRE, APELLIDO, TELEFONO, GENERO FROM USUARIO WHERE USERID = '"+user+"'")
    detalleperfil = cur.fetchone()
 
    print("\n--Datos de cuenta")
@@ -598,6 +629,7 @@ def mostrarPerfil(user):
    print("\n--Datos personales")
    print("Nombre y Apellido:",detalleperfil[2],detalleperfil[3])
    print("Telefono:",detalleperfil[4])
+   print("Autoidentificacion de genero:",detalleperfil[5])
 
 def mostrarDirecciones(user):
    cur.execute("SELECT ID, PARROQUIA, REFERENCIAS, NOMBRECIUDAD, NOMBREPROVINCIA, NOMBREPAIS"+
@@ -1422,7 +1454,7 @@ def actualizarUsuario(user):
     print("\n--- MODIFICAR CUENTA ---")
     print("Enter para SALIR\n")
 
-    dato = input("Ingrese el dato que desea actualizar\nUserID, Email, Pass, Nombre, Apellido, Telefono:\n").lower()
+    dato = input("Ingrese el dato que desea actualizar\nUserID, Email, Pass, Nombre, Apellido, Telefono, Genero:\n").lower()
     if dato == "":
        limpiarPantalla()
        return
@@ -1440,6 +1472,17 @@ def actualizarUsuario(user):
             if newvalue == "":
                limpiarPantalla()
                return
+            
+    if dato == "genero":
+       while newvalue.upper() not in ['MASCULINO', 'FEMENINO', 'LGBTI']:
+          print("Error, las opciones son ['Masculino','Femenino','LGBTI']")
+          newvalue = input("Ingrese genero: ")
+
+          if newvalue == "":
+             limpiarPantalla()
+             return
+          
+          
     try:
         cur.execute("UPDATE USUARIO SET " + dato.upper()+ "= %s WHERE USERID = %s",(newvalue,user))
         mercadolibreconnection.commit()
