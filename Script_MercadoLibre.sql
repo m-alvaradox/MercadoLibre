@@ -540,7 +540,7 @@ DELIMITER ;
 -- CALL CAMBIAR_ESTADO_ORDEN();
 
 -- VISTAS
-CREATE OR REPLACE VIEW generousuarios AS
+CREATE OR REPLACE VIEW genero_usuarios AS
 SELECT genero,
     CONCAT(ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM usuario)), 0), '%') as porcentaje
 FROM usuario
