@@ -1,6 +1,6 @@
 """
 Sistema de Mercado Libre
-Integrantes Grupo #6
+Integrantes Grupo #3
 - Mario Alvarado
 - Xavier Camacho
 - Javier Rodriguez
@@ -18,8 +18,7 @@ warnings.filterwarnings('ignore')
 
 
 # Conexion a la base de datos de mercadolibre
-#mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure.com", user='invitado', passwd= 'root', db='mercadolibre')
-mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 'root', db='mercadolibre')
+mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure.com", user='invitado', passwd= 'root', db='mercadolibre')
 cur = mercadolibreconnection.cursor()
 
 #funciones
@@ -2076,7 +2075,7 @@ def verRespuestas(user):
       print("ENVIADO: ",ENVIADO)
       print("PUBLICACION: ", PUBLICACION)
 
-      print("\n--------------------------\n")
+      print("\n-------------------------------------------------\n")
 
 
 
