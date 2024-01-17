@@ -27,11 +27,12 @@ Proyecto de Bases de Datos II PAO-2023
 ****
 **Documentos**
 
+👉 [Documentación](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/Documentaci%C3%B3n_MercadoLibre.md)
+
 👉 [Manual de Usuario](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/Manual_Usuario.md)
 
-👉 [Schema de la Base de Datos](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/PDF/Schema_MercadoLibre.pdf "Schema de la Base de Datos")
+👉 [Schema](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/Schema_MercadoLibre.pdf)
 
-👉 [Modelo Lógico de la Base de Datos](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/PDF/ModeloLogico_MercadoLibre.pdf "Modelo Lógico de la Base de Datos")
 
 ****
 **Presentaciones**
