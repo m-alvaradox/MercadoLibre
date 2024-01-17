@@ -18,7 +18,8 @@ warnings.filterwarnings('ignore')
 
 
 # Conexion a la base de datos de mercadolibre
-mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure.com", user='invitado', passwd= 'root', db='mercadolibre')
+#mercadolibreconnection = pymysql.connect(host="servergroup3.mysql.database.azure.com", user='invitado', passwd= 'root', db='mercadolibre')
+mercadolibreconnection = pymysql.connect(host="localhost", user='root', passwd= 'root', db='mercadolibre')
 cur = mercadolibreconnection.cursor()
 
 #funciones
@@ -249,9 +250,7 @@ def CrearCuenta():
      else:
         print("Contraseñas no coinciden, intente de nuevo\n")
         
-  cur.execute("INSERT INTO USUARIO(USERID,PASS,NOMBRE,APELLIDO,FECHANACIMIENTO,ESCLIENTE,ESVENDEDOR,EMAIL,TELEFONO,GENERO) VALUES ('"+userName+"','"+password+"','"+nombre+"','"+apellido+"','"+fechanacimiento+"',true,false,'"+email+"','"+telefono+"','"+genero+"')")
-  cur.execute("INSERT INTO CLIENTE VALUES ('"+userName+"')")
-  mercadolibreconnection.commit()
+  cur.callproc("CREARCUENTA", [userName, password, nombre, apellido,fechanacimiento,email,telefono,genero])
   limpiarPantalla()
   print(userName,"creado exitosamente!")
 
@@ -556,6 +555,13 @@ def AccionarUsuario(opcion,user):
        input("\nPresione ENTER para regresar -->")
        limpiarPantalla()
 
+    if opcion == 10:
+      limpiarPantalla()
+      verRespuestas(user)
+      input("\nPresione ENTER para regresar -->")
+      limpiarPantalla()
+
+
 def mostrarcaratula():
    print("\n----- MERCADO LIBRE -----")
    print("Compra más facil y seguro")
@@ -587,8 +593,9 @@ def imprimirMenuPrincipalUsuario(nomuser):
        print('7. Reclamos') 
        print("8. Facturacion")
        print("9. Publicaciones")
+       print("10. Respuestas")
        print('0. SALIR')
-       op = validaropcion(0,9)
+       op = validaropcion(0,10)
 
        AccionarUsuario(op,nomuser)
 
@@ -818,7 +825,8 @@ def generarOrden(nopublicacion, user):
                print("\nMetodo de Pago # ",contador)
                print("Tarjeta No.",tarjetas[card][1])
                print(tarjetas[card][2])
-               print("Vence:",tarjetas[card][4])
+               anio1,mes1,dia1 = str(tarjetas[card][4]).split("-") 
+               print("Vence:",anio1+"/"+mes1)
                print("--------------------------------")
 
             print("Escoja un metodo de pago\n0 para SALIR")
@@ -834,9 +842,8 @@ def generarOrden(nopublicacion, user):
             fechavencestr = tarjetas[metodo][4].strftime("%Y-%m-%d")
 
             anio, mes, dia = fechavencestr.split("-")
-            print(anio, mes, dia)
 
-            if int(anio) >= fecha_actual.year and int(mes) > fecha_actual.month:
+            if verificar_tarjeta_vencida(int(anio), int(mes), int(dia)) == False:
                tarjeta = tarjetas[metodo][1]
             else:
                limpiarPantalla()
@@ -886,7 +893,7 @@ def generarOrden(nopublicacion, user):
       importe = total
       cuota = 1
       creditcard = tarjeta
-      cur.execute("INSERT INTO PAGO (METODO, MONTO, CUOTA, CARDNUMBER, IDCLIENTE) VALUES ('"+metod+"',"+str(importe)+","+str(cuota)+",'"+creditcard+"','"+user+"')")
+      cur.execute("INSERT INTO PAGO (METODO, MONTO, CUOTA, CARDNUMBER, IDCLIENTE) VALUES ('"+metod+"',"+str(importe)+","+str(cuota)+",'"+creditcard+"','"+user+"')") #espero SP Xavier
       cur.execute("SELECT LAST_INSERT_ID()")
       transid = cur.fetchone()[0]
       mercadolibreconnection.commit()
@@ -902,31 +909,13 @@ def generarOrden(nopublicacion, user):
 
 
     print("\nGenerando orden...")
-
-    if(idCupon == None):
-      idCupon = 'NULL'
             
-    if(direccionid == None):
-      direccionid = 'NULL'
+    args = (idCupon, detallespublicacion[3], transid, cantidad, nopublicacion, user, detallespublicacion[4], importe, direccionid, costoenvio, fechaentrega)
 
-    if(fechaentrega == None):
-      fechaentrega = 'NULL'
-    else:
-      fechaentrega = "'"+fechaentrega.strftime('%Y-%m-%d')+"'"
-
-
-            
-    fecha_actual_str = fecha_actual.strftime('%Y-%m-%d')
-            
-
-
-    cur.execute("INSERT INTO ORDEN (FECHACREACION,ESTADO,IDCUPON,PRODUCTID,IDPAGO,CANTIDADPRODUCTO,IDPUBLICACION,IDCLIENTE,IDVENDEDOR,IMPORTE,IDDIRECCION,COSTOENVIO,FECHAENTREGA) VALUES "+
-               "('"+fecha_actual_str+"','Pendiente',"+str(idCupon)+","+str(detallespublicacion[3])+","+str(transid)+","+str(cantidad)+","+str(nopublicacion)+",'"+user+"','"+detallespublicacion[4]+"',"+str(importe)+","+str(direccionid)+","+str(costoenvio)+","+fechaentrega+")")
-            
+    cur.callproc("REALIZARCOMPRA", args)
     cur.execute("SELECT LAST_INSERT_ID()")
-    orderid = cur.fetchone()[0]
-    print("Orden",orderid,"realizada con éxito!")
-    mercadolibreconnection.commit()
+    numorden = cur.fetchone()[0]
+    print("Orden",numorden,"realizada con éxito!")
     print("Gracias por comprar en Mercado Libre :)")
 
 def anadirDireccion(user):
@@ -1011,8 +1000,8 @@ def anadirDireccion(user):
    limpiarPantalla()
    print("Añadiendo dirección...")
 
-   cur.execute("INSERT INTO DIRECCION (PARROQUIA, REFERENCIAS, IDCIUDAD, USERID) VALUES ('"+parroquia+"','"+referencias+"',"+str(idciudad)+",'"+user+"')")
-   mercadolibreconnection.commit()
+   args = (parroquia, referencias, idciudad, user)
+   cur.callproc("NUEVADIRECCION",args)
 
    print("Direccion añadida correctamente!")
 
@@ -1050,14 +1039,13 @@ def eliminarDireccion(user):
    limpiarPantalla()
    print("Eliminando direccion...")
 
-   cur.execute("DELETE FROM DIRECCION WHERE ID = "+str(direccionid)+"")
-   mercadolibreconnection.commit()
+   cur.execute("CALL ELIMINARDIRECCION("+str(direccionid)+")")
 
    print("Direccion eliminada exitosamente")
 
 def mostrarcompras(user):
    print("--- MIS COMPRAS ---\n")
-   query = "SELECT ORDERID AS ORDEN, FECHACREACION AS CREADO, ORD.ESTADO, CANTIDADPRODUCTO AS CANTIDAD, COSTOENVIO AS ENVIO, IMPORTE, NOMBRE AS PRODUCTO, NOMBREPUBLICACION AS PUBLICACION FROM ORDEN ORD JOIN PRODUCTO USING(PRODUCTID) LEFT JOIN PUBLICACION USING (PRODUCTID) WHERE IDCLIENTE = '"+user+"'"
+   query = "SELECT ORDERID AS ORDEN, FECHACREACION AS CREADO, ORD.ESTADO, CANTIDADPRODUCTO AS CANTIDAD, COSTOENVIO AS ENVIO, IMPORTE, NOMBRE AS PRODUCTO, NOMBREPUBLICACION AS PUBLICACION, METODO, CARDNUMBER FROM PAGO JOIN ORDEN ORD ON TRANSID = IDPAGO  JOIN PRODUCTO USING(PRODUCTID) LEFT JOIN PUBLICACION USING (PRODUCTID) WHERE ORD.IDCLIENTE = '"+user+"'"
    data = pd.read_sql(query, mercadolibreconnection)
 
    if data.empty:
@@ -1116,14 +1104,9 @@ def calificarCompra(comp,user):
    
    if comentario == "":
       comentario = None
-
-   if estrellasvendedor == None:
-      estrellasvendedor = 'NULL'
-
-   
-
-   cur.execute("UPDATE ORDEN SET ESTRELLASPRODUCTO = "+str(estrellasproducto)+", ESTRELLASVENDEDOR = "+str(estrellasvendedor)+", COMENTARIO = '"+comentario+"' WHERE ORDERID = "+comp+"")
-   mercadolibreconnection.commit()
+      
+   args = (estrellasproducto, estrellasvendedor, comentario, comp)
+   cur.callproc("CALIFICARCOMPRA", args)
 
    limpiarPantalla()
    print("\nOrden calificada!")
@@ -1227,28 +1210,21 @@ def crearpublicacion(user):
    nombrePublicacion = input("Ingresa el nombre para tu publicación: ")
    descrpicion = input("Redacta la descripción que deseas que los clientes observen en tu publicación: ")
    precio = input("Ingresa el precio de venta al público: $")
-   stock = input("Ingresa la cantidad de stock que posees: ")
-   now = datetime.now()
 
-   cur.execute("UPDATE USUARIO SET ESVENDEDOR = true WHERE USERID='"+user+"'")
-   mercadolibreconnection.commit()
+   while True:
+      stock = input("Ingresa la cantidad de stock que posees: ")
+      if stock > "0":
+         break
+      else:
+         print("\nEl stock no puede ser 0\n")
       
-   lVenderdores = []
-   cur.execute("SELECT USERID FROM VENDEDOR")
-   for USERID in cur.fetchall():
-         lVenderdores.append(USERID[0])
-   if(user not in lVenderdores):
-         cur.execute("INSERT INTO VENDEDOR(USERID) VALUES ('"+user+"')")
-
    limpiarPantalla()
    print("Creando Publicacion...")
-   cur.execute("INSERT INTO PUBLICACION (DESCRIPCION,TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,FECHAPUBLICACION,NOMBREPUBLICACION,STOCK) VALUES ('"+descrpicion+"','"+tipoExposicion+"','"+idProducto+"','"+user+"','"+precio+"','Activa','"+str(now)+"','"+nombrePublicacion+"','"+stock+"')")
+   cur.execute("INSERT INTO PUBLICACION (DESCRIPCION,TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,NOMBREPUBLICACION,STOCK) VALUES ('"+descrpicion+"','"+tipoExposicion+"','"+idProducto+"','"+user+"','"+precio+"','Activa','"+nombrePublicacion+"','"+stock+"')")
    mercadolibreconnection.commit()
    print("\nHas publicado tu venta")
 
 def registrarVisualizacion(user,noPublicacion):
-   fecha_actual = date.today()
-   fecha_actual_str = fecha_actual.strftime('%Y-%m-%d')
    cur.execute("SELECT NOPUBLICACION FROM PUBLICACION WHERE NOPUBLICACION = "+str(noPublicacion)+"")
 
    if cur.fetchone() == None:
@@ -1260,7 +1236,7 @@ def registrarVisualizacion(user,noPublicacion):
    resultado = cur.fetchone()
 
    if(resultado == None):
-      cur.execute("INSERT INTO VISUALIZACION_PUBLICACIONES (USERID, NOPUBLICACION, FECHA) VALUES ('"+user+"',"+noPublicacion+",'"+fecha_actual_str+"')")
+      cur.execute("INSERT INTO VISUALIZACION_PUBLICACIONES (USERID, NOPUBLICACION) VALUES ('"+user+"',"+noPublicacion+")")
 
    else:
       cur.execute("UPDATE VISUALIZACION_PUBLICACIONES SET FECHA = now() WHERE NOPUBLICACION = "+noPublicacion+" AND USERID = '"+user+"'")
@@ -1375,12 +1351,11 @@ def EmitirFactura(user):
 
    limpiarPantalla()
    print("Generando Factura...")
-   cur.execute("INSERT INTO FACTURA (FECHA, DESCRIPCION, IDVENDEDOR, IDCLIENTE, IDORDEN) VALUES ('"+fecha_actual_str+"',"+descripcion+",'"+str(ordenespendientesfacturar[indice][3])+"','"+str(ordenespendientesfacturar[indice][2])+"',"+str(ordenespendientesfacturar[indice][0])+")")
-   
+   args = descripcion, ordenespendientesfacturar[indice][3], ordenespendientesfacturar[indice][2], ordenespendientesfacturar[indice][0]
+   cur.callproc("EMITIRFACTURA", args)
    cur.execute("SELECT LAST_INSERT_ID()")
    factid = cur.fetchone()[0]
    print("FACT#",factid,"generada con exito")
-   mercadolibreconnection.commit()
  
 def realizarReclamo(comp,user):
    print("\n--- EMITIR RECLAMO COMPRA #",comp,"---")
@@ -1426,18 +1401,12 @@ def realizarReclamo(comp,user):
    cur.execute("SELECT IDVENDEDOR FROM ORDEN WHERE ORDERID = "+comp+" AND IDCLIENTE = '"+user+"'")
    idvendedor = cur.fetchone()[0]
 
-   if idvendedor == None:
-      idvendedor = 'NULL'
-   else:
-      idvendedor = "'"+idvendedor+"'"
+   args = (tipo, user, idvendedor, comp)
 
-   cur.execute("INSERT INTO RECLAMO (TIPO, ESTADO, CLIENTEID, VENDEDORID, ORDERID, FECHAINGRESO) VALUES"+
-               "('"+tipo+"','Abierto','"+user+"',"+idvendedor+","+comp+",now())")
-   
+   cur.callproc("NUEVORECLAMO", args)
    cur.execute("SELECT LAST_INSERT_ID()")
    reclamoid = cur.fetchone()[0]
    print("Reclamo #"+str(reclamoid)+" generado con exito!")
-   mercadolibreconnection.commit()
 
 def validarUsuario(usuario):
     cur.execute("SELECT USERID FROM USUARIO")
@@ -1574,7 +1543,7 @@ def realizarPregunta(pub,user):
 
    cur.execute("SELECT IDVENDEDOR FROM PUBLICACION WHERE NOPUBLICACION = "+pub+"")
    vendedor = cur.fetchone()[0]
-   cur.execute("INSERT INTO PREGUNTA (CONTENIDO, TIEMPOENVIADO, IDCLIENTE, IDVENDEDOR, NOPUBLICACION) VALUES (%s, %s, %s, %s, %s)", (mensaje, datetime.now(), user, vendedor, pub))
+   cur.execute("INSERT INTO PREGUNTA (CONTENIDO, IDCLIENTE, IDVENDEDOR, NOPUBLICACION) VALUES (%s, %s, %s, %s)", (mensaje, user, vendedor, pub))
    mercadolibreconnection.commit()
    
    limpiarPantalla()
@@ -1715,7 +1684,6 @@ def editarPublicacion(idPublicacion):
         valor = input("Escriba el nuevo valor\n")
         cur.execute("UPDATE PUBLICACION SET "+campo+" = '"+valor+"' where nopublicacion = " + str(idPublicacion))
         campoNumero = input("Seleccione el campo que desee modificar:\n1 = Producto -- 2 = Descripcion -- 3 = Precio -- 4 = Estado -- 5 = Stock \nPresione otra tecla para volver\n")
-    cur.execute("CALL ACTUALIZARSTOCK("+str(idPublicacion)+")")
     mercadolibreconnection.commit()
     print("¡Datos actualizados correctamente!")
 
@@ -1826,9 +1794,10 @@ def registrarTarjeta(user):
       mes = opcionnumerica()
       print("\nAnio de Vencimiento: ")
       anio = opcionnumerica()
+      dia = 1
 
       if 1 <= int(mes) <= 12 and anio.isnumeric() == True:
-         if int(mes) > fecha_actual.month and int(anio) >= fecha_actual.year:
+         if verificar_tarjeta_vencida(int(anio), int(mes), dia) == False:
             break
          else:
             limpiarPantalla()
@@ -1836,10 +1805,11 @@ def registrarTarjeta(user):
             return None
       else:
          print("Ingrese el mes y anio correcto")
-
+   
+   limpiarPantalla()
    print("\nAgregando Tarjeta...")
 
-   cur.execute("INSERT INTO TARJETA (NUMERO, MARCA, CVV, FECHAVENCIMIENTO, USERID) VALUES ('"+creditcard+"','"+tipo+"',"+cvv+",'"+anio+"-"+mes+"-01','"+user+"')")
+   cur.execute("INSERT INTO TARJETA (NUMERO, MARCA, CVV, FECHAVENCIMIENTO, USERID) VALUES ('"+creditcard+"','"+tipo+"',"+cvv+",'"+anio+"-"+mes+"-"+str(dia)+"','"+user+"')")
    mercadolibreconnection.commit()
 
    print("Tarjeta Agregada con éxito!")
@@ -1879,7 +1849,8 @@ def mostrarMetodosPago(user):
          print("\nMetodo de Pago # ",contador)
          print("Tarjeta No.",tarjetas[card][1])
          print(tarjetas[card][2])
-         print("Vence:",tarjetas[card][4])
+         anio, mes, dia = str(tarjetas[card][4]).split("-")
+         print("Vence:",anio+"/"+mes)
          print("--------------------------------")
 
 def eliminarTarjeta(user):
@@ -2066,8 +2037,52 @@ def filtrarPublicaciones():
    if op == 4:
       mostrarPublicacionfiltrada(cur,vend = busq)
       
+def verificar_tarjeta_vencida(año_expiracion, mes_expiracion, dia_expiracion):
+    # Obtener la fecha actual
+    fecha_actual = datetime.now()
+
+    # Verificar si la tarjeta está vencida
+    if año_expiracion < fecha_actual.year or \
+       (año_expiracion == fecha_actual.year and mes_expiracion < fecha_actual.month) or \
+       (año_expiracion == fecha_actual.year and mes_expiracion == fecha_actual.month and dia_expiracion < fecha_actual.day):
+        return True  # Tarjeta vencida
+    else:
+        return False  # Tarjeta no vencida
+
+def verRespuestas(user):
+   print("--- RESPUESTAS ---\n")
+
+   consulta = "SELECT PREG.IDVENDEDOR AS VENDEDOR, MENSAJERESPUESTA AS RESPUESTA, FECHAHORARESPUESTA AS RESPONDIO, CONTENIDO AS TU_PREGUNTA, TIEMPOENVIADO AS ENVIADO, NOMBREPUBLICACION AS PUBLICACION FROM PREGUNTA PREG NATURAL JOIN PUBLICACION PUB WHERE IDCLIENTE = '"+user+"'"
+   cur.execute(consulta)
+   resultado = cur.fetchall()
+
+   if len(resultado) == 0:
+      print("Hasta el momento no ha realizado preguntas!")
+      return
+   
+   for VENDEDOR, RESPUESTA, RESPONDIO, TU_PREGUNTA, ENVIADO, PUBLICACION in resultado:
+      print("VENDEDOR:", VENDEDOR)
+
+      if RESPONDIO == None:
+         RESPONDIO = 'No ha respondido'
+      else:
+         if RESPUESTA == "":
+            RESPUESTA = "No hay respuesta"
+
+         print("RESPUESTA: ", RESPUESTA)
+      
+      print("RESPONDIO: ",RESPONDIO)
+      print("TU PREGUNTA: ",TU_PREGUNTA)
+      print("ENVIADO: ",ENVIADO)
+      print("PUBLICACION: ", PUBLICACION)
+
+      print("\n--------------------------\n")
+
+
+
 #Programa Principal
 
 imprimirMenuPrincipalInvitado()
 
 mercadolibreconnection.close()
+

@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS USUARIO (
   NOMBRE VARCHAR(10) NOT NULL,
   APELLIDO VARCHAR(10) NOT NULL,
   FECHANACIMIENTO DATE NOT NULL,
-  ESCLIENTE BOOLEAN NOT NULL,
-  ESVENDEDOR BOOLEAN NOT NULL,
+  ESCLIENTE BOOLEAN NOT NULL DEFAULT TRUE,
+  ESVENDEDOR BOOLEAN NOT NULL DEFAULT FALSE,
   EMAIL VARCHAR(50) NOT NULL,
   TELEFONO VARCHAR(10) NOT NULL,
   GENERO ENUM('Masculino','Femenino','LGBTI') NOT NULL
@@ -72,8 +72,8 @@ CREATE TABLE IF NOT EXISTS PUBLICACION (
   PRODUCTID INT NOT NULL,
   IDVENDEDOR VARCHAR(50) NOT NULL,
   PRECIOVENTA FLOAT NOT NULL,
-  ESTADO ENUM('Activa','Agotado'),
-  FECHAPUBLICACION DATE NOT NULL,
+  ESTADO ENUM('Activa','Agotado') NOT NULL DEFAULT 'Activa',
+  FECHAPUBLICACION DATE NOT NULL DEFAULT(CURRENT_DATE),
   NOMBREPUBLICACION VARCHAR(50) NOT NULL,
   STOCK INT NOT NULL,
   PRIMARY KEY(NOPUBLICACION),
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS VISUALIZACION_PUBLICACIONES (
   REGID INT AUTO_INCREMENT PRIMARY KEY,
   USERID VARCHAR(50),
   NOPUBLICACION  int,
-  FECHA DATE,
+  FECHA DATE NOT NULL DEFAULT(CURRENT_DATE),
   CONSTRAINT fk_userid_vispub FOREIGN KEY (USERID) REFERENCES USUARIO (USERID) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT fk_nopublicacion_vispub FOREIGN KEY (NOPUBLICACION) REFERENCES PUBLICACION (NOPUBLICACION) ON DELETE CASCADE
 );
@@ -97,13 +97,14 @@ CREATE TABLE IF NOT EXISTS PAGO (
   CUOTA INT NOT NULL,
   CARDNUMBER VARCHAR(20),
   IDCLIENTE VARCHAR(50),
+  FECHAPAGO DATE NOT NULL DEFAULT (CURRENT_DATE),
   CONSTRAINT fk_idcliente_pago FOREIGN KEY (IDCLIENTE) REFERENCES CLIENTE (USERID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS PREGUNTA (
   IDPREGUNTA int  AUTO_INCREMENT,
   CONTENIDO VARCHAR(50) NOT NULL,
-  TIEMPOENVIADO DATETIME NOT NULL,
+  TIEMPOENVIADO DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
   FECHAHORARESPUESTA DATETIME DEFAULT NULL,
   MENSAJERESPUESTA VARCHAR(100) DEFAULT NULL,
   IDCLIENTE VARCHAR(50),
@@ -128,8 +129,8 @@ CREATE TABLE IF NOT EXISTS CUPON (
 
 CREATE TABLE IF NOT EXISTS ORDEN (
   ORDERID INT AUTO_INCREMENT PRIMARY KEY,
-  FECHACREACION DATE NOT NULL,
-  ESTADO ENUM('Pendiente','En curso','Completada') NOT NULL,
+  FECHACREACION DATE NOT NULL DEFAULT (CURRENT_DATE),
+  ESTADO ENUM('Pendiente','En curso','Completada') NOT NULL DEFAULT 'Pendiente',
   CANTIDADPRODUCTO INT NOT NULL,
   IMPORTE FLOAT NOT NULL,
   COSTOENVIO FLOAT NOT NULL,
@@ -155,12 +156,12 @@ CREATE TABLE IF NOT EXISTS ORDEN (
 
 CREATE TABLE IF NOT EXISTS RECLAMO (
   ID INT AUTO_INCREMENT PRIMARY KEY,
-  TIPO VARCHAR(20),
-  ESTADO ENUM('Abierto','Cerrado'),
-  CLIENTEID VARCHAR(50),
+  TIPO VARCHAR(20) NOT NULL,
+  ESTADO ENUM('Abierto','Cerrado') NOT NULL DEFAULT 'Abierto',
+  CLIENTEID VARCHAR(50) NOT NULL,
   VENDEDORID VARCHAR(50),
   ORDERID INT,
-  FECHAINGRESO DATE NOT NULL,
+  FECHAINGRESO DATE NOT NULL DEFAULT (CURRENT_DATE),
   CONSTRAINT fk_clienteid_reclamo FOREIGN KEY (CLIENTEID) REFERENCES CLIENTE (USERID) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT fk_vendedorid_reclamo FOREIGN KEY (VENDEDORID) REFERENCES VENDEDOR (USERID) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT fk_orderid_reclamo FOREIGN KEY (ORDERID) REFERENCES ORDEN (ORDERID)
@@ -168,11 +169,11 @@ CREATE TABLE IF NOT EXISTS RECLAMO (
 
 CREATE TABLE IF NOT EXISTS FACTURA (
 FACTID INT AUTO_INCREMENT PRIMARY KEY,
-FECHA DATE,
+FECHA DATE NOT NULL DEFAULT (CURRENT_DATE),
 DESCRIPCION VARCHAR(100),
 IDVENDEDOR VARCHAR(50),
 IDCLIENTE VARCHAR(50),
-IDORDEN INT,
+IDORDEN INT NOT NULL,
 CONSTRAINT fk_idvendedor_factura FOREIGN KEY (IDVENDEDOR) REFERENCES VENDEDOR(USERID) ON DELETE SET NULL ON UPDATE CASCADE,
 CONSTRAINT fk_idcliente_factura FOREIGN KEY (IDCLIENTE) REFERENCES CLIENTE(USERID) ON DELETE SET NULL ON UPDATE CASCADE,
 CONSTRAINT fk_idorden_factura FOREIGN KEY (IDORDEN) REFERENCES ORDEN(ORDERID) 
@@ -188,30 +189,381 @@ USERID VARCHAR(50)  NOT NULL,
 CONSTRAINT fk_userid_tarjeta FOREIGN KEY (USERID) REFERENCES USUARIO(USERID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- TRIGGERS
+
+DELIMITER $$
+CREATE TRIGGER IF NOT EXISTS NUEVOCLIENTE
+AFTER INSERT ON USUARIO
+FOR EACH ROW BEGIN
+INSERT INTO CLIENTE VALUES (NEW.USERID);
+END $$
+DELIMITER $$
+
+DELIMITER $$
+CREATE TRIGGER IF NOT EXISTS NUEVOVENDEDOR
+BEFORE INSERT ON PUBLICACION
+FOR EACH ROW BEGIN
+    
+    UPDATE USUARIO
+    SET ESVENDEDOR = TRUE
+    WHERE USERID = NEW.IDVENDEDOR;
+
+    INSERT IGNORE INTO VENDEDOR(USERID) VALUES (NEW.IDVENDEDOR);
+
+END $$
+DELIMITER $$
+
+DELIMITER $$
+CREATE TRIGGER IF NOT EXISTS ACTUALIZAR_ESTADO_PUBLICACION
+BEFORE UPDATE ON PUBLICACION
+FOR EACH ROW BEGIN
+
+	IF NEW.STOCK >0 THEN
+		SET NEW.estado = 'Activa';
+	else
+		SET new.estado = 'Agotado';
+    END IF;
+
+END $$
+DELIMITER $$
+
+DELIMITER $$
+CREATE TRIGGER IF NOT EXISTS GENERARORDEN
+AFTER INSERT ON ORDEN
+FOR EACH ROW BEGIN
+UPDATE PUBLICACION
+SET STOCK = STOCK - NEW.CANTIDADPRODUCTO
+WHERE NOPUBLICACION = NEW.IDPUBLICACION;
+
+UPDATE CUPON
+SET VECES = VECES - 1
+WHERE ID = NEW.IDCUPON;
+
+UPDATE VENDEDOR
+SET REPUTACION = ROUND((SELECT AVG(ESTRELLASVENDEDOR) AS PROMEDIO FROM ORDEN WHERE IDVENDEDOR = new.IDVENDEDOR),2)
+WHERE USERID = new.IDVENDEDOR;
+
+END $$
+DELIMITER $$
+
+DELIMITER $$
+CREATE TRIGGER IF NOT EXISTS ACTUALIZARREPUTACION
+AFTER UPDATE ON ORDEN
+FOR EACH ROW BEGIN
+UPDATE VENDEDOR
+SET REPUTACION = ROUND((SELECT AVG(ESTRELLASVENDEDOR) AS PROMEDIO FROM ORDEN WHERE IDVENDEDOR = new.IDVENDEDOR),2)
+WHERE USERID = new.IDVENDEDOR;
+END $$
+DELIMITER $$
+
+-- PROCEDURES
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS CREARCUENTA (IN USUARIO VARCHAR(50), IN PASS VARCHAR(50), 
+IN NOMBRE VARCHAR(10), IN APELLIDO VARCHAR(10), IN FECHANACIMIENTO DATE, IN EMAIL VARCHAR(50), IN TELEFONO VARCHAR(10), IN GENERO ENUM ('Masculino', 'Femenino', 'LGBT'))
+BEGIN
+
+    DECLARE v_id_usuario INT;
+    DECLARE v_numero_filas INT;
+
+    START TRANSACTION;
+
+    -- Inserto los datos
+
+    INSERT INTO USUARIO (USERID,PASS,NOMBRE,APELLIDO,FECHANACIMIENTO, EMAIL,TELEFONO,GENERO) VALUES
+    (USUARIO, PASS, NOMBRE, APELLIDO, FECHANACIMIENTO, EMAIL, TELEFONO, GENERO);
+
+    SET v_id_usuario = LAST_INSERT_ID();
+
+    -- Obtener el número de filas afectadas
+    SELECT ROW_COUNT() INTO v_numero_filas;
+
+    -- Comprobar si se insertó al menos una fila
+    IF v_numero_filas = 1 THEN
+        -- Éxito: confirmar la transacción
+        COMMIT;
+        SELECT CONCAT('Inserción exitosa. ID de usuario: ', v_id_usuario) AS mensaje;
+    ELSE
+        -- Error: deshacer la transacción
+        ROLLBACK;
+        SELECT 'Error al insertar datos. Transacción deshecha.' AS mensaje;
+    END IF;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS REALIZARCOMPRA (IN IDCUPON INT, IN PRODUCTID INT, IN IDPAGO INT,
+IN CANTIDADPRODUCTO INT, IN IDPUBLICACION INT, IN IDCLIENTE VARCHAR(50), IN IDVENDEDOR VARCHAR(50),
+IN IMPORTE FLOAT, IN IDDIRECCION INT, IN COSTOENVIO FLOAT, IN FECHAENTREGA DATE)
+BEGIN
+
+    DECLARE v_id_orden INT;
+    DECLARE v_numero_filas INT;
+
+    START TRANSACTION;
+
+    -- Inserto los datos
+
+    INSERT INTO ORDEN (IDCUPON, PRODUCTID, IDPAGO, CANTIDADPRODUCTO, IDPUBLICACION, IDCLIENTE, IDVENDEDOR,
+    IMPORTE, IDDIRECCION, COSTOENVIO, FECHAENTREGA) VALUES
+    (IDCUPON, PRODUCTID, IDPAGO, CANTIDADPRODUCTO, IDPUBLICACION, IDCLIENTE, IDVENDEDOR,
+    IMPORTE, IDDIRECCION, COSTOENVIO, FECHAENTREGA);
+
+    SET v_id_orden = LAST_INSERT_ID();
+
+    -- Obtener el número de filas afectadas
+    SELECT ROW_COUNT() INTO v_numero_filas;
+
+    -- Comprobar si se insertó al menos una fila
+    IF v_numero_filas = 1 THEN
+        -- Éxito: confirmar la transacción
+        COMMIT;
+        SELECT CONCAT('Inserción exitosa. ID de Orden: ', v_id_orden) AS mensaje;
+    ELSE
+        -- Error: deshacer la transacción
+        ROLLBACK;
+        SELECT 'Error al insertar datos. Transacción deshecha.' AS mensaje;
+    END IF;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS CALIFICARCOMPRA (IN NEW_ESTRELLASPRODUCTO INT, IN NEW_ESTRELLASVENDEDOR INT, IN NEW_COMENTARIO VARCHAR(100), IN IDORDEN INT)
+BEGIN
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+		SELECT 'ERROR';
+        ROLLBACK;
+	END;
+
+    START TRANSACTION;
+
+    UPDATE ORDEN
+    SET ESTRELLASPRODUCTO = NEW_ESTRELLASPRODUCTO,
+    ESTRELLASVENDEDOR = NEW_ESTRELLASVENDEDOR,
+    COMENTARIO = NEW_COMENTARIO
+    WHERE ORDERID = IDORDEN;
+    SELECT 'OK';
+    COMMIT; 
+
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS NUEVADIRECCION (IN PARROQUIA VARCHAR(50), IN REFERENCIAS VARCHAR(200),
+IN IDCIUDAD INT, IN USERID VARCHAR(50))
+BEGIN
+
+    DECLARE v_id_direccion INT;
+    DECLARE v_numero_filas INT;
+
+    START TRANSACTION;
+
+    -- Inserto los datos
+
+    INSERT INTO DIRECCION (PARROQUIA, REFERENCIAS, IDCIUDAD, USERID) VALUES
+    (PARROQUIA, REFERENCIAS, IDCIUDAD, USERID);
+
+    SET v_id_direccion = LAST_INSERT_ID();
+
+    -- Obtener el número de filas afectadas
+    SELECT ROW_COUNT() INTO v_numero_filas;
+
+    -- Comprobar si se insertó al menos una fila
+    IF v_numero_filas = 1 THEN
+        -- Éxito: confirmar la transacción
+        COMMIT;
+        SELECT CONCAT('Inserción exitosa. Direccion: ', v_id_direccion) AS mensaje;
+    ELSE
+        -- Error: deshacer la transacción
+        ROLLBACK;
+        SELECT 'Error al insertar datos. Transacción deshecha.' AS mensaje;
+    END IF;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS ELIMINARDIRECCION (IN DIRECCION_ID INT)
+BEGIN
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+		SELECT 'ERROR';
+        ROLLBACK;
+	END;
+
+    START TRANSACTION;
+
+    DELETE FROM DIRECCION
+    WHERE ID = DIRECCION_ID;
+
+    SELECT 'OK';
+    COMMIT; 
+
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS NUEVORECLAMO (IN TIPO VARCHAR(20),
+IN CLIENTEID VARCHAR(50), IN VENDEDORID VARCHAR(50), IN ORDERID INT)
+BEGIN
+
+    DECLARE v_id_reclamo INT;
+    DECLARE v_numero_filas INT;
+
+    START TRANSACTION;
+
+    -- Inserto los datos
+
+    INSERT INTO RECLAMO (TIPO, CLIENTEID, VENDEDORID, ORDERID) VALUES
+    (TIPO, CLIENTEID, VENDEDORID, ORDERID);
+
+    SET v_id_reclamo = LAST_INSERT_ID();
+
+    -- Obtener el número de filas afectadas
+    SELECT ROW_COUNT() INTO v_numero_filas;
+
+    -- Comprobar si se insertó al menos una fila
+    IF v_numero_filas = 1 THEN
+        -- Éxito: confirmar la transacción
+        COMMIT;
+        SELECT CONCAT('Inserción exitosa. Reclamo: ', v_id_reclamo) AS mensaje;
+    ELSE
+        -- Error: deshacer la transacción
+        ROLLBACK;
+        SELECT 'Error al insertar datos. Transacción deshecha.' AS mensaje;
+    END IF;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS EMITIRFACTURA (IN DESCRIPCION VARCHAR(100), IN IDVENDEDOR VARCHAR(50), 
+IN IDCLIENTE VARCHAR(50), IN IDORDEN INT)
+BEGIN
+
+    DECLARE v_id_factura INT;
+    DECLARE v_numero_filas INT;
+
+    START TRANSACTION;
+
+    -- Inserto los datos
+
+    INSERT INTO FACTURA (DESCRIPCION, IDVENDEDOR, IDCLIENTE, IDORDEN) VALUES
+    (DESCRIPCION, IDVENDEDOR, IDCLIENTE, IDORDEN);
+
+    SET v_id_factura = LAST_INSERT_ID();
+
+    -- Obtener el número de filas afectadas
+    SELECT ROW_COUNT() INTO v_numero_filas;
+
+    -- Comprobar si se insertó al menos una fila
+    IF v_numero_filas = 1 THEN
+        -- Éxito: confirmar la transacción
+        COMMIT;
+        SELECT CONCAT('Inserción exitosa. Factura: ', v_id_factura) AS mensaje;
+    ELSE
+        -- Error: deshacer la transacción
+        ROLLBACK;
+        SELECT 'Error al insertar datos. Transacción deshecha.' AS mensaje;
+    END IF;
+END $$
+DELIMITER ;
+
+-- PROCEDURES PRUEBA
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS CAMBIAR_ESTADO_RECLAMO (IN RECLAMO_ID INT, IN NUEVO_ESTADO ENUM ('Abierto','Cerrado'))
+BEGIN
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+		SELECT 'ERROR';
+        ROLLBACK;
+	END;
+
+    START TRANSACTION;
+
+    UPDATE RECLAMO
+    SET ESTADO = NUEVO_ESTADO
+    WHERE RECLAMO.ID = RECLAMO_ID;
+    
+    SELECT 'OK';
+    COMMIT; 
+
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS CAMBIAR_TIPO_PUBLICACION (IN PUBLICACION_ID INT, IN NUEVO_TIPO ENUM ('Gratuita','Clásica','Premium'))
+BEGIN
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+		SELECT 'ERROR';
+        ROLLBACK;
+	END;
+
+    START TRANSACTION;
+
+    UPDATE PUBLICACION
+    SET TIPOEXPOSICION = NUEVO_TIPO
+    WHERE NOPUBLICACION = PUBLICACION_ID;
+    SELECT 'OK';
+    COMMIT; 
+
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS CAMBIAR_ESTADO_ORDEN (IN ORDEN_ID INT, IN NUEVO_ESTADO ENUM ('Pendiente','En Curso','Completada'))
+BEGIN
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+		SELECT 'ERROR';
+        ROLLBACK;
+	END;
+
+    START TRANSACTION;
+
+    UPDATE ORDEN
+    SET ESTADO = NUEVO_ESTADO
+    WHERE ORDERID = ORDEN_ID;
+    SELECT 'OK';
+    COMMIT; 
+
+END $$
+DELIMITER ;
+
+#Para llamar los SP
+-- CALL CAMBIAR_ESTADO_RECLAMO();
+-- CALL  CAMBIAR_TIPO_PUBLICACION();
+-- CALL CAMBIAR_ESTADO_ORDEN();
+
+-- VISTAS
+CREATE OR REPLACE VIEW generousuarios AS
+SELECT genero,
+    CONCAT(ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM usuario)), 0), '%') as porcentaje
+FROM usuario
+GROUP BY genero;
+
 -- Insercion Datos
-
-insert into USUARIO values('ownyag','12345','Owen','Yagual','2002-01-10',true,true,'ownyag@live.com','0987654321','Masculino'); 
-insert into USUARIO values('malvaradox','54321','Mario','Alvarado','2003-11-14',true,true,'malvaradox@live.com','0912345678', 'Masculino');
-insert into USUARIO values('xavicam','aaaaa','Xavier','Camacho','2002-04-01',true,true,'xavicam@live.com','0913246587', 'Masculino');
-insert into USUARIO values('javirod','11111','Javier','Rodriguez','2005-03-01',true,true,'javirod@live.com','0915364875','Masculino');
-insert into USUARIO values('naybor','12222222','Nayeli','Borbor','2001-02-01',true,false,'naybor@live.com','0958455652', 'Femenino');
-insert into USUARIO values('luchoont','12229871','Luis','Ontaneda','1990-05-01',true,false,'luchont@yahoo.com','0985128912','LGBTI');
-insert into USUARIO values('nickfigu','122253','Nick','Figueroa','2002-07-09',true,false,'nickfigur@hotmail.com','0921289128','Masculino');
-insert into USUARIO values('charlesrod','1256ga22','Carlos','Rodriguez','2010-05-12',true,false,'charlesrod@gmail.com','0989125982','Masculino');
-insert into USUARIO values('joelvill','1asdsa2222','Joel','Villon','2004-04-01',true,false,'joelvilla@gmail.com','0985181891','Masculino');
-insert into USUARIO values('angivel','122xv2092','Angie','Velastegui','2007-04-01',true,false,'angivel@live.com','0985181895','Femenino');
-insert into USUARIO values('angon','oiadsa','Angel','Ontaneda','2011-05-01',true,true,'angon@live.com','0923748372','LGBTI');
-insert into USUARIO values('ferchon','5ioqw','Fernando','Chacon','2015-03-01',true,true,'ferchon@live.com','1234365465','Masculino');
-insert into USUARIO values('jorgquij','aasdaaaa','Jorge','Quijije','2002-09-01',true,true,'jorguijij@icloud.com','0998724354','Masculino');
-insert into USUARIO values('arperez','11ads','Ariana','Perez','2002-12-01',true,true,'arperez@live.com','3432345676', 'Femenino');
-insert into USUARIO values('fiotorres','1x23zx45','Fiorella','Torres','1980-05-07',true,true,'fiotorres@live.com','0983546753','LGBTI');
-insert into USUARIO values('daniroca','5s43bcds21','Daniela','Roca','1980-10-05',true,true,'daniroca@outlook.es','0956473847','Femenino');
-
-insert into CLIENTE values
-('ownyag'),('malvaradox'),('xavicam'),('javirod'),('naybor'),('luchoont'),('nickfigu'),('charlesrod'),('joelvill'),('angivel'),('angon'),('ferchon'),('jorgquij'),('arperez'),('fiotorres'),('daniroca');
-
-insert into VENDEDOR(USERID) values
-('ownyag'),('malvaradox'),('xavicam'),('javirod'),('angon'),('ferchon'),('jorgquij'),('arperez'),('fiotorres'),('daniroca');
+INSERT INTO USUARIO (USERID, PASS, NOMBRE, APELLIDO, FECHANACIMIENTO, EMAIL, TELEFONO, GENERO) 
+VALUES ('ownyag','12345','Owen','Yagual','2002-01-10','ownyag@live.com','0987654321','Masculino'),
+('malvaradox','54321','Mario','Alvarado','2003-11-14','malvaradox@live.com','0912345678', 'Masculino'),
+('xavicam','aaaaa','Xavier','Camacho','2002-04-01','xavicam@live.com','0913246587', 'Masculino'),
+('javirod','11111','Javier','Rodriguez','2005-03-01','javirod@live.com','0915364875','Masculino'),
+('naybor','12222222','Nayeli','Borbor','2001-02-01','naybor@live.com','0958455652', 'Femenino'),
+('luchoont','12229871','Luis','Ontaneda','1990-05-01','luchont@yahoo.com','0985128912','LGBTI'),
+('nickfigu','122253','Nick','Figueroa','2002-07-09','nickfigur@hotmail.com','0921289128','Masculino'),
+('charlesrod','1256ga22','Carlos','Rodriguez','2010-05-12','charlesrod@gmail.com','0989125982','Masculino'),
+('joelvill','1asdsa2222','Joel','Villon','2004-04-01','joelvilla@gmail.com','0985181891','Masculino'),
+('angivel','122xv2092','Angie','Velastegui','2007-04-01','angivel@live.com','0985181895','Femenino'),
+('angon','oiadsa','Angel','Ontaneda','2011-05-01','angon@live.com','0923748372','LGBTI'),
+('ferchon','5ioqw','Fernando','Chacon','2015-03-01','ferchon@live.com','1234365465','Masculino'),
+('jorgquij','aasdaaaa','Jorge','Quijije','2002-09-01','jorguijij@icloud.com','0998724354','Masculino'),
+('arperez','11ads','Ariana','Perez','2002-12-01','arperez@live.com','3432345676', 'Femenino'),
+('fiotorres','1x23zx45','Fiorella','Torres','1980-05-07','fiotorres@live.com','0983546753','LGBTI'),
+('daniroca','5s43bcds21','Daniela','Roca','1980-10-05','daniroca@outlook.es','0956473847','Femenino');
 
 insert into PAIS values
 (901,'Ecuador'),(902,'Venezuela'),(903,'Colombia'),(904,'Brasil'),(905,'Uruguay'),
@@ -256,7 +608,7 @@ insert into PRODUCTO (NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA) values
     
     INSERT INTO PUBLICACION(DESCRIPCION,TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,FECHAPUBLICACION,NOMBREPUBLICACION,STOCK) values
     ('El Galaxy S23: lo último en tecnología móvil. Pantalla AMOLED de 6,1 pulgadas, procesador Snapdragon 8 Gen 2, cámara de 50MP.',
-    'Gratuita', 1,'ownyag',612.50,'Activa','2023-12-12','SAMSUNG GALAXY A70 SELLADO',2),
+    'Gratuita', 1,'ownyag',612.50,'Activa','2023-12-12','SAMSUNG GALAXY A70 SELLADO',4),
     ('INSPIRON 3910: rendimiento y portabilidad. Procesador Intel Core i5 de 11.ª generación, pantalla de 15,6 pulgadas.',
     'Gratuita',2,'malvaradox',800,'Activa','2022-10-23','DELL INSPIRON 3910 NUEVO',3),
     ('La Nitro 5: rendimiento potente y diseño elegante. Procesador Intel Core i7 de 12.ª generación, tarjeta gráfica NVIDIA RTX 3060',
@@ -266,13 +618,13 @@ insert into PRODUCTO (NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA) values
     ('Las Forum Low: versátiles y combinables. Diseño retro, estilo minimalista.', 'Gratuita',5,'angon',210,
     'Activa','2022-11-11','ADIDAS FORUM LOW',5),
     ('El Millennium Falcon: el set de Lego más grande de la historia. 7541 piezas, nave espacial a escala 1:144.',
-    'Gratuita',6,'ferchon',34.50,'Activa','2023-11-14','MILLENNIUM FALCOM APROVECHA',1),
+    'Gratuita',6,'ferchon',34.50,'Activa','2023-11-14','MILLENNIUM FALCOM APROVECHA',3),
     ('La mesa Pycca: sencilla y elegante. Diseño moderno, construcción resistente.',
     'Gratuita',7,'jorgquij',15.60,'Activa','2023-10-10','MESA PYCCA PARA LA FAMILIA',10),
     ('El iPhone 15 Pro Max: lo último en tecnología Apple. Pantalla OLED de 6,7 pulgadas, procesador A16 Bionic, cámara triple de 48MP.',
     'Gratuita',8,'arperez',1299.99,'Activa','2023-11-26','IPHONE 15 PRO MAX TRAIDA DESDE USA',5),
     ('Los faros LED Philips: más visibilidad y seguridad. Iluminación potente y uniforme, diseño elegante.',
-    'Gratuita',9,'fiotorres',11.23,'Activa','2022-11-13','FAROS LED PHILLIPS',2),
+    'Gratuita',9,'fiotorres',11.23,'Activa','2022-11-13','FAROS LED PHILLIPS',3),
     ('La cámara de reversa Anker: más seguridad al estacionar. Imágenes nítidas y claras, pantalla de 5 pulgadas.',
     'Gratuita',10,'daniroca',300,'Activa','2023-09-09','CAMARA REVERSA',8);
     
@@ -280,12 +632,12 @@ insert into PRODUCTO (NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA) values
 	(1,'ownyag','2023-07-07'),(2,'malvaradox','2023-07-09'),(3,'xavicam','2023-07-12'),(4,'javirod','2023-07-15'),(5,'naybor','2023-08-16'),
     (2,'luchoont','2023-07-28'),(7,'nickfigu','2023-08-01'),(7,'charlesrod','2023-08-07'),(3,'joelvill','2023-08-12'),(8,'angivel','2023-08-15');
     
-INSERT INTO PAGO(IDCLIENTE,MONTO,METODO,CARDNUMBER,CUOTA) VALUES
-('ownyag',210,'Depósito',null,1),
-('malvaradox',612.50,'Depósito',null,1),
-('xavicam',34.50,'Depósito',null,1),
-('javirod',22.46,'Depósito',null,1),
-('naybor',980,'Depósito',null,1);
+INSERT INTO PAGO(IDCLIENTE,MONTO,METODO,CARDNUMBER,CUOTA, FECHAPAGO) VALUES
+('ownyag',210,'Depósito',null,1,'2023-12-26'),
+('malvaradox',612.50,'Depósito',null,1, '2023-12-11'),
+('xavicam',34.50,'Depósito',null,1,'2023-12-21'),
+('javirod',22.46,'Depósito',null,1,'2023-12-15'),
+('naybor',980,'Depósito',null,1,'2023-12-13');
 
 INSERT INTO PREGUNTA (IDCLIENTE, IDVENDEDOR, NOPUBLICACION,  CONTENIDO, TIEMPOENVIADO, FECHAHORARESPUESTA, MENSAJERESPUESTA) VALUES
   ('xavicam','arperez',8, '¿El producto incluye garantía?', '2023-12-07 21:30:00', '2023-12-07 21:40:00','Sí, todos nuestros productos tienen garantía de 1 año.'),
@@ -314,51 +666,9 @@ INSERT INTO FACTURA (FECHA, DESCRIPCION, IDVENDEDOR, IDCLIENTE, IDORDEN) VALUES
 ('2023-12-14','COMPRA DE PRODUCTOS','ownyag','malvaradox',1);
 
 INSERT INTO TARJETA (NUMERO, MARCA, CVV, FECHAVENCIMIENTO, USERID) VALUES
-('5144 2637 4859 47586','MASTERCARD','067','2025-01-01','malvaradox')
+('5144 2637 4859 47586','MASTERCARD','067','2025-01-01','malvaradox');
 
--- TRIGGERS
-DELIMITER $$
-CREATE TRIGGER GENERARORDEN
-BEFORE INSERT ON ORDEN
-FOR EACH ROW BEGIN
-UPDATE PUBLICACION
-SET STOCK = STOCK - NEW.CANTIDADPRODUCTO
-WHERE NOPUBLICACION = NEW.IDPUBLICACION;
---
-UPDATE PUBLICACION
-SET ESTADO = 'Agotado'
-WHERE STOCK = 0 AND NOPUBLICACION = NEW.IDPUBLICACION;
+-- INDICES
 
-UPDATE CUPON
-SET VECES = VECES - 1
-WHERE ID = NEW.IDCUPON;
-
-END $$
-DELIMITER $$
-
-DELIMITER $$
-CREATE TRIGGER ACTUALIZARREPUTACION
-AFTER UPDATE ON ORDEN
-FOR EACH ROW BEGIN
-UPDATE VENDEDOR
-SET REPUTACION = (SELECT AVG(ESTRELLASVENDEDOR) AS PROMEDIO FROM ORDEN WHERE IDVENDEDOR = new.IDVENDEDOR)
-WHERE USERID = new.IDVENDEDOR;
-END $$
-DELIMITER $$
-
--- PROCEDURES
-
-DELIMITER $$
-CREATE PROCEDURE ACTUALIZARSTOCK (IN IDPUBLICACION INT)
-BEGIN
-	IF (SELECT STOCK FROM PUBLICACION WHERE NOPUBLICACION = IDPUBLICACION) >0 THEN
-		UPDATE publicacion
-		SET estado = 'Activa'
-		WHERE NOPUBLICACION = IDPUBLICACION;
-	else
-    UPDATE publicacion
-		SET estado = 'Agotado'
-		WHERE NOPUBLICACION = IDPUBLICACION;
-    END IF;
-END;
-$$
+ALTER TABLE PRODUCTO
+ADD INDEX idx_marca (marca);
