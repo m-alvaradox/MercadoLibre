@@ -23,7 +23,7 @@ Sistema: Mercado Libre
 
 #### Stored Procedures (Procedimientos)
 
-| NOMBRE   | PARÁMETROS   |
+| Nombre   | Parámetros   |
 | ------------ | ------------ |
 | CREARCUENTA  | usuario, password, nombre, apellido, fechanacimiento, email, telefono, genero  |
 | ACTUALIZAR_CUENTA  |   |
