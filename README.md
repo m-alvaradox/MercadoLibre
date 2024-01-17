@@ -13,7 +13,7 @@ Proyecto de Bases de Datos II PAO-2023
 ****
 **Aplicación**
 
-[SistemaMercadoLibre](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/SistemaMercadoLibre.py "SistemaMercadoLibre")
+[Sistema_MercadoLibre](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/Sistema_MercadoLibre.py)
 
 *Desarrollado en: Python*
 
@@ -22,14 +22,14 @@ Proyecto de Bases de Datos II PAO-2023
 ****
 **Script de la Base de Datos Mercado Libre**
 
-[ScriptMercadoLibre](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/ScriptMercadoLibre.sql "Script Mercado Libre")
+[Script_MercadoLibre](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/Script_MercadoLibre.sql)
 
 ****
 **Documentos**
 
 👉 [Documentación](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/Documentaci%C3%B3n_MercadoLibre.md)
 
-👉 [Manual de Usuario](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/Manual_Usuario.md)
+👉 [Manual de Usuario](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/Manual_Usuario_MercadoLibre.md)
 
 👉 [Schema](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/Schema_MercadoLibre.pdf)
 
