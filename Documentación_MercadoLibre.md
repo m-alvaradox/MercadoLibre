@@ -1,8 +1,15 @@
 # Documentación
 Sistema: Mercado Libre
 
+**Índice**   
+1. [Triggers](#id1)
+2. [Views](#id2)
+3. [Procedures](#id3)
+4. [Índices](#id4)
+5. [Usuarios y Privilegios](#id5)
+
 ### Data Definition Language (DDL)
-#### Triggers (Disparadores)
+#### Triggers (Disparadores) <a name="id1"></a>
 |  Nombre | Evento  | Tabla   | Tiempo   | Descripción   |
 | ------------ | ------------ | ------------ | ------------ | ------------ |
 | GENERARORDEN   | INSERT  | ORDEN  | AFTER  |  Se actualiza el stock disponible y la cantidad de veces que puede aplicar un cupón al generar una orden |
@@ -11,7 +18,7 @@ Sistema: Mercado Libre
 | NUEVOCLIENTE    | INSERT   | USUARIO   | AFTER  | Todo nuevo usuario es considerado cliente  |
 | NUEVOVENDEDOR  | INSERT   | PUBLICACION  | BEFORE  | El usuario se convierte en vendedor cuando realiza por primera vez una publicación   |
 
-#### Views (Reportes)
+#### Views (Reportes) <a name="id2"></a>
 | Nombre  | Descripción  |
 | ------------ | ------------ |
 | GENERO_USUARIOS   |  Define un porcentaje de cada género en base a los usuarios registrados en la base de datos |
@@ -21,7 +28,7 @@ Sistema: Mercado Libre
 | INTERES_USUARIOS | Define un porcentaje en base a las visualizaciones de productos por categoría  |
 | CALIDAD_MERCADOLIBRE | Estima la credibilidad del sistema de Mercado Libre a través de una vista que mostrará el promedio de todas las estrellas producto y vendedor de todas la órdenes. Además, a través de condiciones se mostrará la calidad del servicio (Muy mala, Mala, Regular, Buena, Muy Buena) |
 
-#### Stored Procedures (Procedimientos)
+#### Stored Procedures (Procedimientos) <a name="id3"></a>
 
 | Nombre   | Parámetros   |
 | ------------ | ------------ |
@@ -45,7 +52,7 @@ Sistema: Mercado Libre
 
 
 
-#### Índices
+#### Índices <a name="id4"></a>
 
 | Índice  | Tabla   | Columnas  | Justificación
 | ------------ | ------------ | ------------ | ------------ |
@@ -56,7 +63,7 @@ Sistema: Mercado Libre
 |   | Pais  | nombrepais  |  |
 
 
-### Control y Seguridad (DCL)
+### Control y Seguridad (DCL) <a name="id5"></a>
 
 | Usuario  | Contraseña   | Descripción  | Permisos
 | ------------ | ------------ | ------------ | ------------ |
