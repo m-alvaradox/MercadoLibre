@@ -1220,8 +1220,11 @@ def crearpublicacion(user):
    limpiarPantalla()
    print("Creando Publicacion...")
    cur.execute("INSERT INTO PUBLICACION (DESCRIPCION,TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,NOMBREPUBLICACION,STOCK) VALUES ('"+descrpicion+"','"+tipoExposicion+"','"+idProducto+"','"+user+"','"+precio+"','Activa','"+nombrePublicacion+"','"+stock+"')")
-   mercadolibreconnection.commit()
-   print("\nHas publicado tu venta")
+   args = descrpicion,tipoExposicion,idProducto,user,precio,"Activa",datetime.now(),nombrePublicacion,stock
+   cur.callproc("crearPublicacion", args)
+   cur.execute("SELECT LAST_INSERT_ID()")
+   pubid = cur.fetchone()[0]
+   print("Venta#",pubid," publicada con exito")
 
 def registrarVisualizacion(user,noPublicacion):
    cur.execute("SELECT NOPUBLICACION FROM PUBLICACION WHERE NOPUBLICACION = "+str(noPublicacion)+"")
@@ -1235,13 +1238,11 @@ def registrarVisualizacion(user,noPublicacion):
    resultado = cur.fetchone()
 
    if(resultado == None):
-      cur.execute("INSERT INTO VISUALIZACION_PUBLICACIONES (USERID, NOPUBLICACION) VALUES ('"+user+"',"+noPublicacion+")")
+      args = user,noPublicacion,datetime.now()
+      cur.callproc("registrarVisualizacion",args)
 
    else:
       cur.execute("UPDATE VISUALIZACION_PUBLICACIONES SET FECHA = now() WHERE NOPUBLICACION = "+noPublicacion+" AND USERID = '"+user+"'")
-
-   mercadolibreconnection.commit()
-
    return True
 
 def mostrarPublicacionesDeInteres(user):
