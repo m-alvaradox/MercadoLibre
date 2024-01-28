@@ -1199,10 +1199,8 @@ def crearpublicacion(user):
             return
          
          print("\nRegistrando Producto")
-         query = "INSERT INTO PRODUCTO (NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA) VALUES (%s, %s, %s, %s)"
-         values = (nProducto, mProducto, cProducto, scProducto)
-         cur.execute(query, values)
-         mercadolibreconnection.commit()
+         args1 = nProducto, mProducto, cProducto, scProducto
+         cur.callproc("registrarProducto", args1)  #Falto el SP para registrar producto
          
          print("\nProducto registrado existosamente")
       
@@ -1219,8 +1217,7 @@ def crearpublicacion(user):
       
    limpiarPantalla()
    print("Creando Publicacion...")
-   cur.execute("INSERT INTO PUBLICACION (DESCRIPCION,TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,NOMBREPUBLICACION,STOCK) VALUES ('"+descrpicion+"','"+tipoExposicion+"','"+idProducto+"','"+user+"','"+precio+"','Activa','"+nombrePublicacion+"','"+stock+"')")
-   args = descrpicion,tipoExposicion,idProducto,user,precio,"Activa",datetime.now(),nombrePublicacion,stock
+   args = descrpicion,tipoExposicion,idProducto,user,precio,nombrePublicacion,stock
    cur.callproc("crearPublicacion", args)
    cur.execute("SELECT LAST_INSERT_ID()")
    pubid = cur.fetchone()[0]
@@ -1238,11 +1235,12 @@ def registrarVisualizacion(user,noPublicacion):
    resultado = cur.fetchone()
 
    if(resultado == None):
-      args = user,noPublicacion,datetime.now()
+      args = user,noPublicacion
       cur.callproc("registrarVisualizacion",args)
 
    else:
       cur.execute("UPDATE VISUALIZACION_PUBLICACIONES SET FECHA = now() WHERE NOPUBLICACION = "+noPublicacion+" AND USERID = '"+user+"'")
+      mercadolibreconnection.commit()
    return True
 
 def mostrarPublicacionesDeInteres(user):

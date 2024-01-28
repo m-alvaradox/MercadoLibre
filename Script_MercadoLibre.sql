@@ -470,8 +470,38 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS registrarProducto(IN NOMBRE VARCHAR(50), IN MARCA VARCHAR(15), IN CATEGORIA VARCHAR(20), IN SUBCATEGORIA VARCHAR(20))
+BEGIN
+
+    DECLARE v_id_producto INT;
+    DECLARE v_numero_filas INT;
+
+    START TRANSACTION;
+    -- Insertar datos
+    INSERT INTO PRODUCTO (NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA)
+    VALUES(NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA);
+
+    SET v_id_producto = LAST_INSERT_ID();
+
+    -- Obtener el número de filas afectadas
+    SELECT ROW_COUNT() INTO v_numero_filas;
+
+    -- Comprobar si se insertó al menos una fila
+    IF v_numero_filas = 1 THEN
+        -- Éxito: confirmar la transacción
+        COMMIT;
+        SELECT CONCAT('Inserción exitosa. Producto: ', v_id_producto) AS mensaje;
+    ELSE
+        -- Error: deshacer la transacción
+        ROLLBACK;
+        SELECT 'Error al insertar datos. Transacción deshecha.' AS mensaje;
+    END IF;
+END $$
+DELIMITER ;
+
+DELIMITER $$
 CREATE PROCEDURE IF NOT EXISTS crearPublicacion(IN DESCRIPCION VARCHAR(500), IN TIPOEXPOSICION varchar(50), 
-IN PRODUCTID int, IN IDVENDEDOR varchar(50), IN PRECIOVENTA float, IN ESTADO varchar(50),IN FECHAPUBLICACION date,
+IN PRODUCTID int, IN IDVENDEDOR varchar(50), IN PRECIOVENTA float,
 IN NOMBREPUBLICACION VARCHAR(50), IN STOCK int)
 BEGIN
 
@@ -480,9 +510,9 @@ BEGIN
 
     START TRANSACTION;
     -- Insertar datos
-    INSERT INTO PUBLICACION (DESCRIPCION,TIPOEXPOSICION, PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,FECHAPUBLICACION,
+    INSERT INTO PUBLICACION (DESCRIPCION,TIPOEXPOSICION, PRODUCTID,IDVENDEDOR,PRECIOVENTA,
         NOMBREPUBLICACION,STOCK)
-    VALUES(DESCRIPCION, TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,FECHAPUBLICACION,
+    VALUES(DESCRIPCION, TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,
         NOMBREPUBLICACION,STOCK);
 
     SET v_id_publicacion = LAST_INSERT_ID();
@@ -504,16 +534,17 @@ END $$
 DELIMITER ;
 
 DELIMITER $$
-CREATE PROCEDURE IF NOT EXISTS registrarVisualizacion(IN USERID varchar(50), IN NOPUBLICACION int, IN FECHA date)
+CREATE PROCEDURE IF NOT EXISTS registrarVisualizacion(IN USERID varchar(50), IN NOPUBLICACION int)
 BEGIN
     DECLARE v_regid INT;
     DECLARE v_numero_filas INT;
-    START TRANSACTION;
-    --Insertar datos
-    INSERT INTO visualizacion_publicaciones (USERID,NOPUBLICACION,FECHA) 
-    VALUES(USERID, NOPUBLICACION, FECHA);
 
-    SET v_id_regid = LAST_INSERT_ID();
+    START TRANSACTION;
+    -- Insertar datos
+    INSERT INTO visualizacion_publicaciones (USERID,NOPUBLICACION) 
+    VALUES(USERID, NOPUBLICACION);
+
+    SET v_regid = LAST_INSERT_ID();
 
     -- Obtener el número de filas afectadas
     SELECT ROW_COUNT() INTO v_numero_filas;
@@ -620,10 +651,10 @@ ALTER TABLE PRODUCTO
 ADD INDEX idx_marca (marca);
 
 ALTER TABLE USUARIO
-ADD INDEX idx_nombre_usuario ON USUARIO(nombre);
+ADD INDEX idx_nombre_usuario (nombre);
 
 ALTER TABLE USUARIO
-ADD INDEX idx_apellido_usuario ON USUARIO(apellido);
+ADD INDEX idx_apellido_usuario (apellido);
 
 -- INSERCIONES
 INSERT INTO USUARIO (USERID, PASS, NOMBRE, APELLIDO, FECHANACIMIENTO, EMAIL, TELEFONO, GENERO) 
