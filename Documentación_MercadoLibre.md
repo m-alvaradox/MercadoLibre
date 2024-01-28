@@ -23,7 +23,6 @@ Sistema: Mercado Libre
 | ------------ | ------------ |
 | GENERO_USUARIOS   |  Define un porcentaje de cada género en base a los usuarios registrados en la base de datos |
 | EDADES_USUARIOS  | Muestre las edades actuales de los usuarios en base a la fecha de nacimiento  |
-| CUMPLEAÑEROS_DEL_MES   | Muestra los cumpleañeros del mes actual con la edad a cumplir |
 | USUARIOS_POR_PAÍS | Define un porcentaje de los usuarios por país |
 | INTERES_USUARIOS | Define un porcentaje en base a las visualizaciones de productos por categoría  |
 | CALIDAD_MERCADOLIBRE | Estima la credibilidad del sistema de Mercado Libre a través de una vista que mostrará el promedio de todas las estrellas producto y vendedor de todas la órdenes. Además, a través de condiciones se mostrará la calidad del servicio (Muy mala, Mala, Regular, Buena, Muy Buena) |
@@ -35,12 +34,13 @@ Sistema: Mercado Libre
 | CREARCUENTA  | usuario, password, nombre, apellido, fechanacimiento, email, telefono, genero  |
 | ACTUALIZAR_CUENTA  |   |
 | CANCELAR_CUENTA  |   |
-| NUEVA_PUBLICACION  |   |
+| registrarProducto  |   |
+| crearPublicacion  |   |
 | MODIFICAR_PUBLICACION  |   |
 | ELIMINAR_PUBLICACION  |   |
 | ENVIAR_PREGUNTA |   |
 | RESPONDER_PREGUNTA  |   |
-| REGISTRAR_HISTORIAL  |   |
+| registrarVisualizacion  |   |
 | REALIZARCOMPRA  |  cupon, idproducto, idpago, cantidadproducto, idpublicacion, idcliente, idvendedor, importe, iddireccion, costoenvio, fechaentrega |
 | CALIFICARCOMPRA  | estrellasproducto, estrellasvendedor, comentario,  idOrden |
 | NUEVADIRECCION  | parroquia, referencias, idCiudad, userid  |
@@ -67,9 +67,9 @@ Sistema: Mercado Libre
 
 | Usuario  | Contraseña   | Descripción  | Permisos
 | ------------ | ------------ | ------------ | ------------ |
-|   |   | Sociólogo  | Views: genero_usuarios, edades_usuarios |
-|   |   | Analista/Estratega de Marketing  | Views: calidad_mercadolibre, interes_usuarios, edades_usuarios, cumpleañeros_del_mes  |
-|   |   | Banquero del Barrio: Es quien efectúa los pagos mediante depósito en el sistema   | Views: edades_usuarios Procedures: agregar_deposito  |
-|   |   | Talento Humano: Encargado de enviar un correo de felicitación a quienes cumplen años este mes  | Views: cumpleañeros_del_mes, interes_usuarios  |
-|   |   | Secretario: Encargado de agregar cupones | Views: edades_usuarios, cumpleañeros_del_mes Procedures: agregar_cupones |
+| rafaelrosado  | contrasena1  | Sociólogo  | Views: genero_usuarios, edades_usuarios |
+| micarod  | contrasena2  | Analista/Estratega de Marketing  | Views: calidad_mercadolibre, interes_usuarios, edades_usuarios  |
+| lupita  | contrasena3  | Banquero del Barrio: Es quien efectúa los pagos mediante depósito en el sistema   | Views: edades_usuarios Procedures: agregar_deposito  |
+| astridlopez  | contrasena4  | Talento Humano: Encargado de enviar un correo de felicitación a quienes cumplen años este mes  | Views: edades_usuarios, interes_usuarios  |
+| michaelpena  | contrasena5  | Secretario: Encargado de agregar cupones | Views: edades_usuarios, Procedures: agregar_cupones |
 
