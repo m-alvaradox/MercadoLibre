@@ -469,6 +469,69 @@ BEGIN
 END $$
 DELIMITER ;
 
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS crearPublicacion(IN DESCRIPCION VARCHAR(500), IN TIPOEXPOSICION varchar(50), 
+IN PRODUCTID int, IN IDVENDEDOR varchar(50), IN PRECIOVENTA float, IN ESTADO varchar(50),IN FECHAPUBLICACION date,
+IN NOMBREPUBLICACION VARCHAR(50), IN STOCK int)
+BEGIN
+
+    DECLARE v_id_publicacion INT;
+    DECLARE v_numero_filas INT;
+
+    START TRANSACTION;
+    -- Insertar datos
+    INSERT INTO PUBLICACION (DESCRIPCION,TIPOEXPOSICION, PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,FECHAPUBLICACION,
+        NOMBREPUBLICACION,STOCK)
+    VALUES(DESCRIPCION, TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,FECHAPUBLICACION,
+        NOMBREPUBLICACION,STOCK);
+
+    SET v_id_publicacion = LAST_INSERT_ID();
+
+    -- Obtener el número de filas afectadas
+    SELECT ROW_COUNT() INTO v_numero_filas;
+
+    -- Comprobar si se insertó al menos una fila
+    IF v_numero_filas = 1 THEN
+        -- Éxito: confirmar la transacción
+        COMMIT;
+        SELECT CONCAT('Inserción exitosa. Publicacion: ', v_id_publicacion) AS mensaje;
+    ELSE
+        -- Error: deshacer la transacción
+        ROLLBACK;
+        SELECT 'Error al insertar datos. Transacción deshecha.' AS mensaje;
+    END IF;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE IF NOT EXISTS registrarVisualizacion(IN USERID varchar(50), IN NOPUBLICACION int, IN FECHA date)
+BEGIN
+    DECLARE v_regid INT;
+    DECLARE v_numero_filas INT;
+    START TRANSACTION;
+    --Insertar datos
+    INSERT INTO visualizacion_publicaciones (USERID,NOPUBLICACION,FECHA) 
+    VALUES(USERID, NOPUBLICACION, FECHA);
+
+    SET v_id_regid = LAST_INSERT_ID();
+
+    -- Obtener el número de filas afectadas
+    SELECT ROW_COUNT() INTO v_numero_filas;
+
+    -- Comprobar si se insertó al menos una fila
+    IF v_numero_filas = 1 THEN
+        -- Éxito: confirmar la transacción
+        COMMIT;
+        SELECT CONCAT('Inserción exitosa. Publicacion: ', v_regid) AS mensaje;
+    ELSE
+        -- Error: deshacer la transacción
+        ROLLBACK;
+        SELECT 'Error al insertar datos. Transacción deshecha.' AS mensaje;
+    END IF;
+
+END $$
+DELIMITER;
+
 -- PROCEDURES PRUEBA
 DELIMITER $$
 CREATE PROCEDURE IF NOT EXISTS CAMBIAR_ESTADO_RECLAMO (IN RECLAMO_ID INT, IN NUEVO_ESTADO ENUM ('Abierto','Cerrado'))
@@ -546,9 +609,21 @@ SELECT genero,
 FROM usuario
 GROUP BY genero;
 
+CREATE OR REPLACE VIEW visualizacion_categoria AS
+SELECT Producto.categoria, 
+    CONCAT(ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM visualizacion_publicaciones)), 1), '%') as porcentaje
+FROM visualizacion_publicaciones LEFT JOIN  publicacion USING(NOPUBLICACION) JOIN Producto USING(PRODUCTID)
+GROUP BY Producto.categoria;
+
 -- INDICES
 ALTER TABLE PRODUCTO
 ADD INDEX idx_marca (marca);
+
+ALTER TABLE USUARIO
+ADD INDEX idx_nombre_usuario ON USUARIO(nombre);
+
+ALTER TABLE USUARIO
+ADD INDEX idx_apellido_usuario ON USUARIO(apellido);
 
 -- INSERCIONES
 INSERT INTO USUARIO (USERID, PASS, NOMBRE, APELLIDO, FECHANACIMIENTO, EMAIL, TELEFONO, GENERO) 
