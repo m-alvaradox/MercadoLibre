@@ -628,10 +628,72 @@ BEGIN
 END $$
 DELIMITER ;
 
+DELIMITER $$
+
+CREATE PROCEDURE IF NOT EXISTS AGREGAR_CUPON(IN IDCUPON INT, IN NOMBRE VARCHAR(10), IN DESCUENTO FLOAT, 
+IN FECHAVENCIMIENTO DATE, IN CLIENTEID VARCHAR(50), IN VECES INT)
+BEGIN
+
+    DECLARE v_numero_filas int;
+
+    START TRANSACTION;
+
+    INSERT INTO CUPON (ID, NOMBRE, DESCUENTO, FECHAVENCIMIENTO, CLIENTEID, VECES)
+    VALUES (IDCUPON, NOMBRE, DESCUENTO, FECHAVENCIMIENTO, CLIENTEID, VECES);
+
+    -- Obtener el número de filas afectadas
+    SELECT ROW_COUNT() INTO v_numero_filas;
+
+    -- Comprobar si se insertó al menos una fila
+    IF v_numero_filas = 1 THEN
+        -- Éxito: confirmar la transacción
+        COMMIT;
+        SELECT CONCAT('Inserción exitosa') AS mensaje;
+    ELSE
+        -- Error: deshacer la transacción
+        ROLLBACK;
+        SELECT 'Error al insertar datos. Transacción deshecha.' AS mensaje;
+    END IF;
+END $$
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE PROCEDURE IF NOT EXISTS AGREGAR_DEPOSITO(IN IDCLIENTE VARCHAR(50),IN MONTO FLOAT)
+BEGIN
+
+    DECLARE v_id_pago INT;
+    DECLARE v_numero_filas int;
+
+    START TRANSACTION;
+
+    INSERT INTO PAGO (METODO, MONTO, CUOTA, IDCLIENTE)
+    VALUES ('Depósito', MONTO, 1, IDCLIENTE);
+
+    SET v_id_pago = LAST_INSERT_ID();
+
+    -- Obtener el número de filas afectadas
+    SELECT ROW_COUNT() INTO v_numero_filas;
+
+    -- Comprobar si se insertó al menos una fila
+    IF v_numero_filas = 1 THEN
+        -- Éxito: confirmar la transacción
+        COMMIT;
+        SELECT CONCAT('Inserción exitosa. Pago: ', v_id_pago) AS mensaje;
+    ELSE
+        -- Error: deshacer la transacción
+        ROLLBACK;
+        SELECT 'Error al insertar datos. Transacción deshecha.' AS mensaje;
+    END IF;
+END $$
+DELIMITER ;
+
 -- Para llamar los SP
 -- CALL CAMBIAR_ESTADO_RECLAMO();
 -- CALL  CAMBIAR_TIPO_PUBLICACION();
 -- CALL CAMBIAR_ESTADO_ORDEN();
+-- CALL AGREGAR_CUPON();
+-- CALL AGREGAR_DEPOSITO();
 
 -- VISTAS
 CREATE OR REPLACE VIEW genero_usuarios AS
@@ -640,11 +702,53 @@ SELECT genero,
 FROM usuario
 GROUP BY genero;
 
-CREATE OR REPLACE VIEW visualizacion_categoria AS
+CREATE OR REPLACE VIEW interes_usuarios AS
 SELECT Producto.categoria, 
-    CONCAT(ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM visualizacion_publicaciones)), 1), '%') as porcentaje
+    CONCAT(ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM visualizacion_publicaciones)), 0), '%') as porcentaje
 FROM visualizacion_publicaciones LEFT JOIN  publicacion USING(NOPUBLICACION) JOIN Producto USING(PRODUCTID)
 GROUP BY Producto.categoria;
+
+CREATE OR REPLACE VIEW edades_usuarios AS
+SELECT
+    nombre,
+    apellido,
+    email,
+    fechanacimiento,
+    YEAR(CURDATE()) - YEAR(fechanacimiento) - (DATE_FORMAT(CURDATE(), '%m%d') < DATE_FORMAT(fechanacimiento, '%m%d')) AS edad_actual
+FROM
+    usuario;
+
+CREATE OR REPLACE VIEW usuarios_por_pais AS
+SELECT
+    nombrepais,
+    CONCAT(ROUND(((COUNT(*) / (SELECT COUNT(*) FROM usuario)) * 100),0),'%') AS porcentaje
+FROM
+    usuario join direccion using (userid) join ciudad on idciudad = cityid join provincia using (provid) join pais using (countryid)
+GROUP BY
+    nombrepais;
+
+
+CREATE OR REPLACE VIEW calidad_mercadolibre AS
+SELECT
+    ROUND((AVG(estrellasproducto)),2) AS promedio_estrellas_producto,
+    ROUND((AVG(estrellasvendedor)),2) AS promedio_estrellas_vendedor,
+    CASE
+        WHEN AVG(estrellasproducto) >= 0 AND AVG(estrellasproducto) < 2 THEN 'Muy mala'
+        WHEN AVG(estrellasproducto) >= 2 AND AVG(estrellasproducto) < 3 THEN 'Mala'
+        WHEN AVG(estrellasproducto) >= 3 AND AVG(estrellasproducto) < 4 THEN 'Regular'
+        WHEN AVG(estrellasproducto) >= 4 AND AVG(estrellasproducto) < 5 THEN 'Buena'
+        WHEN AVG(estrellasproducto) = 5 THEN 'Muy buena'
+    END AS calidad_producto,
+    CASE
+        WHEN AVG(estrellasvendedor) >= 0 AND AVG(estrellasvendedor) < 2 THEN 'Muy mala'
+        WHEN AVG(estrellasvendedor) >= 2 AND AVG(estrellasvendedor) < 3 THEN 'Mala'
+        WHEN AVG(estrellasvendedor) >= 3 AND AVG(estrellasvendedor) < 4 THEN 'Regular'
+        WHEN AVG(estrellasvendedor) >= 4 AND AVG(estrellasvendedor) < 5 THEN 'Buena'
+        WHEN AVG(estrellasvendedor) = 5 THEN 'Muy buena'
+    END AS calidad_vendedor
+FROM
+    orden;
+
 
 -- INDICES
 ALTER TABLE PRODUCTO
@@ -703,44 +807,44 @@ insert into DIRECCION (IDCIUDAD, USERID, PARROQUIA, REFERENCIAS) values
 (701,'malvaradox','Tarqui','La Vista Towers Edif. 8D 7A');
 
 insert into PRODUCTO (NOMBRE, MARCA, CATEGORIA, SUBCATEGORIA) values
-    ('GALAXY A70','SAMSUNG','TECNOLOGIA','SMARTPHONES'),
-    ('INSPIRON 3910','DELL','TECNOLOGIA','LAPTOPS'),
-    ('XXKIU','ACER','TECNOLOGIA','LAPTOPS'),
-    ('AIR FORCE 1','NIKE','DEPORTES','ZAPATILLAS'),
-    ('FORUM LOW','ADIDAS','DEPORTES','ZAPATILLAS'),
-    ('LEGO STAR WARS MILLENNIUM FALCON','LEGO','JUGUETES','ROMPECABEZAS'),
-    ('MESA','PYCCA','HOGAR','MUEBLES'),
-    ('IPHONE 15 PRO MAX','APPLE','TECNOLOGIA','SMARTPHONES'),
-    ('KIT DE FAROS LED PARA AUTO','PHILIPS','AUTOS','ACCESORIOS'),
-    ('CAMARA DE REVERSA CON PANTALLA','ANKER','AUTOS','ACCESORIOS'),
-    ('SISTEMA DE AUDIO PARA AUTO','JBL','AUTOS','ACCESORIOS'),
-    ('LEGO CREATOR 3 EN 1','LEGO','JUGUETES','ROMPECABEZAS');
+('GALAXY A70','SAMSUNG','TECNOLOGIA','SMARTPHONES'),
+('INSPIRON 3910','DELL','TECNOLOGIA','LAPTOPS'),
+('XXKIU','ACER','TECNOLOGIA','LAPTOPS'),
+('AIR FORCE 1','NIKE','DEPORTES','ZAPATILLAS'),
+('FORUM LOW','ADIDAS','DEPORTES','ZAPATILLAS'),
+('LEGO STAR WARS MILLENNIUM FALCON','LEGO','JUGUETES','ROMPECABEZAS'),
+('MESA','PYCCA','HOGAR','MUEBLES'),
+('IPHONE 15 PRO MAX','APPLE','TECNOLOGIA','SMARTPHONES'),
+('KIT DE FAROS LED PARA AUTO','PHILIPS','AUTOS','ACCESORIOS'),
+('CAMARA DE REVERSA CON PANTALLA','ANKER','AUTOS','ACCESORIOS'),
+('SISTEMA DE AUDIO PARA AUTO','JBL','AUTOS','ACCESORIOS'),
+('LEGO CREATOR 3 EN 1','LEGO','JUGUETES','ROMPECABEZAS');
     
-    INSERT INTO PUBLICACION(DESCRIPCION,TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,FECHAPUBLICACION,NOMBREPUBLICACION,STOCK) values
-    ('El Galaxy S23: lo último en tecnología móvil. Pantalla AMOLED de 6,1 pulgadas, procesador Snapdragon 8 Gen 2, cámara de 50MP.',
+INSERT INTO PUBLICACION(DESCRIPCION,TIPOEXPOSICION,PRODUCTID,IDVENDEDOR,PRECIOVENTA,ESTADO,FECHAPUBLICACION,NOMBREPUBLICACION,STOCK) values
+('El Galaxy S23: lo último en tecnología móvil. Pantalla AMOLED de 6,1 pulgadas, procesador Snapdragon 8 Gen 2, cámara de 50MP.',
     'Gratuita', 1,'ownyag',612.50,'Activa','2023-12-12','SAMSUNG GALAXY A70 SELLADO',4),
-    ('INSPIRON 3910: rendimiento y portabilidad. Procesador Intel Core i5 de 11.ª generación, pantalla de 15,6 pulgadas.',
+('INSPIRON 3910: rendimiento y portabilidad. Procesador Intel Core i5 de 11.ª generación, pantalla de 15,6 pulgadas.',
     'Gratuita',2,'malvaradox',800,'Activa','2022-10-23','DELL INSPIRON 3910 NUEVO',3),
-    ('La Nitro 5: rendimiento potente y diseño elegante. Procesador Intel Core i7 de 12.ª generación, tarjeta gráfica NVIDIA RTX 3060',
+('La Nitro 5: rendimiento potente y diseño elegante. Procesador Intel Core i7 de 12.ª generación, tarjeta gráfica NVIDIA RTX 3060',
     'Gratuita',3,'xavicam',250,'Activa','2019-11-11','XXXKIU DE OPORTUNIDAD',4),
-    ('Las Air Force 1: un clásico de la moda urbana. Diseño sencillo, comodidad inigualable.',
+('Las Air Force 1: un clásico de la moda urbana. Diseño sencillo, comodidad inigualable.',
     'Gratuita',4,'javirod',62.50,'Activa','2023-12-01','NKE AIR FORCE ONE',1),
-    ('Las Forum Low: versátiles y combinables. Diseño retro, estilo minimalista.', 'Gratuita',5,'angon',210,
+('Las Forum Low: versátiles y combinables. Diseño retro, estilo minimalista.', 'Gratuita',5,'angon',210,
     'Activa','2022-11-11','ADIDAS FORUM LOW',5),
-    ('El Millennium Falcon: el set de Lego más grande de la historia. 7541 piezas, nave espacial a escala 1:144.',
+('El Millennium Falcon: el set de Lego más grande de la historia. 7541 piezas, nave espacial a escala 1:144.',
     'Gratuita',6,'ferchon',34.50,'Activa','2023-11-14','MILLENNIUM FALCOM APROVECHA',3),
-    ('La mesa Pycca: sencilla y elegante. Diseño moderno, construcción resistente.',
+('La mesa Pycca: sencilla y elegante. Diseño moderno, construcción resistente.',
     'Gratuita',7,'jorgquij',15.60,'Activa','2023-10-10','MESA PYCCA PARA LA FAMILIA',10),
-    ('El iPhone 15 Pro Max: lo último en tecnología Apple. Pantalla OLED de 6,7 pulgadas, procesador A16 Bionic, cámara triple de 48MP.',
+('El iPhone 15 Pro Max: lo último en tecnología Apple. Pantalla OLED de 6,7 pulgadas, procesador A16 Bionic, cámara triple de 48MP.',
     'Gratuita',8,'arperez',1299.99,'Activa','2023-11-26','IPHONE 15 PRO MAX TRAIDA DESDE USA',5),
-    ('Los faros LED Philips: más visibilidad y seguridad. Iluminación potente y uniforme, diseño elegante.',
+('Los faros LED Philips: más visibilidad y seguridad. Iluminación potente y uniforme, diseño elegante.',
     'Gratuita',9,'fiotorres',11.23,'Activa','2022-11-13','FAROS LED PHILLIPS',3),
-    ('La cámara de reversa Anker: más seguridad al estacionar. Imágenes nítidas y claras, pantalla de 5 pulgadas.',
+('La cámara de reversa Anker: más seguridad al estacionar. Imágenes nítidas y claras, pantalla de 5 pulgadas.',
     'Gratuita',10,'daniroca',300,'Activa','2023-09-09','CAMARA REVERSA',8);
     
-    INSERT INTO VISUALIZACION_PUBLICACIONES (NOPUBLICACION,USERID,FECHA) VALUES
-	(1,'ownyag','2023-07-07'),(2,'malvaradox','2023-07-09'),(3,'xavicam','2023-07-12'),(4,'javirod','2023-07-15'),(5,'naybor','2023-08-16'),
-    (2,'luchoont','2023-07-28'),(7,'nickfigu','2023-08-01'),(7,'charlesrod','2023-08-07'),(3,'joelvill','2023-08-12'),(8,'angivel','2023-08-15');
+INSERT INTO VISUALIZACION_PUBLICACIONES (NOPUBLICACION,USERID,FECHA) VALUES
+(1,'ownyag','2023-07-07'),(2,'malvaradox','2023-07-09'),(3,'xavicam','2023-07-12'),(4,'javirod','2023-07-15'),(5,'naybor','2023-08-16'),
+(2,'luchoont','2023-07-28'),(7,'nickfigu','2023-08-01'),(7,'charlesrod','2023-08-07'),(3,'joelvill','2023-08-12'),(8,'angivel','2023-08-15');
     
 INSERT INTO PAGO(IDCLIENTE,MONTO,METODO,CARDNUMBER,CUOTA, FECHAPAGO) VALUES
 ('ownyag',210,'Depósito',null,1,'2023-12-26'),
@@ -750,11 +854,11 @@ INSERT INTO PAGO(IDCLIENTE,MONTO,METODO,CARDNUMBER,CUOTA, FECHAPAGO) VALUES
 ('naybor',980,'Depósito',null,1,'2023-12-13');
 
 INSERT INTO PREGUNTA (IDCLIENTE, IDVENDEDOR, NOPUBLICACION,  CONTENIDO, TIEMPOENVIADO, FECHAHORARESPUESTA, MENSAJERESPUESTA) VALUES
-  ('xavicam','arperez',8, '¿El producto incluye garantía?', '2023-12-07 21:30:00', '2023-12-07 21:40:00','Sí, todos nuestros productos tienen garantía de 1 año.'),
-  ('luchoont','malvaradox',2,'¿Acepta transferencias por PagoMovil?','2023-12-23 07:15:00','2023-12-23 09:40:00','No amigo, solo tarjetas de credito'),
-  ('nickfigu','malvaradox',2,'Tiene para colocar SIM fisico?','2023-12-23 10:10:10','2023-12-23 17:00:00','No, solo soporta ESIM que puede conseguir en Movistar'),
-  ('joelvill','javirod',4,'Son originales?','2024-01-02 12:35:21','2024-01-03 13:15:33','Si, por que no?'),
-  ('angivel','jorgquij',7,'Estan ubicados en Manta?','2023-12-27 12:00:00',NULL,NULL);
+('xavicam','arperez',8, '¿El producto incluye garantía?', '2023-12-07 21:30:00', '2023-12-07 21:40:00','Sí, todos nuestros productos tienen garantía de 1 año.'),
+('luchoont','malvaradox',2,'¿Acepta transferencias por PagoMovil?','2023-12-23 07:15:00','2023-12-23 09:40:00','No amigo, solo tarjetas de credito'),
+('nickfigu','malvaradox',2,'Tiene para colocar SIM fisico?','2023-12-23 10:10:10','2023-12-23 17:00:00','No, solo soporta ESIM que puede conseguir en Movistar'),
+('joelvill','javirod',4,'Son originales?','2024-01-02 12:35:21','2024-01-03 13:15:33','Si, por que no?'),
+('angivel','jorgquij',7,'Estan ubicados en Manta?','2023-12-27 12:00:00',NULL,NULL);
   
 INSERT INTO CUPON VALUES
 (4001,'DESCNAV',32,'2023-12-31','malvaradox',2),(4002,'DESCMAQ',35,'2024-02-15','xavicam',2),
@@ -777,3 +881,44 @@ INSERT INTO FACTURA (FECHA, DESCRIPCION, IDVENDEDOR, IDCLIENTE, IDORDEN) VALUES
 
 INSERT INTO TARJETA (NUMERO, MARCA, CVV, FECHAVENCIMIENTO, USERID) VALUES
 ('5144 2637 4859 47586','MASTERCARD','067','2025-01-01','malvaradox');
+
+-- DCL PERMISOS
+ 
+-- Usuario 1: Sociologo
+CREATE USER 'rafaelrosado'@'localhost' IDENTIFIED BY 'contrasena1';
+GRANT SELECT ON mercadolibre.edades_usuarios TO 'rafaelrosado'@'localhost';
+GRANT SELECT ON mercadolibre.genero_usuarios TO 'rafaelrosado'@'localhost';
+FLUSH PRIVILEGES;
+
+-- Usuario 2: Analista / Estratega de Marketing
+CREATE USER 'micarod'@'localhost' IDENTIFIED BY 'contrasena2';
+GRANT SELECT ON mercadolibre.calidad_mercadolibre TO 'micarod'@'localhost';
+GRANT SELECT ON mercadolibre.interes_usuarios TO 'micarod'@'localhost';
+GRANT SELECT ON mercadolibre.edades_usuarios TO 'micarod'@'localhost';
+FLUSH PRIVILEGES;
+
+-- Usuario 3: Banquero del barrio
+CREATE USER 'lupita'@'localhost' IDENTIFIED BY 'contrasena3';
+GRANT EXECUTE ON PROCEDURE mercadolibre.agregar_deposito TO 'lupita'@'localhost';
+GRANT SELECT ON mercadolibre.edades_usuarios TO 'lupita'@'localhost';
+FLUSH PRIVILEGES;
+
+-- Usuario 4: Talento Humano
+CREATE USER 'astridlopez'@'localhost' IDENTIFIED BY 'contrasena4';
+GRANT SELECT ON mercadolibre.interes_usuarios TO 'astridlopez'@'localhost';
+GRANT SELECT ON mercadolibre.edades_usuarios TO 'astridlopez'@'localhost';
+FLUSH PRIVILEGES;
+
+-- Usuario 5: Secretario
+CREATE USER 'michaelpena'@'localhost' IDENTIFIED BY 'contrasena5';
+GRANT EXECUTE ON PROCEDURE mercadolibre.agregar_cupon TO 'michaelpena'@'localhost';
+GRANT SELECT ON mercadolibre.edades_usuarios TO 'michaelpena'@'localhost';
+FLUSH PRIVILEGES;
+
+/* Eliminar usuarios
+DROP USER 'rafaelrosado'@'localhost';
+DROP USER 'micarod'@'localhost';
+DROP USER 'lupita'@'localhost';
+DROP USER 'astridlopez'@'localhost';
+DROP USER 'michaelpena'@'localhost';
+*/
