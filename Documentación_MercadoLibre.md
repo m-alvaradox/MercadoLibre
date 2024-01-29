@@ -35,12 +35,12 @@ Sistema: Mercado Libre
 | ACTUALIZAR_CUENTA  |   |
 | CANCELAR_CUENTA  |   |
 | registrarProducto  |   |
-| crearPublicacion  |   |
+| crearPublicacion  | descripcion, tipoexposicion, productid, idvendedor, precioventa, nombrepublicacion, stock  |
 | MODIFICAR_PUBLICACION  |   |
 | ELIMINAR_PUBLICACION  |   |
 | ENVIAR_PREGUNTA |   |
 | RESPONDER_PREGUNTA  |   |
-| registrarVisualizacion  |   |
+| registrarVisualizacion  | userid, nopublicacion  |
 | REALIZARCOMPRA  |  cupon, idproducto, idpago, cantidadproducto, idpublicacion, idcliente, idvendedor, importe, iddireccion, costoenvio, fechaentrega |
 | CALIFICARCOMPRA  | estrellasproducto, estrellasvendedor, comentario,  idOrden |
 | NUEVADIRECCION  | parroquia, referencias, idCiudad, userid  |
