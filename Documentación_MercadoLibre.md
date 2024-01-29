@@ -34,11 +34,11 @@ Sistema: Mercado Libre
 | CREARCUENTA  | usuario, password, nombre, apellido, fechanacimiento, email, telefono, genero  |
 | ACTUALIZAR_CUENTA  |   |
 | CANCELAR_CUENTA  |   |
-| registrarProducto  |   |
+| registrarProducto  | nombre, marca, categoria, subcategoria |
 | crearPublicacion  | descripcion, tipoexposicion, productid, idvendedor, precioventa, nombrepublicacion, stock  |
 | MODIFICAR_PUBLICACION  |   |
 | ELIMINAR_PUBLICACION  |   |
-| ENVIAR_PREGUNTA |   |
+| ENVIAR_PREGUNTA | idCliente, vendedor, publicacion, mensaje |
 | RESPONDER_PREGUNTA  |   |
 | registrarVisualizacion  | userid, nopublicacion  |
 | REALIZARCOMPRA  |  cupon, idproducto, idpago, cantidadproducto, idpublicacion, idcliente, idvendedor, importe, iddireccion, costoenvio, fechaentrega |
@@ -59,7 +59,7 @@ Sistema: Mercado Libre
 | idx_marca  | Producto | marca  | Agregue este indice porque las personas queremos identificar un producto directamente por la marca, por lo que ahorrariamos buscar en todas las filas la marca cuando podemos establecer este indice que nos lleve directo haciendo mas eficaz el tiempo de ejecucion del query |
 | idx_nombre_usuario  | Usuario  | nombre   | Agregado con el objetivo de agilizar el tiempo de consulta para el filtrado de usuario donde en la mayoria de los casos, buscaremos mostrar su nombre, accion que es utilizada frecuentemente en nuestro diseño de la aplicacion |
 | idx_apellido_usuario  | Usuario  | apellido  | Agregado con el objetivo de agilizar el tiempo de consulta para el filtrado de usuario que al igual que el indice por nombre, casi siempre buscaremos mostrar el apellido del cliente |
-|   | Ciudad  | nombreciudad  |  |
+| idx_nombre_ciudad  | Ciudad  | nombreciudad  | La razón por la que se creó el índice previo es debido a que es importante optimizar la búsqueda a partir de las distintas ciudades. Especialmente cuando se trata de una ṕagina en la que se realiza una compra-venta desde y hasta una variedad de lugares. |
 |   | Pais  | nombrepais  |  |
 
 
