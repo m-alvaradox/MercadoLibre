@@ -32,14 +32,14 @@ Sistema: Mercado Libre
 | Nombre   | Parámetros   |
 | ------------ | ------------ |
 | CREARCUENTA  | usuario, password, nombre, apellido, fechanacimiento, email, telefono, genero  |
-| ACTUALIZAR_CUENTA  |   |
-| CANCELAR_CUENTA  |   |
+| ACTUALIZAR_CUENTA  | IDUSUARIO, DATO_ACTUALIZAR, NUEVO_DATO  |
+| CANCELAR_CUENTA  | IDUSUARIO |
 | registrarProducto  | nombre, marca, categoria, subcategoria |
 | crearPublicacion  | descripcion, tipoexposicion, productid, idvendedor, precioventa, nombrepublicacion, stock  |
-| MODIFICAR_PUBLICACION  |   |
-| ELIMINAR_PUBLICACION  |   |
+| MODIFICAR_PUBLICACION  |  IDPUBLICACION, CAMPO, NUEVO_VALOR |
+| ELIMINAR_PUBLICACION  | IDPUBLICACION  |
 | ENVIAR_PREGUNTA | idCliente, vendedor, publicacion, mensaje |
-| RESPONDER_PREGUNTA  |   |
+| RESPONDER_PREGUNTA  | PREGUNTAID, RESPUESTA  |
 | registrarVisualizacion  | userid, nopublicacion  |
 | REALIZARCOMPRA  |  cupon, idproducto, idpago, cantidadproducto, idpublicacion, idcliente, idvendedor, importe, iddireccion, costoenvio, fechaentrega |
 | CALIFICARCOMPRA  | estrellasproducto, estrellasvendedor, comentario,  idOrden |
@@ -60,7 +60,7 @@ Sistema: Mercado Libre
 | idx_nombre_usuario  | Usuario  | nombre   | Agregado con el objetivo de agilizar el tiempo de consulta para el filtrado de usuario donde en la mayoria de los casos, buscaremos mostrar su nombre, accion que es utilizada frecuentemente en nuestro diseño de la aplicacion |
 | idx_apellido_usuario  | Usuario  | apellido  | Agregado con el objetivo de agilizar el tiempo de consulta para el filtrado de usuario que al igual que el indice por nombre, casi siempre buscaremos mostrar el apellido del cliente |
 | idx_nombre_ciudad  | Ciudad  | nombreciudad  | La razón por la que se creó el índice previo es debido a que es importante optimizar la búsqueda a partir de las distintas ciudades. Especialmente cuando se trata de una ṕagina en la que se realiza una compra-venta desde y hasta una variedad de lugares. |
-|   | Pais  | nombrepais  |  |
+| idx_nombre_pais  | Pais  | nombrepais  |  En una aplicacion como mercado libre es muy importante el país, por lo que cada busqueda o uso en el sistema será optimizado al crear un indice de la tabla país |
 
 
 ### Control y Seguridad (DCL) <a name="id5"></a>
