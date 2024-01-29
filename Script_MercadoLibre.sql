@@ -563,6 +563,39 @@ BEGIN
 END $$
 DELIMITER;
 
+DELIMITER //
+CREATE PROCEDURE AskQuestion(IN idCliente VARCHAR(50), IN vendedor VARCHAR(50), IN publicacion INT, IN mensaje VARCHAR(50))
+BEGIN
+    DECLARE v_question_id INT;
+    DECLARE v_numero_filas INT;
+
+    START TRANSACTION;
+    -- Insertar datos
+
+    INSERT INTO PREGUNTA (CONTENIDO, IDCLIENTE, IDVENDEDOR, NOPUBLICACION) 
+    VALUES (mensaje, idCliente, vendedor, publicacion);
+
+
+    SET v_question_id = LAST_INSERT_ID();
+    
+    -- Obtener el número de filas afectadas
+    SELECT ROW_COUNT() INTO v_numero_filas;
+    
+    -- Comprobar si se insertó al menos una fila
+    IF v_numero_filas = 1 THEN
+        -- Éxito: confirmar la transacción
+        COMMIT;
+        SELECT CONCAT('Inserción exitosa. Pregunta: ', v_question_id) AS mensaje;
+    ELSE
+        -- Error: deshacer la transacción
+        ROLLBACK;
+        SELECT 'Error al insertar datos. Transacción deshecha.' AS mensaje;
+    END IF;
+    
+END //
+DELIMITER ;
+
+
 -- PROCEDURES PRUEBA
 DELIMITER $$
 CREATE PROCEDURE IF NOT EXISTS CAMBIAR_ESTADO_RECLAMO (IN RECLAMO_ID INT, IN NUEVO_ESTADO ENUM ('Abierto','Cerrado'))
@@ -759,6 +792,9 @@ ADD INDEX idx_nombre_usuario (nombre);
 
 ALTER TABLE USUARIO
 ADD INDEX idx_apellido_usuario (apellido);
+
+ALTER TABLE CIUDAD
+ADD INDEX idx_nombre_ciudad (NOMBRECIUDAD);
 
 -- INSERCIONES
 INSERT INTO USUARIO (USERID, PASS, NOMBRE, APELLIDO, FECHANACIMIENTO, EMAIL, TELEFONO, GENERO) 

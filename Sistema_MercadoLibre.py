@@ -1541,9 +1541,9 @@ def realizarPregunta(pub,user):
 
    cur.execute("SELECT IDVENDEDOR FROM PUBLICACION WHERE NOPUBLICACION = "+pub+"")
    vendedor = cur.fetchone()[0]
-   cur.execute("INSERT INTO PREGUNTA (CONTENIDO, IDCLIENTE, IDVENDEDOR, NOPUBLICACION) VALUES (%s, %s, %s, %s)", (mensaje, user, vendedor, pub))
-   mercadolibreconnection.commit()
-   
+
+   args = user, vendedor, pub, mensaje
+   cur.callproc("AskQuestion", args)
    limpiarPantalla()
    print("La pregunta ha sido enviada correctamente.")
    print("Muchas gracias por su tiempo, esperamos que sus dudas sean resueltas lo mas pronto posible.\nAdios.")
