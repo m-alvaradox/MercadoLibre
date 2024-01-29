@@ -895,7 +895,7 @@ def generarOrden(nopublicacion, user):
       cur.execute("INSERT INTO PAGO (METODO, MONTO, CUOTA, CARDNUMBER, IDCLIENTE) VALUES ('"+metod+"',"+str(importe)+","+str(cuota)+",'"+creditcard+"','"+user+"')") #espero SP Xavier
       cur.execute("SELECT LAST_INSERT_ID()")
       transid = cur.fetchone()[0]
-      mercadolibreconnection.commit()
+      #mercadolibreconnection.commit()
 
 
     print("\n--- Transaccion valida")
