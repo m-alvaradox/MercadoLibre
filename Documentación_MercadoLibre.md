@@ -12,7 +12,7 @@ Sistema: Mercado Libre
 
 ### Data Definition Language (DDL)
 
-#### Triggers (Disparadores) `<a name="id1"></a>`
+#### Triggers (Disparadores) <a name="id1"></a>
 
 | Nombre                        | Evento | Tabla       | Tiempo | Descripción                                                                                             |
 | ----------------------------- | ------ | ----------- | ------ | -------------------------------------------------------------------------------------------------------- |
@@ -22,7 +22,7 @@ Sistema: Mercado Libre
 | NUEVOCLIENTE                  | INSERT | USUARIO     | AFTER  | Todo nuevo usuario es considerado cliente                                                                |
 | NUEVOVENDEDOR                 | INSERT | PUBLICACION | BEFORE | El usuario se convierte en vendedor cuando realiza por primera vez una publicación                      |
 
-#### Views (Reportes) `<a name="id2"></a>`
+#### Views (Reportes) <a name="id2"></a>
 
 | Nombre               | Descripción                                                                                                                                                                                                                                                                             |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -32,7 +32,7 @@ Sistema: Mercado Libre
 | INTERES_USUARIOS     | Define un porcentaje en base a las visualizaciones de productos por categoría                                                                                                                                                                                                           |
 | CALIDAD_MERCADOLIBRE | Estima la credibilidad del sistema de Mercado Libre a través de una vista que mostrará el promedio de todas las estrellas producto y vendedor de todas la órdenes. Además, a través de condiciones se mostrará la calidad del servicio (Muy mala, Mala, Regular, Buena, Muy Buena) |
 
-#### Stored Procedures (Procedimientos) `<a name="id3"></a>`
+#### Stored Procedures (Procedimientos) <a name="id3"></a>
 
 | Nombre                 | Parámetros                                                                                                                       |
 | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
@@ -55,7 +55,7 @@ Sistema: Mercado Libre
 | AGREGAR_CUPON          | IDCUPON, NOMBRE, DESCUENTO, FECHAVENCIMIENTO, CLIENTEID, VECES                                                                    |
 | AGREGAR_DEPOSITO       | IDCLIENTE, MONTO                                                                                                                  |
 
-#### Índices `<a name="id4"></a>`
+#### Índices <a name="id4"></a>
 
 | Índice              | Tabla    | Columnas     | Justificación                                                                                                                                                                                                                                                                  |
 | -------------------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -65,7 +65,7 @@ Sistema: Mercado Libre
 | idx_nombre_ciudad    | Ciudad   | nombreciudad | La razón por la que se creó el índice previo es debido a que es importante optimizar la búsqueda a partir de las distintas ciudades. Especialmente cuando se trata de una ṕagina en la que se realiza una compra-venta desde y hasta una variedad de lugares.              |
 | idx_nombre_pais      | Pais     | nombrepais   | En una aplicacion como mercado libre es muy importante el país, por lo que cada busqueda o uso en el sistema será optimizado al crear un indice de la tabla país                                                                                                             |
 
-### Control y Seguridad (DCL) `<a name="id5"></a>`
+### Control y Seguridad (DCL) <a name="id5"></a>
 
 | Usuario      | Contraseña | Descripción                                                                                    | Permisos                                                       |
 | ------------ | ----------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
