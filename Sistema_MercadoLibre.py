@@ -1448,22 +1448,14 @@ def actualizarUsuario(user):
              limpiarPantalla()
              return
           
-          
-    try:
-        cur.execute("UPDATE USUARIO SET " + dato.upper()+ "= %s WHERE USERID = %s",(newvalue,user))
-        mercadolibreconnection.commit()
+    cur.callproc("ACTUALIZAR_CUENTA",[user,dato,newvalue])
+    limpiarPantalla()
+    print("¡Su " + dato +" ha sido cambiado con éxito!")
 
-        limpiarPantalla()
-        print("¡Su " + dato +" ha sido cambiado con éxito!")
-
-        if dato == "userid":
-           return newvalue
-        else:
-           return None
-
-    except Exception as e:
-        print(f"Error: {e}")
-    cur.close()
+    if dato == "userid":
+      return newvalue
+    else:
+       return None
 
 def eliminarUsuario(user):
     print("--- ELIMINAR CUENTA "+user+" ---")
@@ -1471,21 +1463,13 @@ def eliminarUsuario(user):
     
     validacion = input("¿Está seguro que quiere eliminar su cuenta?\n¡Esta acción no se puede revertir!\nEscriba 'si' para confirmar\nENTER para SALIR\n")
     if validacion.lower() == "si":
-        try:
-            print("Eliminando usuario...")
-            mercadolibreconnection.begin()
-            cur.execute("DELETE FROM USUARIO WHERE USERID = '"+ user +"';") 
-            mercadolibreconnection.commit()
-            
+      print("Eliminando usuario...")
+      cur.callproc("CANCELAR_CUENTA",[user])
+      limpiarPantalla()
+      print("¡Usuario eliminado con éxito!")
+      print("Vuelve pronto :), estamos para servirte!")
+      return None
 
-            limpiarPantalla()
-            print("¡Usuario eliminado con éxito!")
-            print("Vuelve pronto :), estamos para servirte!")
-            return None
-
-        except Exception as e:
-            print(f"Error: {e}")
-            mercadolibreconnection.rollback()
     else:
         limpiarPantalla()
         print("Acción cancelada")
@@ -1581,10 +1565,8 @@ def responderpregunta(userid):
             print("¡ID no encontrado!")
             preg = input("Seleccione el id de la pregunta que desea responder: \n")
         newrespuesta = input("Escriba su respuesta: \n")
-        cur.execute("UPDATE PREGUNTA SET MENSAJERESPUESTA = '"+newrespuesta+"' where idpregunta = "+preg+";")
-        cur.execute("UPDATE PREGUNTA SET FECHAHORARESPUESTA = NOW() where idpregunta = "+preg+";")
+        cur.callproc("RESPONDER_PREGUNTA",[preg,newrespuesta])
         responder = input("¿Desea responder otro comentario?\nSI/NO\n").lower()
-        mercadolibreconnection.commit()
 
 def verReclamos(userid):
     print("")
@@ -1680,19 +1662,13 @@ def editarPublicacion(idPublicacion):
         elif campoNumero == "5":
             campo = 'stock'
         valor = input("Escriba el nuevo valor\n")
-        cur.execute("UPDATE PUBLICACION SET "+campo+" = '"+valor+"' where nopublicacion = " + str(idPublicacion))
+        cur.callproc("EDITAR_PUBLICACION", [idPublicacion,campo,valor])
         campoNumero = input("Seleccione el campo que desee modificar:\n1 = Producto -- 2 = Descripcion -- 3 = Precio -- 4 = Estado -- 5 = Stock \nPresione otra tecla para volver\n")
-    mercadolibreconnection.commit()
     print("¡Datos actualizados correctamente!")
 
 def eliminarPublicacion(idpublicacion):
-    try:
-        mercadolibreconnection.begin()
-        cur.execute("delete from publicacion where nopublicacion = "+str(idpublicacion)+";")
-        mercadolibreconnection.commit()
-    except Exception as e:
-        print(f"Error{e}")
-        mercadolibreconnection.rollback()
+   #cur.execute("delete from publicacion where nopublicacion = "+str(idpublicacion)+";")
+   cur.callproc("ELIMINAR_PUBLICACION",[idpublicacion])
 
 def gestionarPublicaciones(userid):
     cur.execute("SELECT NOPUBLICACION FROM PUBLICACION WHERE IDVENDEDOR = '" + userid + "';")
