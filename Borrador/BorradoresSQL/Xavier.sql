@@ -200,3 +200,7 @@ BEGIN
     END IF;
 END //
 DELIMITER ;
+
+CREATE INDEX idx_nombre_ciudad ON CIUDAD(NOMBRECIUDAD);
+--La razón por la que se creó el índice previo es debido a que es importante optimizar la búsqueda a partir de las distintas ciudades.
+--Especialmente cuando se trata de una ṕagina en la que se realiza una compra-venta desde y hasta una variedad de lugares.
