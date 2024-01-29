@@ -57,8 +57,8 @@ Sistema: Mercado Libre
 | Índice  | Tabla   | Columnas  | Justificación
 | ------------ | ------------ | ------------ | ------------ |
 | idx_marca  | Producto | marca  | Agregue este indice porque las personas queremos identificar un producto directamente por la marca, por lo que ahorrariamos buscar en todas las filas la marca cuando podemos establecer este indice que nos lleve directo haciendo mas eficaz el tiempo de ejecucion del query |
-|   | Usuario  | nombre   |  |
-|   | Usuario  | apellido  |  |
+| idx_nombre_usuario  | Usuario  | nombre   | Agregado con el objetivo de agilizar el tiempo de consulta para el filtrado de usuario donde en la mayoria de los casos, buscaremos mostrar su nombre, accion que es utilizada frecuentemente en nuestro diseño de la aplicacion |
+| idx_apellido_usuario  | Usuario  | apellido  | Agregado con el objetivo de agilizar el tiempo de consulta para el filtrado de usuario que al igual que el indice por nombre, casi siempre buscaremos mostrar el apellido del cliente |
 |   | Ciudad  | nombreciudad  |  |
 |   | Pais  | nombrepais  |  |
 
