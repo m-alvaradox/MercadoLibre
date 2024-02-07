@@ -34,13 +34,6 @@ Importar
 
 - Para manejar la base de datos, debe poseer un IDE  (MySQL Workbench, MariaDB, etc...)
 
-##### Servidor de la base de datos de Mercado Libre (Microsoft Azure)
-
-<!--sec data-title="Prompt: Windows" data-id="windows_prompt2" data-collapse=true ces-->
-
-    host="servergroup3.mysql.database.azure.com"
-
-<!--endsec-->
 
 ## **Menú Principal** <a name="id2"></a>
 ### Menú Invitado
