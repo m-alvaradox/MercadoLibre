@@ -1,5 +1,5 @@
 # Mercado Libre
-Proyecto de Bases de Datos II PAO-2023
+Proyecto de Bases de Datos
 
 -- Grupo #3 --
 
