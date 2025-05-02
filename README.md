@@ -1,16 +1,4 @@
 # Mercado Libre
-Proyecto de Bases de Datos
-
--- Grupo #3 --
-
-**Integrantes**
-
-- Mario Alvarado
-- Xavier Camacho
-- Javier Rodriguez
-- Owuen Yagual
-
-****
 **Aplicación**
 
 [Sistema_MercadoLibre](https://github.com/m-alvaradox/MercadoLibre_G3/blob/main/Sistema_MercadoLibre.py)
